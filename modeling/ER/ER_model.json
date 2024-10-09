@@ -1,0 +1,467 @@
+{
+  "entities": [
+    {
+      "name": "Class type",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_class_type",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "name",
+          "primary": false,
+          "unique": true,
+          "nullable": false,
+          "type": null
+        }
+      ],
+      "transform": {
+        "x": 130.92929261140148,
+        "y": 124.05523989898984,
+        "width": 154.65625,
+        "height": 62.1875
+      }
+    },
+    {
+      "name": "Fitness class",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_class",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "capacity",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "date",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "time",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ],
+      "transform": {
+        "x": -60.07070738859852,
+        "y": -60.94476010101016,
+        "width": 141.21875,
+        "height": 95.6875
+      }
+    },
+    {
+      "name": "Instructor",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_employee",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "name",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "surname",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "birth_date",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ],
+      "transform": {
+        "x": -286.0707073885985,
+        "y": -26.94476010101016,
+        "width": 148.34375,
+        "height": 95.6875
+      }
+    },
+    {
+      "name": "Room",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_room",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "max_capacity",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ],
+      "transform": {
+        "x": -196.07070738859852,
+        "y": 137.05523989898984,
+        "width": 130.03125,
+        "height": 62.1875
+      }
+    },
+    {
+      "name": "Trainees",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_trainee",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "email",
+          "primary": false,
+          "unique": true,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "name",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "surname",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ],
+      "transform": {
+        "x": 194.92929261140148,
+        "y": -81.94476010101016,
+        "width": 127.28125,
+        "height": 95.6875
+      }
+    }
+  ],
+  "relations": [
+    [
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null,
+        "name": "is of type",
+        "transform": {
+          "anchor": {
+            "x": 81.14804261140148,
+            "y": -3.6400726010101607,
+            "edge": 1
+          },
+          "points": [
+            {
+              "x": 134.03866761140148,
+              "y": 54.70758364898984
+            }
+          ],
+          "manual": false
+        }
+      },
+      {
+        "entity": "Class type",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 1,
+        "xor": null,
+        "name": null,
+        "transform": {
+          "anchor": {
+            "x": 175.92929261140148,
+            "y": 124.05523989898984,
+            "edge": 0
+          },
+          "points": [
+            {
+              "x": 134.03866761140148,
+              "y": 54.70758364898984
+            }
+          ],
+          "manual": false
+        }
+      }
+    ],
+    [
+      {
+        "entity": "Instructor",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null,
+        "name": "specialize in",
+        "transform": {
+          "anchor": {
+            "x": -245.07070738859852,
+            "y": 68.74273989898984,
+            "edge": 2
+          },
+          "points": [
+            {
+              "x": -245.07070738859852,
+              "y": 380.05523989898984
+            },
+            {
+              "x": -78.07070738859852,
+              "y": 380.05523989898984
+            }
+          ],
+          "manual": true
+        }
+      },
+      {
+        "entity": "Class type",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null,
+        "name": "relation",
+        "transform": {
+          "anchor": {
+            "x": 199.92929261140148,
+            "y": 186.24273989898984,
+            "edge": 2
+          },
+          "points": [
+            {
+              "x": 122.92929261140148,
+              "y": 251.05523989898984
+            },
+            {
+              "x": 111.92929261140148,
+              "y": 259.05523989898984
+            },
+            {
+              "x": -78.07070738859852,
+              "y": 380.05523989898984
+            }
+          ],
+          "manual": true
+        }
+      }
+    ],
+    [
+      {
+        "entity": "Instructor",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 1,
+        "xor": null,
+        "name": null,
+        "transform": {
+          "anchor": {
+            "x": -137.72695738859852,
+            "y": 20.89898989898984,
+            "edge": 1
+          },
+          "points": [
+            {
+              "x": -98.89883238859852,
+              "y": 3.8989898989898393
+            }
+          ],
+          "manual": false
+        }
+      },
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null,
+        "name": "lead",
+        "transform": {
+          "anchor": {
+            "x": -60.07070738859852,
+            "y": -13.10101010101016,
+            "edge": 3
+          },
+          "points": [
+            {
+              "x": -98.89883238859852,
+              "y": 3.8989898989898393
+            }
+          ],
+          "manual": false
+        }
+      }
+    ],
+    [
+      {
+        "entity": "Room",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null,
+        "name": null,
+        "transform": {
+          "anchor": {
+            "x": -66.03945738859852,
+            "y": 168.14898989898984,
+            "edge": 1
+          },
+          "points": [
+            {
+              "x": 32.44491761140148,
+              "y": 166.92242739898984
+            }
+          ],
+          "manual": false
+        }
+      },
+      {
+        "entity": "Class type",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null,
+        "name": "can be held in",
+        "transform": {
+          "anchor": {
+            "x": 130.92929261140148,
+            "y": 165.69586489898984,
+            "edge": 3
+          },
+          "points": [
+            {
+              "x": 32.44491761140148,
+              "y": 166.92242739898984
+            }
+          ],
+          "manual": false
+        }
+      }
+    ],
+    [
+      {
+        "entity": "Room",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 1,
+        "xor": null,
+        "name": null,
+        "transform": {
+          "anchor": {
+            "x": -131.05508238859852,
+            "y": 137.05523989898984,
+            "edge": 0
+          },
+          "points": [
+            {
+              "x": -89.56289488859852,
+              "y": 85.89898989898984
+            }
+          ],
+          "manual": false
+        }
+      },
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null,
+        "name": "are held in",
+        "transform": {
+          "anchor": {
+            "x": -48.07070738859852,
+            "y": 34.74273989898984,
+            "edge": 2
+          },
+          "points": [
+            {
+              "x": -89.56289488859852,
+              "y": 85.89898989898984
+            }
+          ],
+          "manual": false
+        }
+      }
+    ],
+    [
+      {
+        "entity": "Trainees",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null,
+        "name": "attend",
+        "transform": {
+          "anchor": {
+            "x": 194.92929261140148,
+            "y": -34.10101010101016,
+            "edge": 3
+          },
+          "points": [
+            {
+              "x": 138.03866761140148,
+              "y": -33.06194760101016
+            }
+          ],
+          "manual": false
+        }
+      },
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null,
+        "name": null,
+        "transform": {
+          "anchor": {
+            "x": 81.14804261140148,
+            "y": -32.02288510101016,
+            "edge": 1
+          },
+          "points": [
+            {
+              "x": 138.03866761140148,
+              "y": -33.06194760101016
+            }
+          ],
+          "manual": false
+        }
+      }
+    ]
+  ],
+  "notes": []
+}
