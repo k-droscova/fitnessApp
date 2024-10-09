@@ -1,0 +1,245 @@
+{
+  "entities": [
+    {
+      "name": "Class type",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_class_type",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "name",
+          "primary": false,
+          "unique": true,
+          "nullable": false,
+          "type": null
+        }
+      ]
+    },
+    {
+      "name": "Fitness class",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_class",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "capacity",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "date",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "time",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ]
+    },
+    {
+      "name": "Instructor",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_employee",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "birth_date",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "name",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "surname",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ]
+    },
+    {
+      "name": "Room",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_room",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "max_capacity",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ]
+    },
+    {
+      "name": "Trainees",
+      "parent": null,
+      "attr": [
+        {
+          "name": "id_trainee",
+          "primary": true,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "email",
+          "primary": false,
+          "unique": true,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "name",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        },
+        {
+          "name": "surname",
+          "primary": false,
+          "unique": false,
+          "nullable": false,
+          "type": null
+        }
+      ]
+    }
+  ],
+  "relations": [
+    [
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null
+      },
+      {
+        "entity": "Class type",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 1,
+        "xor": null
+      }
+    ],
+    [
+      {
+        "entity": "Instructor",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null
+      },
+      {
+        "entity": "Class type",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null
+      }
+    ],
+    [
+      {
+        "entity": "Instructor",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 1,
+        "xor": null
+      },
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null
+      }
+    ],
+    [
+      {
+        "entity": "Room",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null
+      },
+      {
+        "entity": "Class type",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null
+      }
+    ],
+    [
+      {
+        "entity": "Room",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 1,
+        "xor": null
+      },
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": false,
+        "cardinality": 0,
+        "xor": null
+      }
+    ],
+    [
+      {
+        "entity": "Trainees",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null
+      },
+      {
+        "entity": "Fitness class",
+        "identifying": false,
+        "optional": true,
+        "cardinality": 0,
+        "xor": null
+      }
+    ]
+  ],
+  "notes": []
+}
