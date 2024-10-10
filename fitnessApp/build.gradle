@@ -2,18 +2,59 @@ plugins {
     id 'java'
 }
 
-group = 'org.example'
+group = 'cz.cvut.fit.tjv.fitnessApp'
 version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 dependencies {
+    // JUnit for testing
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Spring Framework dependencies
+    implementation group: 'org.springframework', name: 'spring-context', version: '6.1.13'
+    implementation group: 'org.springframework', name: 'spring-core', version: '6.1.13'
+    implementation group: 'org.springframework', name: 'spring-beans', version: '6.1.13'
+
+    // Spring Data JPA (with Hibernate)
+    implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '3.1.2'
+
+    // Hibernate as JPA provider
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '6.2.7.Final'
+
+    // JPA API (explicitly added)
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
+    // H2 in-memory database
+    runtimeOnly group: 'com.h2database', name: 'h2', version: '2.2.224'
 }
 
 test {
     useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'cz.cvut.fit.tjv.fitnessApp.Main'
+        )
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    // Handle duplicate files
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    exclude "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA"
 }

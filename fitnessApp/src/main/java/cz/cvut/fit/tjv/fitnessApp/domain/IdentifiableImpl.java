@@ -11,10 +11,6 @@ public abstract class IdentifiableImpl<ID> implements Identifiable<ID> {
         return id;
     }
 
-    public void setId(ID id) {
-        this.id = id;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

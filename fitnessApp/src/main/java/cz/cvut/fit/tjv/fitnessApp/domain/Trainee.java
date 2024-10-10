@@ -1,16 +1,32 @@
 package cz.cvut.fit.tjv.fitnessApp.domain;
 
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 public class Trainee extends IdentifiableImpl<Integer> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_trainee")
+    private Integer id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String surname;
+
+    @ManyToMany(mappedBy = "trainees")
     private final Set<FitnessClass> classes = new HashSet<>();
 
-    public Trainee(Integer id, String email, String name, String surname) {
-        this.id = id;
+    public Trainee() {}
+
+    public Trainee(String email, String name, String surname) {
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -40,15 +56,21 @@ public class Trainee extends IdentifiableImpl<Integer> {
         this.surname = surname;
     }
 
-    public Set<FitnessClass> getClasses() {
+    public Set<FitnessClass> classesCopy() {
         return new HashSet<>(classes);
     }
 
     public void addFitnessClass(FitnessClass fitnessClass) {
-        this.classes.add(fitnessClass);
+        if (!this.classes.contains(fitnessClass)) {
+            this.classes.add(fitnessClass);
+            fitnessClass.addTrainee(this);
+        }
     }
 
     public void removeFitnessClass(FitnessClass fitnessClass) {
-        this.classes.remove(fitnessClass);
+        if (this.classes.contains(fitnessClass)) {
+            this.classes.remove(fitnessClass);
+            fitnessClass.removeTrainee(this);
+        }
     }
 }
