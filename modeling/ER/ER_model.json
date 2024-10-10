@@ -250,7 +250,7 @@
       {
         "entity": "Class type",
         "identifying": false,
-        "optional": false,
+        "optional": true,
         "cardinality": 0,
         "xor": null,
         "name": "relation",
@@ -350,7 +350,7 @@
       {
         "entity": "Class type",
         "identifying": false,
-        "optional": false,
+        "optional": true,
         "cardinality": 0,
         "xor": null,
         "name": "can be held in",
