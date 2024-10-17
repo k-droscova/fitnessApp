@@ -1,1 +1,8 @@
+# Dev Environment
+*.idea
 .DS_Store
+
+# Ignore H2 database files
+*.mv.db
+*.trace.db
+
