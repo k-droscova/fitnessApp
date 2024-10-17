@@ -1,13 +1,21 @@
 package cz.cvut.fit.tjv.fitnessApp.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
-import cz.cvut.fit.tjv.fitnessApp.respository.ClassTypeRepository;
-import cz.cvut.fit.tjv.fitnessApp.respository.CrudRepository;
+import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 
+@Service
 public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Integer> implements ClassTypeService {
-    private ClassTypeRepository classTypeRepository;
+
+    private final ClassTypeRepository classTypeRepository;
+
+    @Autowired
+    public ClassTypeServiceImpl(ClassTypeRepository classTypeRepository) {
+        this.classTypeRepository = classTypeRepository;
+    }
     @Override
-    protected CrudRepository<ClassType, Integer> getRepository() {
+    protected ClassTypeRepository getRepository() {
         return classTypeRepository;
     }
 }

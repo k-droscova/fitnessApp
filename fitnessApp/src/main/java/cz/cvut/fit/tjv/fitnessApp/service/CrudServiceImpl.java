@@ -1,12 +1,11 @@
 package cz.cvut.fit.tjv.fitnessApp.service;
 
 import cz.cvut.fit.tjv.fitnessApp.domain.Identifiable;
-import cz.cvut.fit.tjv.fitnessApp.respository.CrudRepository;
-
+import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 public abstract class CrudServiceImpl<T extends Identifiable<ID>, ID> implements CrudService<T, ID> {
-
+    protected abstract CrudRepository<T, ID> getRepository();
     @Override
     public T create(T entity) {
         if (getRepository().existsById(entity.getId())) {
@@ -28,7 +27,7 @@ public abstract class CrudServiceImpl<T extends Identifiable<ID>, ID> implements
     @Override
     public void update(ID id, T entity) {
         if (!getRepository().existsById(id)) {
-            return;
+            throw new IllegalArgumentException("Entity with ID " + id + " does not exist.");
         }
         getRepository().save(entity);
     }
@@ -40,5 +39,4 @@ public abstract class CrudServiceImpl<T extends Identifiable<ID>, ID> implements
         }
         getRepository().deleteById(id);
     }
-    protected abstract CrudRepository<T, ID> getRepository();
 }

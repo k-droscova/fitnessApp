@@ -22,15 +22,21 @@ public class Trainee extends IdentifiableImpl<Integer> {
     private String surname;
 
     @ManyToMany(mappedBy = "trainees")
-    private final Set<FitnessClass> classes = new HashSet<>();
+    private Set<FitnessClass> classes = new HashSet<>();
 
+    // Default constructor for JPA
     public Trainee() {}
 
-    public Trainee(String email, String name, String surname) {
+    // Constructor for testing or creating Trainee instances
+    public Trainee(Integer id, String email, String name, String surname, Set<FitnessClass> classes) {
+        this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
+        this.classes = classes != null ? classes : new HashSet<>();
     }
+
+    // Getters and setters
 
     public String getEmail() {
         return email;
@@ -56,21 +62,11 @@ public class Trainee extends IdentifiableImpl<Integer> {
         this.surname = surname;
     }
 
-    public Set<FitnessClass> classesCopy() {
-        return new HashSet<>(classes);
+    public Set<FitnessClass> getClasses() {
+        return classes;
     }
 
-    public void addFitnessClass(FitnessClass fitnessClass) {
-        if (!this.classes.contains(fitnessClass)) {
-            this.classes.add(fitnessClass);
-            fitnessClass.addTrainee(this);
-        }
-    }
-
-    public void removeFitnessClass(FitnessClass fitnessClass) {
-        if (this.classes.contains(fitnessClass)) {
-            this.classes.remove(fitnessClass);
-            fitnessClass.removeTrainee(this);
-        }
+    public void setClasses(Set<FitnessClass> classes) {
+        this.classes = classes;
     }
 }

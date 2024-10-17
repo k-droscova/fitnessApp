@@ -7,33 +7,48 @@ import java.util.Set;
 
 @Entity
 public class Instructor extends IdentifiableImpl<Integer> {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_employee")
     private Integer id;
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String surname;
+
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
+
     @ManyToMany
     @JoinTable(
             name = "instructor_specializations",  // The join table name
             joinColumns = @JoinColumn(name = "id_employee"),  // Instructor's foreign key column
             inverseJoinColumns = @JoinColumn(name = "id_class_type")  // ClassType's foreign key column
     )
-    private final Set<ClassType> specializations = new HashSet<>();
-    @OneToMany(mappedBy = "instructor")
-    private final Set<FitnessClass> classes = new HashSet<>();
+    private Set<ClassType> specializations = new HashSet<>();
 
-    public Instructor(String name, String surname, LocalDate birthDate) {
+    @OneToMany(mappedBy = "instructor")
+    private Set<FitnessClass> classes = new HashSet<>();
+
+    // Default constructor for JPA
+    public Instructor() {}
+
+    // Constructor for testing
+    public Instructor(Integer id, String name, String surname, LocalDate birthDate, Set<ClassType> specializations, Set<FitnessClass> classes) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.birthDate = birthDate;
+        this.specializations = specializations != null ? specializations : new HashSet<>();
+        this.classes = classes != null ? classes : new HashSet<>();
     }
 
-    public Instructor() {}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -59,38 +74,19 @@ public class Instructor extends IdentifiableImpl<Integer> {
         this.birthDate = birthDate;
     }
 
-    public Set<ClassType> specalizationsCopy() {
-        return new HashSet<>(specializations);
+    public Set<ClassType> getSpecializations() {
+        return specializations;
     }
 
-    public void addSpecialization(ClassType specialization) {
-        if (!this.specializations.contains((specialization))) {
-            this.specializations.add(specialization);
-            specialization.addInstructor(this);  // Synchronize the relationship on the ClassType side
-        }
+    public void setSpecializations(Set<ClassType> specializations) {
+        this.specializations = specializations;
     }
 
-    public void removeSpecialization(ClassType specialization) {
-        if (this.specializations.contains((specialization))) {
-            this.specializations.remove(specialization);
-            specialization.removeInstructor(this);
-        }
-    }
-    public Set<FitnessClass> classesCopy() {
-        return new HashSet<>(classes);
+    public Set<FitnessClass> getClasses() {
+        return classes;
     }
 
-    public void addFitnessClass(FitnessClass fitnessClass) {
-        if (!this.classes.contains(fitnessClass)) {  // Avoid circular call
-            this.classes.add(fitnessClass);
-            fitnessClass.setInstructor(this);  // Synchronize the relationship
-        }
-    }
-
-    public void removeFitnessClass(FitnessClass fitnessClass) {
-        if (this.classes.contains(fitnessClass)) {  // Avoid circular call
-            this.classes.remove(fitnessClass);
-            fitnessClass.removeInstructor();  // Break the relationship
-        }
+    public void setClasses(Set<FitnessClass> classes) {
+        this.classes = classes;
     }
 }

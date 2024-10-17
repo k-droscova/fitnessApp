@@ -13,17 +13,27 @@ public class ClassType extends IdentifiableImpl<Integer> {
     @Column(nullable = false, unique = true)
     private String name;
     @ManyToMany(mappedBy = "specializations")
-    private final Set<Instructor> instructors = new HashSet<>();
+    private Set<Instructor> instructors = new HashSet<>();
     @ManyToMany(mappedBy = "classTypes")
-    private final Set<Room> rooms = new HashSet<>();
-
+    private Set<Room> rooms = new HashSet<>();
     @OneToMany(mappedBy = "classType")
-    private final Set<FitnessClass> classes = new HashSet<>();
+    private Set<FitnessClass> classes = new HashSet<>();
 
     public ClassType(String name) {
         this.name = name;
     }
+    protected ClassType(Integer id, String name, Set<Instructor> instructors, Set<Room> rooms, Set<FitnessClass> classes) {
+        this.id = id;
+        this.name = name;
+        this.instructors = instructors;
+        this.rooms = rooms;
+        this.classes = classes;
+    }
+
     public ClassType() {}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -33,41 +43,15 @@ public class ClassType extends IdentifiableImpl<Integer> {
         this.name = name;
     }
 
-    public Set<Instructor> instructorsCopy() { return new HashSet<>(instructors); }
-
-    public void addInstructor(Instructor instructor) {
-        this.instructors.add(instructor);
-        instructor.addSpecialization(this);
+    public Set<Instructor> getInstructors() {
+        return instructors;
     }
 
-    public void removeInstructor(Instructor instructor) {
-        this.instructors.remove(instructor);
-        instructor.removeSpecialization(this);
+    public Set<Room> getRooms() {
+        return rooms;
     }
 
-    public Set<Room> roomsCopy() {
-        return new HashSet<>(rooms);
-    }
-
-    public void addRoom(Room room) {
-        this.rooms.add(room);
-        room.addClassType(this);
-    }
-
-    public void removeRoom(Room room) {
-        this.rooms.remove(room);
-        room.removeClassType(this);
-    }
-
-    public Set<FitnessClass> classesCopy() { return new HashSet<>(classes); }
-
-    public void addFitnessClass(FitnessClass fitnessClass) {
-        this.classes.add(fitnessClass);
-        fitnessClass.setClassType(this);
-    }
-
-    public void removeFitnessClass(FitnessClass fitnessClass) {
-        this.classes.remove(fitnessClass);
-        fitnessClass.setClassType(null);
+    public Set<FitnessClass> getClasses() {
+        return classes;
     }
 }

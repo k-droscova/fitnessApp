@@ -1,7 +1,6 @@
 package cz.cvut.fit.tjv.fitnessApp.service;
 
 import cz.cvut.fit.tjv.fitnessApp.domain.Identifiable;
-
 import java.util.Optional;
 
 public interface CrudService<T extends Identifiable<ID>, ID> {
