@@ -27,16 +27,10 @@ public class ClassTypeController {
 
     private final ClassTypeService classTypeService;
     private final ClassTypeMapper classTypeMapper;
-    private final InstructorMapper instructorMapper;
-    private final RoomMapper roomMapper;
-    private final FitnessClassMapper fitnessClassMapper;
 
-    public ClassTypeController(ClassTypeService classTypeService) {
+    public ClassTypeController(ClassTypeService classTypeService, ClassTypeMapper classTypeMapper) {
         this.classTypeService = classTypeService;
-        this.classTypeMapper = ClassTypeMapper.INSTANCE;
-        this.instructorMapper = InstructorMapper.INSTANCE;
-        this.roomMapper = RoomMapper.INSTANCE;
-        this.fitnessClassMapper = FitnessClassMapper.INSTANCE;
+        this.classTypeMapper = classTypeMapper;
     }
 
     @Operation(summary = "Create a new ClassType")
