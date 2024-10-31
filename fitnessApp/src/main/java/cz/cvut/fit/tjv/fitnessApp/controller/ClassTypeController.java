@@ -1,5 +1,10 @@
 package cz.cvut.fit.tjv.fitnessApp.controller;
 
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.ClassTypeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.mappers.ClassTypeMapper;
+import cz.cvut.fit.tjv.fitnessApp.controller.mappers.FitnessClassMapper;
+import cz.cvut.fit.tjv.fitnessApp.controller.mappers.InstructorMapper;
+import cz.cvut.fit.tjv.fitnessApp.controller.mappers.RoomMapper;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
@@ -21,9 +26,17 @@ import java.util.Set;
 public class ClassTypeController {
 
     private final ClassTypeService classTypeService;
+    private final ClassTypeMapper classTypeMapper;
+    private final InstructorMapper instructorMapper;
+    private final RoomMapper roomMapper;
+    private final FitnessClassMapper fitnessClassMapper;
 
     public ClassTypeController(ClassTypeService classTypeService) {
         this.classTypeService = classTypeService;
+        this.classTypeMapper = ClassTypeMapper.INSTANCE;
+        this.instructorMapper = InstructorMapper.INSTANCE;
+        this.roomMapper = RoomMapper.INSTANCE;
+        this.fitnessClassMapper = FitnessClassMapper.INSTANCE;
     }
 
     @Operation(summary = "Create a new ClassType")
