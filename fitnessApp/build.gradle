@@ -19,13 +19,15 @@ java {
 dependencies {
     // Spring Boot Starter for Core Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
     // Spring Boot Starter for Spring Data JPA (includes Hibernate)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    // Rest API
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
+    // Lombok for reducing boilerplate code
     implementation 'org.projectlombok:lombok:1.18.26'
+    // MapStruct for automatic mapping
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    // Rest API documentation
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
 
     // H2 in-memory database for testing
     runtimeOnly 'com.h2database:h2'
