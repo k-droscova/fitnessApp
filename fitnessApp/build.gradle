@@ -25,6 +25,7 @@ dependencies {
 
     // Rest API
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
+    implementation 'org.projectlombok:lombok:1.18.26'
 
     // H2 in-memory database for testing
     runtimeOnly 'com.h2database:h2'

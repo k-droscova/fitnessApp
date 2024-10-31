@@ -1,10 +1,17 @@
 package cz.cvut.fit.tjv.fitnessApp.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class ClassType extends IdentifiableImpl<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,30 +35,5 @@ public class ClassType extends IdentifiableImpl<Integer> {
         this.instructors = instructors;
         this.rooms = rooms;
         this.classes = classes;
-    }
-
-    public ClassType() {}
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Instructor> getInstructors() {
-        return instructors;
-    }
-
-    public Set<Room> getRooms() {
-        return rooms;
-    }
-
-    public Set<FitnessClass> getClasses() {
-        return classes;
     }
 }

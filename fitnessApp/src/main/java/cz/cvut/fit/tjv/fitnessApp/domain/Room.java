@@ -1,10 +1,17 @@
 package cz.cvut.fit.tjv.fitnessApp.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class Room extends IdentifiableImpl<Integer> {
 
     @Id
@@ -31,40 +38,10 @@ public class Room extends IdentifiableImpl<Integer> {
     )
     private Set<ClassType> classTypes = new HashSet<>();
 
-    // Default constructor for JPA
-    public Room() {}
-
-    // Constructor for creating Room instances
     public Room(Integer id, int maxCapacity, Set<FitnessClass> classes, Set<ClassType> classTypes) {
         this.id = id;
         this.maxCapacity = maxCapacity;
         this.classes = classes != null ? classes : new HashSet<>();
         this.classTypes = classTypes != null ? classTypes : new HashSet<>();
-    }
-
-    // Getter and Setter methods
-
-    public int getMaxCapacity() {
-        return maxCapacity;
-    }
-
-    public void setMaxCapacity(int maxCapacity) {
-        this.maxCapacity = maxCapacity;
-    }
-
-    public Set<FitnessClass> getClasses() {
-        return classes;
-    }
-
-    public void setClasses(Set<FitnessClass> classes) {
-        this.classes = classes;
-    }
-
-    public Set<ClassType> getClassTypes() {
-        return classTypes;
-    }
-
-    public void setClassTypes(Set<ClassType> classTypes) {
-        this.classTypes = classTypes;
     }
 }
