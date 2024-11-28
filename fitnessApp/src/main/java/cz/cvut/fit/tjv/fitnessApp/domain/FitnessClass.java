@@ -49,16 +49,4 @@ public class FitnessClass extends IdentifiableImpl<Integer> {
             inverseJoinColumns = @JoinColumn(name = "id_trainee")
     )
     private Set<Trainee> trainees = new HashSet<>();
-
-    // Constructor for testing
-    protected FitnessClass(Integer id, int capacity, LocalDate date, LocalTime time, Instructor instructor, Room room, ClassType classType, Set<Trainee> trainees) {
-        this.id = id;
-        this.capacity = capacity;
-        this.date = date;
-        this.time = time;
-        this.instructor = instructor;
-        this.room = room;
-        this.classType = classType;
-        this.trainees = trainees != null ? trainees : new HashSet<>();
-    }
 }

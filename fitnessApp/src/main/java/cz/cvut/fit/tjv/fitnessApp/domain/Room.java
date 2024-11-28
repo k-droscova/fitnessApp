@@ -37,11 +37,4 @@ public class Room extends IdentifiableImpl<Integer> {
             inverseJoinColumns = @JoinColumn(name = "id_class_type")  // Foreign key to ClassType
     )
     private Set<ClassType> classTypes = new HashSet<>();
-
-    public Room(Integer id, int maxCapacity, Set<FitnessClass> classes, Set<ClassType> classTypes) {
-        this.id = id;
-        this.maxCapacity = maxCapacity;
-        this.classes = classes != null ? classes : new HashSet<>();
-        this.classTypes = classTypes != null ? classTypes : new HashSet<>();
-    }
 }

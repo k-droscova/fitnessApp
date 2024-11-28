@@ -30,12 +30,4 @@ public class Trainee extends IdentifiableImpl<Integer> {
 
     @ManyToMany(mappedBy = "trainees")
     private Set<FitnessClass> classes = new HashSet<>();
-
-    public Trainee(Integer id, String email, String name, String surname, Set<FitnessClass> classes) {
-        this.id = id;
-        this.email = email;
-        this.name = name;
-        this.surname = surname;
-        this.classes = classes != null ? classes : new HashSet<>();
-    }
 }

@@ -39,13 +39,4 @@ public class Instructor extends IdentifiableImpl<Integer> {
 
     @OneToMany(mappedBy = "instructor")
     private Set<FitnessClass> classes = new HashSet<>();
-
-    public Instructor(Integer id, String name, String surname, LocalDate birthDate, Set<ClassType> specializations, Set<FitnessClass> classes) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.specializations = specializations != null ? specializations : new HashSet<>();
-        this.classes = classes != null ? classes : new HashSet<>();
-    }
 }

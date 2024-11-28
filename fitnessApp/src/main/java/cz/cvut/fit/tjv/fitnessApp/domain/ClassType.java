@@ -25,15 +25,4 @@ public class ClassType extends IdentifiableImpl<Integer> {
     private Set<Room> rooms = new HashSet<>();
     @OneToMany(mappedBy = "classType")
     private Set<FitnessClass> classes = new HashSet<>();
-
-    public ClassType(String name) {
-        this.name = name;
-    }
-    protected ClassType(Integer id, String name, Set<Instructor> instructors, Set<Room> rooms, Set<FitnessClass> classes) {
-        this.id = id;
-        this.name = name;
-        this.instructors = instructors;
-        this.rooms = rooms;
-        this.classes = classes;
-    }
 }

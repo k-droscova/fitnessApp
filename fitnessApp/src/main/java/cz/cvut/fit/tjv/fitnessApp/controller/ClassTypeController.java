@@ -1,15 +1,12 @@
 package cz.cvut.fit.tjv.fitnessApp.controller;
 
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.ClassTypeDto;
-import cz.cvut.fit.tjv.fitnessApp.controller.mappers.ClassTypeMapper;
-import cz.cvut.fit.tjv.fitnessApp.controller.mappers.FitnessClassMapper;
-import cz.cvut.fit.tjv.fitnessApp.controller.mappers.InstructorMapper;
-import cz.cvut.fit.tjv.fitnessApp.controller.mappers.RoomMapper;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.ClassTypeDto;
 import cz.cvut.fit.tjv.fitnessApp.service.ClassTypeService;
+import cz.cvut.fit.tjv.fitnessApp.service.mappers.ClassTypeMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,9 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/classtype")
@@ -39,8 +39,9 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PostMapping
-    public ClassType create(@RequestBody ClassType classType) {
-        return classTypeService.create(classType);
+    public ClassTypeDto create(@RequestBody ClassTypeDto classTypeDto) {
+        ClassType classType = classTypeMapper.convertToEntity(classTypeDto);
+        return classTypeMapper.convertToDto(classTypeService.create(classType));
     }
 
     @Operation(summary = "Update an existing ClassType by ID")
@@ -50,8 +51,9 @@ public class ClassTypeController {
     })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable Integer id, @RequestBody ClassType data) {
-        classTypeService.update(id, data);
+    public void update(@PathVariable Integer id, @RequestBody ClassTypeDto classTypeDto) {
+        ClassType classType = classTypeMapper.convertToEntity(classTypeDto);
+        classTypeService.update(id, classType);
     }
 
     @Operation(summary = "Retrieve all ClassTypes or search by name")
@@ -60,11 +62,15 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "400", description = "Invalid search query")
     })
     @GetMapping
-    public Iterable<ClassType> readAllOrByName(@RequestParam Optional<String> name) {
+    public List<ClassTypeDto> readAllOrByName(@RequestParam Optional<String> name) {
         if (name.isPresent()) {
-            return classTypeService.readAllByName(name.get());
+            Set<ClassType> classTypes = classTypeService.readAllByName(name.get());
+            return classTypeMapper.convertManyToDto(new ArrayList<>(classTypes));
         } else {
-            return classTypeService.readAll();
+            Iterable<ClassType> classTypes = classTypeService.readAll();
+            return classTypeMapper.convertManyToDto(
+                    StreamSupport.stream(classTypes.spliterator(), false).collect(Collectors.toList())
+            );
         }
     }
 
@@ -74,9 +80,10 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}")
-    public ClassType readById(@PathVariable Integer id) {
-        return classTypeService.readById(id).orElseThrow(() ->
+    public ClassTypeDto readById(@PathVariable Integer id) {
+        ClassType classType = classTypeService.readById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "ClassType not found"));
+        return classTypeMapper.convertToDto(classType);
     }
 
     @Operation(summary = "Delete a ClassType by ID")
@@ -100,8 +107,10 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}/instructors")
-    public Set<Instructor> getInstructorsByClassType(@PathVariable Integer id) {
-        return classTypeService.findInstructorsByClassType(id);
+    public Set<Integer> getInstructorsByClassType(@PathVariable Integer id) {
+        return classTypeService.findInstructorsByClassType(id).stream()
+                .map(Instructor::getId)
+                .collect(Collectors.toSet());
     }
 
     @Operation(summary = "Retrieve rooms by ClassType ID")
@@ -110,8 +119,10 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}/rooms")
-    public Set<Room> getRoomsByClassType(@PathVariable Integer id) {
-        return classTypeService.findRoomsByClassType(id);
+    public Set<Integer> getRoomsByClassType(@PathVariable Integer id) {
+        return classTypeService.findRoomsByClassType(id).stream()
+                .map(Room::getId)
+                .collect(Collectors.toSet());
     }
 
     @Operation(summary = "Retrieve fitness classes by ClassType ID")
@@ -120,7 +131,9 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}/fitness-classes")
-    public Set<FitnessClass> getFitnessClassesByClassType(@PathVariable Integer id) {
-        return classTypeService.findFitnessClassesByClassType(id);
+    public Set<Integer> getFitnessClassesByClassType(@PathVariable Integer id) {
+        return classTypeService.findFitnessClassesByClassType(id).stream()
+                .map(FitnessClass::getId)
+                .collect(Collectors.toSet());
     }
 }
