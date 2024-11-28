@@ -6,7 +6,6 @@ import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
 import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,21 +17,20 @@ public class RoomMapper implements EntityMapper<Room, RoomDto> {
 
     private final FitnessClassRepository fitnessClassRepository;
     private final ClassTypeRepository classTypeRepository;
-    private final ModelMapper modelMapper;
 
     public RoomMapper(FitnessClassRepository fitnessClassRepository,
-                      ClassTypeRepository classTypeRepository,
-                      ModelMapper modelMapper) {
+                      ClassTypeRepository classTypeRepository) {
         this.fitnessClassRepository = fitnessClassRepository;
         this.classTypeRepository = classTypeRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
     public Room convertToEntity(RoomDto roomDto) {
-        Room room = modelMapper.map(roomDto, Room.class);
+        Room room = new Room();
+        room.setId(roomDto.getId());
+        room.setMaxCapacity(roomDto.getMaxCapacity());
 
-        // Map FitnessClass IDs
+        // Map FitnessClass IDs to entities
         if (roomDto.getFitnessClassIds() != null) {
             Set<FitnessClass> classes = roomDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
@@ -41,7 +39,7 @@ public class RoomMapper implements EntityMapper<Room, RoomDto> {
             room.setClasses(classes);
         }
 
-        // Map ClassType IDs
+        // Map ClassType IDs to entities
         if (roomDto.getClassTypeIds() != null) {
             Set<ClassType> classTypes = roomDto.getClassTypeIds().stream()
                     .map(id -> classTypeRepository.findById(id)
@@ -55,7 +53,27 @@ public class RoomMapper implements EntityMapper<Room, RoomDto> {
 
     @Override
     public RoomDto convertToDto(Room room) {
-        return modelMapper.map(room, RoomDto.class);
+        RoomDto roomDto = new RoomDto();
+        roomDto.setId(room.getId());
+        roomDto.setMaxCapacity(room.getMaxCapacity());
+
+        // Map FitnessClass entities to IDs
+        if (room.getClasses() != null) {
+            Set<Integer> fitnessClassIds = room.getClasses().stream()
+                    .map(FitnessClass::getId)
+                    .collect(Collectors.toSet());
+            roomDto.setFitnessClassIds(fitnessClassIds);
+        }
+
+        // Map ClassType entities to IDs
+        if (room.getClassTypes() != null) {
+            Set<Integer> classTypeIds = room.getClassTypes().stream()
+                    .map(ClassType::getId)
+                    .collect(Collectors.toSet());
+            roomDto.setClassTypeIds(classTypeIds);
+        }
+
+        return roomDto;
     }
 
     @Override

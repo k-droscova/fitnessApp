@@ -10,7 +10,6 @@ import cz.cvut.fit.tjv.fitnessApp.repository.InstructorRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.RoomRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.TraineeRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,23 +23,24 @@ public class FitnessClassMapper implements EntityMapper<FitnessClass, FitnessCla
     private final RoomRepository roomRepository;
     private final ClassTypeRepository classTypeRepository;
     private final TraineeRepository traineeRepository;
-    private final ModelMapper modelMapper;
 
     public FitnessClassMapper(InstructorRepository instructorRepository,
                               RoomRepository roomRepository,
                               ClassTypeRepository classTypeRepository,
-                              TraineeRepository traineeRepository,
-                              ModelMapper modelMapper) {
+                              TraineeRepository traineeRepository) {
         this.instructorRepository = instructorRepository;
         this.roomRepository = roomRepository;
         this.classTypeRepository = classTypeRepository;
         this.traineeRepository = traineeRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
     public FitnessClass convertToEntity(FitnessClassDto fitnessClassDto) {
-        FitnessClass fitnessClass = modelMapper.map(fitnessClassDto, FitnessClass.class);
+        FitnessClass fitnessClass = new FitnessClass();
+        fitnessClass.setId(fitnessClassDto.getId());
+        fitnessClass.setCapacity(fitnessClassDto.getCapacity());
+        fitnessClass.setDate(fitnessClassDto.getDate());
+        fitnessClass.setTime(fitnessClassDto.getTime());
 
         // Map instructor ID
         if (fitnessClassDto.getInstructorId() != null) {
@@ -77,7 +77,36 @@ public class FitnessClassMapper implements EntityMapper<FitnessClass, FitnessCla
 
     @Override
     public FitnessClassDto convertToDto(FitnessClass fitnessClass) {
-        return modelMapper.map(fitnessClass, FitnessClassDto.class);
+        FitnessClassDto fitnessClassDto = new FitnessClassDto();
+        fitnessClassDto.setId(fitnessClass.getId());
+        fitnessClassDto.setCapacity(fitnessClass.getCapacity());
+        fitnessClassDto.setDate(fitnessClass.getDate());
+        fitnessClassDto.setTime(fitnessClass.getTime());
+
+        // Map instructor to ID
+        if (fitnessClass.getInstructor() != null) {
+            fitnessClassDto.setInstructorId(fitnessClass.getInstructor().getId());
+        }
+
+        // Map room to ID
+        if (fitnessClass.getRoom() != null) {
+            fitnessClassDto.setRoomId(fitnessClass.getRoom().getId());
+        }
+
+        // Map class type to ID
+        if (fitnessClass.getClassType() != null) {
+            fitnessClassDto.setClassTypeId(fitnessClass.getClassType().getId());
+        }
+
+        // Map trainees to IDs
+        if (fitnessClass.getTrainees() != null) {
+            Set<Integer> traineeIds = fitnessClass.getTrainees().stream()
+                    .map(Trainee::getId)
+                    .collect(Collectors.toSet());
+            fitnessClassDto.setTraineeIds(traineeIds);
+        }
+
+        return fitnessClassDto;
     }
 
     @Override

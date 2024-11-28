@@ -24,8 +24,6 @@ dependencies {
     // Lombok for reducing boilerplate code
     implementation 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
-    // Mapping
-    implementation 'org.modelmapper:modelmapper:3.1.0'
     // Rest API documentation
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
 

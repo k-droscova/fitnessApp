@@ -8,7 +8,6 @@ import cz.cvut.fit.tjv.fitnessApp.domain.Room;
 import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.InstructorRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.RoomRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,21 +20,20 @@ public class ClassTypeMapper implements EntityMapper<ClassType, ClassTypeDto> {
     private final InstructorRepository instructorRepository;
     private final RoomRepository roomRepository;
     private final FitnessClassRepository fitnessClassRepository;
-    private final ModelMapper modelMapper;
 
     public ClassTypeMapper(InstructorRepository instructorRepository,
                            RoomRepository roomRepository,
-                           FitnessClassRepository fitnessClassRepository,
-                           ModelMapper modelMapper) {
+                           FitnessClassRepository fitnessClassRepository) {
         this.instructorRepository = instructorRepository;
         this.roomRepository = roomRepository;
         this.fitnessClassRepository = fitnessClassRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
     public ClassType convertToEntity(ClassTypeDto classTypeDto) {
-        ClassType classType = modelMapper.map(classTypeDto, ClassType.class);
+        ClassType classType = new ClassType();
+        classType.setId(classTypeDto.getId());
+        classType.setName(classTypeDto.getName());
 
         // Map instructor IDs
         if (classTypeDto.getInstructorIds() != null) {
@@ -46,7 +44,7 @@ public class ClassTypeMapper implements EntityMapper<ClassType, ClassTypeDto> {
             classType.setInstructors(instructors);
         }
 
-        // Map rooms IDs
+        // Map room IDs
         if (classTypeDto.getRoomIds() != null) {
             Set<Room> rooms = classTypeDto.getRoomIds().stream()
                     .map(id -> roomRepository.findById(id)
@@ -55,7 +53,7 @@ public class ClassTypeMapper implements EntityMapper<ClassType, ClassTypeDto> {
             classType.setRooms(rooms);
         }
 
-        // Map fitness classes IDs
+        // Map fitness class IDs
         if (classTypeDto.getFitnessClassIds() != null) {
             Set<FitnessClass> fitnessClasses = classTypeDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
@@ -69,7 +67,35 @@ public class ClassTypeMapper implements EntityMapper<ClassType, ClassTypeDto> {
 
     @Override
     public ClassTypeDto convertToDto(ClassType classType) {
-        return modelMapper.map(classType, ClassTypeDto.class);
+        ClassTypeDto classTypeDto = new ClassTypeDto();
+        classTypeDto.setId(classType.getId());
+        classTypeDto.setName(classType.getName());
+
+        // Map instructor entities to IDs
+        if (classType.getInstructors() != null) {
+            Set<Integer> instructorIds = classType.getInstructors().stream()
+                    .map(Instructor::getId)
+                    .collect(Collectors.toSet());
+            classTypeDto.setInstructorIds(instructorIds);
+        }
+
+        // Map room entities to IDs
+        if (classType.getRooms() != null) {
+            Set<Integer> roomIds = classType.getRooms().stream()
+                    .map(Room::getId)
+                    .collect(Collectors.toSet());
+            classTypeDto.setRoomIds(roomIds);
+        }
+
+        // Map fitness class entities to IDs
+        if (classType.getClasses() != null) {
+            Set<Integer> fitnessClassIds = classType.getClasses().stream()
+                    .map(FitnessClass::getId)
+                    .collect(Collectors.toSet());
+            classTypeDto.setFitnessClassIds(fitnessClassIds);
+        }
+
+        return classTypeDto;
     }
 
     @Override

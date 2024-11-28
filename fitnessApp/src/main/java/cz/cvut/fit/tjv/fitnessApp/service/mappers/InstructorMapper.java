@@ -6,7 +6,6 @@ import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,21 +17,22 @@ public class InstructorMapper implements EntityMapper<Instructor, InstructorDto>
 
     private final ClassTypeRepository classTypeRepository;
     private final FitnessClassRepository fitnessClassRepository;
-    private final ModelMapper modelMapper;
 
     public InstructorMapper(ClassTypeRepository classTypeRepository,
-                            FitnessClassRepository fitnessClassRepository,
-                            ModelMapper modelMapper) {
+                            FitnessClassRepository fitnessClassRepository) {
         this.classTypeRepository = classTypeRepository;
         this.fitnessClassRepository = fitnessClassRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
     public Instructor convertToEntity(InstructorDto instructorDto) {
-        Instructor instructor = modelMapper.map(instructorDto, Instructor.class);
+        Instructor instructor = new Instructor();
+        instructor.setId(instructorDto.getId());
+        instructor.setName(instructorDto.getName());
+        instructor.setSurname(instructorDto.getSurname());
+        instructor.setBirthDate(instructorDto.getBirthDate());
 
-        // Map ClassType IDs
+        // Map ClassType IDs to entities
         if (instructorDto.getClassTypeIds() != null) {
             Set<ClassType> specializations = instructorDto.getClassTypeIds().stream()
                     .map(id -> classTypeRepository.findById(id)
@@ -41,7 +41,7 @@ public class InstructorMapper implements EntityMapper<Instructor, InstructorDto>
             instructor.setSpecializations(specializations);
         }
 
-        // Map FitnessClass IDs
+        // Map FitnessClass IDs to entities
         if (instructorDto.getFitnessClassIds() != null) {
             Set<FitnessClass> classes = instructorDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
@@ -55,7 +55,29 @@ public class InstructorMapper implements EntityMapper<Instructor, InstructorDto>
 
     @Override
     public InstructorDto convertToDto(Instructor instructor) {
-        return modelMapper.map(instructor, InstructorDto.class);
+        InstructorDto instructorDto = new InstructorDto();
+        instructorDto.setId(instructor.getId());
+        instructorDto.setName(instructor.getName());
+        instructorDto.setSurname(instructor.getSurname());
+        instructorDto.setBirthDate(instructor.getBirthDate());
+
+        // Map ClassType entities to IDs
+        if (instructor.getSpecializations() != null) {
+            Set<Integer> classTypeIds = instructor.getSpecializations().stream()
+                    .map(ClassType::getId)
+                    .collect(Collectors.toSet());
+            instructorDto.setClassTypeIds(classTypeIds);
+        }
+
+        // Map FitnessClass entities to IDs
+        if (instructor.getClasses() != null) {
+            Set<Integer> fitnessClassIds = instructor.getClasses().stream()
+                    .map(FitnessClass::getId)
+                    .collect(Collectors.toSet());
+            instructorDto.setFitnessClassIds(fitnessClassIds);
+        }
+
+        return instructorDto;
     }
 
     @Override

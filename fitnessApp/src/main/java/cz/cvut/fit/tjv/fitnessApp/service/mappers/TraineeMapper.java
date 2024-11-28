@@ -4,7 +4,6 @@ import cz.cvut.fit.tjv.fitnessApp.controller.dto.TraineeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
 import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,18 +14,20 @@ import java.util.stream.Collectors;
 public class TraineeMapper implements EntityMapper<Trainee, TraineeDto> {
 
     private final FitnessClassRepository fitnessClassRepository;
-    private final ModelMapper modelMapper;
 
-    public TraineeMapper(FitnessClassRepository fitnessClassRepository, ModelMapper modelMapper) {
+    public TraineeMapper(FitnessClassRepository fitnessClassRepository) {
         this.fitnessClassRepository = fitnessClassRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
     public Trainee convertToEntity(TraineeDto traineeDto) {
-        Trainee trainee = modelMapper.map(traineeDto, Trainee.class);
+        Trainee trainee = new Trainee();
+        trainee.setId(traineeDto.getId());
+        trainee.setEmail(traineeDto.getEmail());
+        trainee.setName(traineeDto.getName());
+        trainee.setSurname(traineeDto.getSurname());
 
-        // Map FitnessClass IDs
+        // Map FitnessClass IDs to entities
         if (traineeDto.getFitnessClassIds() != null) {
             Set<FitnessClass> classes = traineeDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
@@ -40,7 +41,21 @@ public class TraineeMapper implements EntityMapper<Trainee, TraineeDto> {
 
     @Override
     public TraineeDto convertToDto(Trainee trainee) {
-        return modelMapper.map(trainee, TraineeDto.class);
+        TraineeDto traineeDto = new TraineeDto();
+        traineeDto.setId(trainee.getId());
+        traineeDto.setEmail(trainee.getEmail());
+        traineeDto.setName(trainee.getName());
+        traineeDto.setSurname(trainee.getSurname());
+
+        // Map FitnessClass entities to IDs
+        if (trainee.getClasses() != null) {
+            Set<Integer> fitnessClassIds = trainee.getClasses().stream()
+                    .map(FitnessClass::getId)
+                    .collect(Collectors.toSet());
+            traineeDto.setFitnessClassIds(fitnessClassIds);
+        }
+
+        return traineeDto;
     }
 
     @Override
