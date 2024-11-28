@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -15,10 +15,10 @@ import java.util.Set;
 @AllArgsConstructor
 
 public class InstructorDto {
-    private Integer id;
+    private Long id;
     private String name;
     private String surname;
     private LocalDate birthDate;
-    private Set<Integer> classTypeIds = new HashSet<>();
-    private Set<Integer> fitnessClassIds = new HashSet<>();
+    private List<Long> classTypeIds = new ArrayList<>();
+    private List<Long> fitnessClassIds = new ArrayList<>();
 }

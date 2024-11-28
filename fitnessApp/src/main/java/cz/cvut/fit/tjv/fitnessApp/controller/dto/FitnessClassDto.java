@@ -7,8 +7,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -16,12 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 
 public class FitnessClassDto {
-    private Integer id;
+    private Long id;
     private int capacity;
     private LocalDate date;
     private LocalTime time;
-    private Integer instructorId;
-    private Integer roomId;
-    private Integer classTypeId;
-    private Set<Integer> traineeIds = new HashSet<>();
+    private Long instructorId;
+    private Long roomId;
+    private Long classTypeId;
+    private List<Long> traineeIds = new ArrayList<>();
 }

@@ -7,7 +7,7 @@ import cz.cvut.fit.tjv.fitnessApp.repository.RoomRepository;
 import org.springframework.data.repository.CrudRepository;
 
 @Service
-public class RoomServiceImpl extends CrudServiceImpl<Room, Integer> implements RoomService {
+public class RoomServiceImpl extends CrudServiceImpl<Room, Long> implements RoomService {
 
     private final RoomRepository roomRepository;
 
@@ -17,7 +17,7 @@ public class RoomServiceImpl extends CrudServiceImpl<Room, Integer> implements R
     }
 
     @Override
-    protected CrudRepository<Room, Integer> getRepository() {
+    protected CrudRepository<Room, Long> getRepository() {
         return roomRepository;
     }
 }

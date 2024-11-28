@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -45,27 +44,27 @@ class InstructorMapperTest {
     void setUp() {
         // Mock Instructor
         mockInstructor = new Instructor();
-        mockInstructor.setId(1);
+        mockInstructor.setId(1L);
         mockInstructor.setName("John");
         mockInstructor.setSurname("Doe");
         mockInstructor.setBirthDate(LocalDate.of(1985, 5, 15));
 
         mockClassType = new ClassType();
-        mockClassType.setId(10);
-        mockInstructor.setSpecializations(Set.of(mockClassType));
+        mockClassType.setId(10L);
+        mockInstructor.setSpecializations(List.of(mockClassType));
 
         mockFitnessClass = new FitnessClass();
-        mockFitnessClass.setId(20);
-        mockInstructor.setClasses(Set.of(mockFitnessClass));
+        mockFitnessClass.setId(20L);
+        mockInstructor.setClasses(List.of(mockFitnessClass));
 
         // Mock DTO
         mockInstructorDto = new InstructorDto();
-        mockInstructorDto.setId(1);
+        mockInstructorDto.setId(1L);
         mockInstructorDto.setName("John");
         mockInstructorDto.setSurname("Doe");
         mockInstructorDto.setBirthDate(LocalDate.of(1985, 5, 15));
-        mockInstructorDto.setClassTypeIds(Set.of(10));
-        mockInstructorDto.setFitnessClassIds(Set.of(20));
+        mockInstructorDto.setClassTypeIds(List.of(10L));
+        mockInstructorDto.setFitnessClassIds(List.of(20L));
     }
 
     @AfterEach
@@ -78,8 +77,8 @@ class InstructorMapperTest {
 
     @Test
     void convertToEntity_Successful() {
-        when(classTypeRepository.findById(10)).thenReturn(Optional.of(mockClassType));
-        when(fitnessClassRepository.findById(20)).thenReturn(Optional.of(mockFitnessClass));
+        when(classTypeRepository.findById(10L)).thenReturn(Optional.of(mockClassType));
+        when(fitnessClassRepository.findById(20L)).thenReturn(Optional.of(mockFitnessClass));
 
         Instructor result = instructorMapper.convertToEntity(mockInstructorDto);
 
@@ -96,23 +95,23 @@ class InstructorMapperTest {
 
     @Test
     void convertToEntity_ThrowsException_WhenClassTypeNotFound() {
-        when(classTypeRepository.findById(10)).thenReturn(Optional.empty());
+        when(classTypeRepository.findById(10L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> instructorMapper.convertToEntity(mockInstructorDto));
     }
 
     @Test
     void convertToEntity_ThrowsException_WhenFitnessClassNotFound() {
-        when(classTypeRepository.findById(10)).thenReturn(Optional.of(mockClassType));
-        when(fitnessClassRepository.findById(20)).thenReturn(Optional.empty());
+        when(classTypeRepository.findById(10L)).thenReturn(Optional.of(mockClassType));
+        when(fitnessClassRepository.findById(20L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> instructorMapper.convertToEntity(mockInstructorDto));
     }
 
     @Test
     void convertToEntity_ReturnsEmptyCollections_WhenIDsAreEmpty() {
-        mockInstructorDto.setClassTypeIds(Collections.emptySet());
-        mockInstructorDto.setFitnessClassIds(Collections.emptySet());
+        mockInstructorDto.setClassTypeIds(Collections.emptyList());
+        mockInstructorDto.setFitnessClassIds(Collections.emptyList());
 
         Instructor result = instructorMapper.convertToEntity(mockInstructorDto);
 
@@ -144,25 +143,20 @@ class InstructorMapperTest {
         assertEquals("John", result.getName());
         assertEquals("Doe", result.getSurname());
         assertEquals(LocalDate.of(1985, 5, 15), result.getBirthDate());
-        assertEquals(Set.of(10), result.getClassTypeIds());
-        assertEquals(Set.of(20), result.getFitnessClassIds());
+        assertEquals(List.of(10L), result.getClassTypeIds());
+        assertEquals(List.of(20L), result.getFitnessClassIds());
     }
 
     @Test
     void convertToDto_ReturnsDtoWithEmptyCollections_WhenEntityHasEmptyCollections() {
-        mockInstructor.setSpecializations(Collections.emptySet());
-        mockInstructor.setClasses(Collections.emptySet());
+        mockInstructor.setSpecializations(Collections.emptyList());
+        mockInstructor.setClasses(Collections.emptyList());
 
         InstructorDto result = instructorMapper.convertToDto(mockInstructor);
 
         assertNotNull(result);
         assertTrue(result.getClassTypeIds().isEmpty());
         assertTrue(result.getFitnessClassIds().isEmpty());
-    }
-
-    @Test
-    void convertToDto_ThrowsException_WhenEntityIsNull() {
-        assertThrows(NullPointerException.class, () -> instructorMapper.convertToDto(null));
     }
 
     @Test

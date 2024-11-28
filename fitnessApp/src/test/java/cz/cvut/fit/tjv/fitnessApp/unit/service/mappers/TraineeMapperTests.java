@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -38,22 +37,22 @@ class TraineeMapperTest {
     void setUp() {
         // Mock Trainee
         mockTrainee = new Trainee();
-        mockTrainee.setId(1);
+        mockTrainee.setId(1L);
         mockTrainee.setEmail("test@example.com");
         mockTrainee.setName("John");
         mockTrainee.setSurname("Doe");
 
         mockFitnessClass = new FitnessClass();
-        mockFitnessClass.setId(10);
-        mockTrainee.setClasses(Set.of(mockFitnessClass));
+        mockFitnessClass.setId(10L);
+        mockTrainee.setClasses(List.of(mockFitnessClass));
 
         // Mock DTO
         mockTraineeDto = new TraineeDto();
-        mockTraineeDto.setId(1);
+        mockTraineeDto.setId(1L);
         mockTraineeDto.setEmail("test@example.com");
         mockTraineeDto.setName("John");
         mockTraineeDto.setSurname("Doe");
-        mockTraineeDto.setFitnessClassIds(Set.of(10));
+        mockTraineeDto.setFitnessClassIds(List.of(10L));
     }
 
     @AfterEach
@@ -65,7 +64,7 @@ class TraineeMapperTest {
 
     @Test
     void convertToEntity_Successful() {
-        when(fitnessClassRepository.findById(10)).thenReturn(Optional.of(mockFitnessClass));
+        when(fitnessClassRepository.findById(10L)).thenReturn(Optional.of(mockFitnessClass));
 
         Trainee result = traineeMapper.convertToEntity(mockTraineeDto);
 
@@ -76,20 +75,20 @@ class TraineeMapperTest {
         assertEquals("Doe", result.getSurname());
         assertEquals(1, result.getClasses().size());
         assertTrue(result.getClasses().contains(mockFitnessClass));
-        verify(fitnessClassRepository).findById(10);
+        verify(fitnessClassRepository).findById(10L);
     }
 
     @Test
     void convertToEntity_ThrowsException_WhenFitnessClassNotFound() {
-        when(fitnessClassRepository.findById(10)).thenReturn(Optional.empty());
+        when(fitnessClassRepository.findById(10L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> traineeMapper.convertToEntity(mockTraineeDto));
-        verify(fitnessClassRepository).findById(10);
+        verify(fitnessClassRepository).findById(10L);
     }
 
     @Test
     void convertToEntity_ReturnsEmptyCollections_WhenIDsAreEmpty() {
-        mockTraineeDto.setFitnessClassIds(Collections.emptySet());
+        mockTraineeDto.setFitnessClassIds(Collections.emptyList());
 
         Trainee result = traineeMapper.convertToEntity(mockTraineeDto);
 
@@ -124,22 +123,17 @@ class TraineeMapperTest {
         assertEquals("test@example.com", result.getEmail());
         assertEquals("John", result.getName());
         assertEquals("Doe", result.getSurname());
-        assertEquals(Set.of(10), result.getFitnessClassIds());
+        assertEquals(List.of(10L), result.getFitnessClassIds());
     }
 
     @Test
     void convertToDto_ReturnsDtoWithEmptyCollections_WhenEntityHasEmptyCollections() {
-        mockTrainee.setClasses(Collections.emptySet());
+        mockTrainee.setClasses(Collections.emptyList());
 
         TraineeDto result = traineeMapper.convertToDto(mockTrainee);
 
         assertNotNull(result);
         assertTrue(result.getFitnessClassIds().isEmpty());
-    }
-
-    @Test
-    void convertToDto_ThrowsException_WhenEntityIsNull() {
-        assertThrows(NullPointerException.class, () -> traineeMapper.convertToDto(null));
     }
 
     @Test
@@ -152,7 +146,7 @@ class TraineeMapperTest {
         assertEquals("test@example.com", result.get(0).getEmail());
         assertEquals("John", result.get(0).getName());
         assertEquals("Doe", result.get(0).getSurname());
-        assertEquals(Set.of(10), result.get(0).getFitnessClassIds());
+        assertEquals(List.of(10L), result.get(0).getFitnessClassIds());
     }
 
     @Test

@@ -7,7 +7,6 @@ import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,10 +28,10 @@ public class TraineeMapper implements EntityMapper<Trainee, TraineeDto> {
 
         // Map FitnessClass IDs to entities
         if (traineeDto.getFitnessClassIds() != null) {
-            Set<FitnessClass> classes = traineeDto.getFitnessClassIds().stream()
+            List<FitnessClass> classes = traineeDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("FitnessClass not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             trainee.setClasses(classes);
         }
 
@@ -49,9 +48,9 @@ public class TraineeMapper implements EntityMapper<Trainee, TraineeDto> {
 
         // Map FitnessClass entities to IDs
         if (trainee.getClasses() != null) {
-            Set<Integer> fitnessClassIds = trainee.getClasses().stream()
+            List<Long> fitnessClassIds = trainee.getClasses().stream()
                     .map(FitnessClass::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             traineeDto.setFitnessClassIds(fitnessClassIds);
         }
 

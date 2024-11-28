@@ -2,7 +2,11 @@ package cz.cvut.fit.tjv.fitnessApp.service;
 
 import cz.cvut.fit.tjv.fitnessApp.domain.Identifiable;
 import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public abstract class CrudServiceImpl<T extends Identifiable<ID>, ID> implements CrudService<T, ID> {
     protected abstract CrudRepository<T, ID> getRepository();
@@ -20,8 +24,10 @@ public abstract class CrudServiceImpl<T extends Identifiable<ID>, ID> implements
     }
 
     @Override
-    public Iterable<T> readAll() {
-        return getRepository().findAll();
+    public List<T> readAll() {
+        Iterable<T> iterable = getRepository().findAll();
+        return StreamSupport.stream(iterable.spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @Override

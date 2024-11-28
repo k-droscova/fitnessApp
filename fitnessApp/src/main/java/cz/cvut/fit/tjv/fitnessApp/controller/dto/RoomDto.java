@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -14,8 +14,8 @@ import java.util.Set;
 @AllArgsConstructor
 
 public class RoomDto {
-    private Integer id;
+    private Long id;
     private int maxCapacity;
-    private Set<Integer> fitnessClassIds = new HashSet<>();
-    private Set<Integer> classTypeIds = new HashSet<>();
+    private List<Long> fitnessClassIds = new ArrayList<>();
+    private List<Long> classTypeIds = new ArrayList<>();
 }

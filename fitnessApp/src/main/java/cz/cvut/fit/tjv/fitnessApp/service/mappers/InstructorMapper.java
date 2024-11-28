@@ -9,7 +9,6 @@ import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,19 +33,19 @@ public class InstructorMapper implements EntityMapper<Instructor, InstructorDto>
 
         // Map ClassType IDs to entities
         if (instructorDto.getClassTypeIds() != null) {
-            Set<ClassType> specializations = instructorDto.getClassTypeIds().stream()
+            List<ClassType> specializations = instructorDto.getClassTypeIds().stream()
                     .map(id -> classTypeRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("ClassType not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             instructor.setSpecializations(specializations);
         }
 
         // Map FitnessClass IDs to entities
         if (instructorDto.getFitnessClassIds() != null) {
-            Set<FitnessClass> classes = instructorDto.getFitnessClassIds().stream()
+            List<FitnessClass> classes = instructorDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("FitnessClass not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             instructor.setClasses(classes);
         }
 
@@ -63,17 +62,17 @@ public class InstructorMapper implements EntityMapper<Instructor, InstructorDto>
 
         // Map ClassType entities to IDs
         if (instructor.getSpecializations() != null) {
-            Set<Integer> classTypeIds = instructor.getSpecializations().stream()
+            List<Long> classTypeIds = instructor.getSpecializations().stream()
                     .map(ClassType::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             instructorDto.setClassTypeIds(classTypeIds);
         }
 
         // Map FitnessClass entities to IDs
         if (instructor.getClasses() != null) {
-            Set<Integer> fitnessClassIds = instructor.getClasses().stream()
+            List<Long> fitnessClassIds = instructor.getClasses().stream()
                     .map(FitnessClass::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             instructorDto.setFitnessClassIds(fitnessClassIds);
         }
 

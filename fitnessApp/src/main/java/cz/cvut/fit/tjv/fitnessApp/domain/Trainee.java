@@ -5,19 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class Trainee extends IdentifiableImpl<Integer> {
+public class Trainee extends IdentifiableImpl<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_trainee")
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -29,5 +29,5 @@ public class Trainee extends IdentifiableImpl<Integer> {
     private String surname;
 
     @ManyToMany(mappedBy = "trainees")
-    private Set<FitnessClass> classes = new HashSet<>();
+    private List<FitnessClass> classes = new ArrayList<>();
 }

@@ -12,10 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +33,7 @@ class ClassTypeServiceImplTest {
     @BeforeEach
     void setUp() {
         mockClassType = new ClassType();
-        mockClassType.setId(1);
+        mockClassType.setId(1L);
         mockClassType.setName("Yoga");
     }
 
@@ -46,7 +44,7 @@ class ClassTypeServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(classTypeRepository.existsById(1)).thenReturn(false);
+        when(classTypeRepository.existsById(1L)).thenReturn(false);
         when(classTypeRepository.save(mockClassType)).thenReturn(mockClassType);
 
         ClassType result = classTypeService.create(mockClassType);
@@ -59,7 +57,7 @@ class ClassTypeServiceImplTest {
 
     @Test
     void create_ThrowsException_WhenIdExists() {
-        when(classTypeRepository.existsById(1)).thenReturn(true);
+        when(classTypeRepository.existsById(1L)).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> classTypeService.create(mockClassType));
         verify(classTypeRepository, never()).save(any());
@@ -67,9 +65,9 @@ class ClassTypeServiceImplTest {
 
     @Test
     void readById_ReturnsEntity_WhenFound() {
-        when(classTypeRepository.findById(1)).thenReturn(Optional.of(mockClassType));
+        when(classTypeRepository.findById(1L)).thenReturn(Optional.of(mockClassType));
 
-        Optional<ClassType> result = classTypeService.readById(1);
+        Optional<ClassType> result = classTypeService.readById(1L);
 
         assertTrue(result.isPresent());
         assertEquals("Yoga", result.get().getName());
@@ -77,9 +75,9 @@ class ClassTypeServiceImplTest {
 
     @Test
     void readById_ReturnsEmpty_WhenNotFound() {
-        when(classTypeRepository.findById(1)).thenReturn(Optional.empty());
+        when(classTypeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<ClassType> result = classTypeService.readById(1);
+        Optional<ClassType> result = classTypeService.readById(1L);
 
         assertTrue(result.isEmpty());
     }
@@ -88,66 +86,66 @@ class ClassTypeServiceImplTest {
     void readAll_ReturnsEntities() {
         when(classTypeRepository.findAll()).thenReturn(List.of(mockClassType));
 
-        Iterable<ClassType> result = classTypeService.readAll();
+        List<ClassType> result = classTypeService.readAll();
 
         assertNotNull(result);
-        assertEquals(1, ((List<ClassType>) result).size());
+        assertEquals(1, result.size());
     }
 
     @Test
     void readAll_ReturnsEmpty_WhenNoEntities() {
         when(classTypeRepository.findAll()).thenReturn(List.of());
 
-        Iterable<ClassType> result = classTypeService.readAll();
+        List<ClassType> result = classTypeService.readAll();
 
         assertNotNull(result);
-        assertEquals(0, ((List<ClassType>) result).size());
+        assertEquals(0, result.size());
     }
 
     @Test
     void update_Successful() {
-        when(classTypeRepository.existsById(1)).thenReturn(true);
+        when(classTypeRepository.existsById(1L)).thenReturn(true);
         when(classTypeRepository.save(mockClassType)).thenReturn(mockClassType);
 
-        classTypeService.update(1, mockClassType);
+        classTypeService.update(1L, mockClassType);
 
         verify(classTypeRepository).save(mockClassType);
     }
 
     @Test
     void update_ThrowsException_WhenEntityDoesNotExist() {
-        when(classTypeRepository.existsById(1)).thenReturn(false);
+        when(classTypeRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> classTypeService.update(1, mockClassType));
+        assertThrows(IllegalArgumentException.class, () -> classTypeService.update(1L, mockClassType));
         verify(classTypeRepository, never()).save(any());
     }
 
     @Test
     void deleteById_Successful() {
-        when(classTypeRepository.existsById(1)).thenReturn(true);
+        when(classTypeRepository.existsById(1L)).thenReturn(true);
 
-        classTypeService.deleteById(1);
+        classTypeService.deleteById(1L);
 
-        verify(classTypeRepository).deleteById(1);
+        verify(classTypeRepository).deleteById(1L);
     }
 
     @Test
     void deleteById_ThrowsException_WhenEntityDoesNotExist() {
-        when(classTypeRepository.existsById(1)).thenReturn(false);
+        when(classTypeRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> classTypeService.deleteById(1));
+        assertThrows(IllegalArgumentException.class, () -> classTypeService.deleteById(1L));
         verify(classTypeRepository, never()).deleteById(any());
     }
 
     @Test
     void findInstructorsByClassType_ReturnsInstructors() {
         Instructor instructor = new Instructor();
-        instructor.setId(10);
-        mockClassType.setInstructors(Set.of(instructor));
+        instructor.setId(10L);
+        mockClassType.setInstructors(List.of(instructor));
 
-        when(classTypeRepository.findById(1)).thenReturn(Optional.of(mockClassType));
+        when(classTypeRepository.findById(1L)).thenReturn(Optional.of(mockClassType));
 
-        Set<Instructor> result = classTypeService.findInstructorsByClassType(1);
+        List<Instructor> result = classTypeService.findInstructorsByClassType(1L);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -156,9 +154,9 @@ class ClassTypeServiceImplTest {
 
     @Test
     void findInstructorsByClassType_ReturnsEmpty_WhenClassTypeNotFound() {
-        when(classTypeRepository.findById(1)).thenReturn(Optional.empty());
+        when(classTypeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Set<Instructor> result = classTypeService.findInstructorsByClassType(1);
+        List<Instructor> result = classTypeService.findInstructorsByClassType(1L);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -166,19 +164,22 @@ class ClassTypeServiceImplTest {
 
     @Test
     void readAllByName_ReturnsMatchingEntities() {
-        when(classTypeRepository.findByNameContainingIgnoreCase("Yoga")).thenReturn(new HashSet<>(List.of(mockClassType)));
+        ClassType classType = new ClassType();
+        classType.setName("Power Yoga");
+        classType.setId(2L);
+        when(classTypeRepository.findByNameContainingIgnoreCase("Yoga")).thenReturn(List.of(mockClassType, classType));
 
-        Set<ClassType> result = classTypeService.readAllByName("Yoga");
+        List<ClassType> result = classTypeService.readAllByName("Yoga");
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
     }
 
     @Test
     void readAllByName_ReturnsEmpty_WhenNoMatches() {
-        when(classTypeRepository.findByNameContainingIgnoreCase("Zumba")).thenReturn(new HashSet<>());
+        when(classTypeRepository.findByNameContainingIgnoreCase("Zumba")).thenReturn(List.of());
 
-        Set<ClassType> result = classTypeService.readAllByName("Zumba");
+        List<ClassType> result = classTypeService.readAllByName("Zumba");
 
         assertNotNull(result);
         assertTrue(result.isEmpty());

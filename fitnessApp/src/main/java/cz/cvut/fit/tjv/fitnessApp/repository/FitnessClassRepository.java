@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.CrudRepository;
 
 @Repository
-public interface FitnessClassRepository extends CrudRepository<FitnessClass, Integer> {
+public interface FitnessClassRepository extends CrudRepository<FitnessClass, Long> {
 }

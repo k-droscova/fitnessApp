@@ -31,7 +31,7 @@ class InstructorServiceImplTest {
     @BeforeEach
     void setUp() {
         mockInstructor = new Instructor();
-        mockInstructor.setId(1);
+        mockInstructor.setId(1L);
         mockInstructor.setName("John");
         mockInstructor.setSurname("Doe");
     }
@@ -43,7 +43,7 @@ class InstructorServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(instructorRepository.existsById(1)).thenReturn(false);
+        when(instructorRepository.existsById(1L)).thenReturn(false);
         when(instructorRepository.save(mockInstructor)).thenReturn(mockInstructor);
 
         Instructor result = instructorService.create(mockInstructor);
@@ -57,7 +57,7 @@ class InstructorServiceImplTest {
 
     @Test
     void create_ThrowsException_WhenIdExists() {
-        when(instructorRepository.existsById(1)).thenReturn(true);
+        when(instructorRepository.existsById(1L)).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> instructorService.create(mockInstructor));
         verify(instructorRepository, never()).save(any());
@@ -65,9 +65,9 @@ class InstructorServiceImplTest {
 
     @Test
     void readById_ReturnsEntity_WhenFound() {
-        when(instructorRepository.findById(1)).thenReturn(Optional.of(mockInstructor));
+        when(instructorRepository.findById(1L)).thenReturn(Optional.of(mockInstructor));
 
-        Optional<Instructor> result = instructorService.readById(1);
+        Optional<Instructor> result = instructorService.readById(1L);
 
         assertTrue(result.isPresent());
         assertEquals("John", result.get().getName());
@@ -76,9 +76,9 @@ class InstructorServiceImplTest {
 
     @Test
     void readById_ReturnsEmpty_WhenNotFound() {
-        when(instructorRepository.findById(1)).thenReturn(Optional.empty());
+        when(instructorRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<Instructor> result = instructorService.readById(1);
+        Optional<Instructor> result = instructorService.readById(1L);
 
         assertTrue(result.isEmpty());
     }
@@ -87,54 +87,54 @@ class InstructorServiceImplTest {
     void readAll_ReturnsEntities() {
         when(instructorRepository.findAll()).thenReturn(List.of(mockInstructor));
 
-        Iterable<Instructor> result = instructorService.readAll();
+        List<Instructor> result = instructorService.readAll();
 
         assertNotNull(result);
-        assertEquals(1, ((List<Instructor>) result).size());
+        assertEquals(1, result.size());
     }
 
     @Test
     void readAll_ReturnsEmpty_WhenNoEntities() {
         when(instructorRepository.findAll()).thenReturn(List.of());
 
-        Iterable<Instructor> result = instructorService.readAll();
+        List<Instructor> result = instructorService.readAll();
 
         assertNotNull(result);
-        assertEquals(0, ((List<Instructor>) result).size());
+        assertEquals(0, result.size());
     }
 
     @Test
     void update_Successful() {
-        when(instructorRepository.existsById(1)).thenReturn(true);
+        when(instructorRepository.existsById(1L)).thenReturn(true);
         when(instructorRepository.save(mockInstructor)).thenReturn(mockInstructor);
 
-        instructorService.update(1, mockInstructor);
+        instructorService.update(1L, mockInstructor);
 
         verify(instructorRepository).save(mockInstructor);
     }
 
     @Test
     void update_ThrowsException_WhenEntityDoesNotExist() {
-        when(instructorRepository.existsById(1)).thenReturn(false);
+        when(instructorRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> instructorService.update(1, mockInstructor));
+        assertThrows(IllegalArgumentException.class, () -> instructorService.update(1L, mockInstructor));
         verify(instructorRepository, never()).save(any());
     }
 
     @Test
     void deleteById_Successful() {
-        when(instructorRepository.existsById(1)).thenReturn(true);
+        when(instructorRepository.existsById(1L)).thenReturn(true);
 
-        instructorService.deleteById(1);
+        instructorService.deleteById(1L);
 
-        verify(instructorRepository).deleteById(1);
+        verify(instructorRepository).deleteById(1L);
     }
 
     @Test
     void deleteById_ThrowsException_WhenEntityDoesNotExist() {
-        when(instructorRepository.existsById(1)).thenReturn(false);
+        when(instructorRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> instructorService.deleteById(1));
+        assertThrows(IllegalArgumentException.class, () -> instructorService.deleteById(1L));
         verify(instructorRepository, never()).deleteById(any());
     }
 }

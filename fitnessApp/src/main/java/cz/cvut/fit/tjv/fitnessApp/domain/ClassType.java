@@ -5,24 +5,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class ClassType extends IdentifiableImpl<Integer> {
+public class ClassType extends IdentifiableImpl<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_class_type")
-    private Integer id;
+    private Long id;
     @Column(nullable = false, unique = true)
     private String name;
     @ManyToMany(mappedBy = "specializations")
-    private Set<Instructor> instructors = new HashSet<>();
+    private List<Instructor> instructors = new ArrayList<>();
     @ManyToMany(mappedBy = "classTypes")
-    private Set<Room> rooms = new HashSet<>();
+    private List<Room> rooms = new ArrayList<>();
     @OneToMany(mappedBy = "classType")
-    private Set<FitnessClass> classes = new HashSet<>();
+    private List<FitnessClass> classes = new ArrayList<>();
 }

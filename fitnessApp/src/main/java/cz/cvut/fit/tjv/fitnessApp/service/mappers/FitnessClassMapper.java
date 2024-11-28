@@ -1,19 +1,14 @@
 package cz.cvut.fit.tjv.fitnessApp.service.mappers;
 
 import cz.cvut.fit.tjv.fitnessApp.controller.dto.FitnessClassDto;
-import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
-import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
-import cz.cvut.fit.tjv.fitnessApp.domain.Room;
-import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
-import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
+import cz.cvut.fit.tjv.fitnessApp.domain.*;
+import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.InstructorRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.RoomRepository;
-import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.TraineeRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -65,10 +60,10 @@ public class FitnessClassMapper implements EntityMapper<FitnessClass, FitnessCla
 
         // Map trainee IDs
         if (fitnessClassDto.getTraineeIds() != null) {
-            Set<Trainee> trainees = fitnessClassDto.getTraineeIds().stream()
+            List<Trainee> trainees = fitnessClassDto.getTraineeIds().stream()
                     .map(id -> traineeRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("Trainee not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             fitnessClass.setTrainees(trainees);
         }
 
@@ -100,9 +95,9 @@ public class FitnessClassMapper implements EntityMapper<FitnessClass, FitnessCla
 
         // Map trainees to IDs
         if (fitnessClass.getTrainees() != null) {
-            Set<Integer> traineeIds = fitnessClass.getTrainees().stream()
+            List<Long> traineeIds = fitnessClass.getTrainees().stream()
                     .map(Trainee::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             fitnessClassDto.setTraineeIds(traineeIds);
         }
 

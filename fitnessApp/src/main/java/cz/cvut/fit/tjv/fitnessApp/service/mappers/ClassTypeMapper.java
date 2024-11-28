@@ -11,7 +11,6 @@ import cz.cvut.fit.tjv.fitnessApp.repository.RoomRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -37,28 +36,28 @@ public class ClassTypeMapper implements EntityMapper<ClassType, ClassTypeDto> {
 
         // Map instructor IDs
         if (classTypeDto.getInstructorIds() != null) {
-            Set<Instructor> instructors = classTypeDto.getInstructorIds().stream()
+            List<Instructor> instructors = classTypeDto.getInstructorIds().stream()
                     .map(id -> instructorRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("Instructor not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             classType.setInstructors(instructors);
         }
 
         // Map room IDs
         if (classTypeDto.getRoomIds() != null) {
-            Set<Room> rooms = classTypeDto.getRoomIds().stream()
+            List<Room> rooms = classTypeDto.getRoomIds().stream()
                     .map(id -> roomRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("Room not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             classType.setRooms(rooms);
         }
 
         // Map fitness class IDs
         if (classTypeDto.getFitnessClassIds() != null) {
-            Set<FitnessClass> fitnessClasses = classTypeDto.getFitnessClassIds().stream()
+            List<FitnessClass> fitnessClasses = classTypeDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("Fitness class not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             classType.setClasses(fitnessClasses);
         }
 
@@ -73,25 +72,25 @@ public class ClassTypeMapper implements EntityMapper<ClassType, ClassTypeDto> {
 
         // Map instructor entities to IDs
         if (classType.getInstructors() != null) {
-            Set<Integer> instructorIds = classType.getInstructors().stream()
+            List<Long> instructorIds = classType.getInstructors().stream()
                     .map(Instructor::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             classTypeDto.setInstructorIds(instructorIds);
         }
 
         // Map room entities to IDs
         if (classType.getRooms() != null) {
-            Set<Integer> roomIds = classType.getRooms().stream()
+            List<Long> roomIds = classType.getRooms().stream()
                     .map(Room::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             classTypeDto.setRoomIds(roomIds);
         }
 
         // Map fitness class entities to IDs
         if (classType.getClasses() != null) {
-            Set<Integer> fitnessClassIds = classType.getClasses().stream()
+            List<Long> fitnessClassIds = classType.getClasses().stream()
                     .map(FitnessClass::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             classTypeDto.setFitnessClassIds(fitnessClassIds);
         }
 

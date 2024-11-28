@@ -31,7 +31,7 @@ class FitnessClassServiceImplTest {
     @BeforeEach
     void setUp() {
         mockFitnessClass = new FitnessClass();
-        mockFitnessClass.setId(1);
+        mockFitnessClass.setId(1L);
         mockFitnessClass.setCapacity(20);
     }
 
@@ -42,7 +42,7 @@ class FitnessClassServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(fitnessClassRepository.existsById(1)).thenReturn(false);
+        when(fitnessClassRepository.existsById(1L)).thenReturn(false);
         when(fitnessClassRepository.save(mockFitnessClass)).thenReturn(mockFitnessClass);
 
         FitnessClass result = fitnessClassService.create(mockFitnessClass);
@@ -55,7 +55,7 @@ class FitnessClassServiceImplTest {
 
     @Test
     void create_ThrowsException_WhenIdExists() {
-        when(fitnessClassRepository.existsById(1)).thenReturn(true);
+        when(fitnessClassRepository.existsById(1L)).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> fitnessClassService.create(mockFitnessClass));
         verify(fitnessClassRepository, never()).save(any());
@@ -63,9 +63,9 @@ class FitnessClassServiceImplTest {
 
     @Test
     void readById_ReturnsEntity_WhenFound() {
-        when(fitnessClassRepository.findById(1)).thenReturn(Optional.of(mockFitnessClass));
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
 
-        Optional<FitnessClass> result = fitnessClassService.readById(1);
+        Optional<FitnessClass> result = fitnessClassService.readById(1L);
 
         assertTrue(result.isPresent());
         assertEquals(20, result.get().getCapacity());
@@ -73,9 +73,9 @@ class FitnessClassServiceImplTest {
 
     @Test
     void readById_ReturnsEmpty_WhenNotFound() {
-        when(fitnessClassRepository.findById(1)).thenReturn(Optional.empty());
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<FitnessClass> result = fitnessClassService.readById(1);
+        Optional<FitnessClass> result = fitnessClassService.readById(1L);
 
         assertTrue(result.isEmpty());
     }
@@ -84,54 +84,54 @@ class FitnessClassServiceImplTest {
     void readAll_ReturnsEntities() {
         when(fitnessClassRepository.findAll()).thenReturn(List.of(mockFitnessClass));
 
-        Iterable<FitnessClass> result = fitnessClassService.readAll();
+        List<FitnessClass> result = fitnessClassService.readAll();
 
         assertNotNull(result);
-        assertEquals(1, ((List<FitnessClass>) result).size());
+        assertEquals(1, result.size());
     }
 
     @Test
     void readAll_ReturnsEmpty_WhenNoEntities() {
         when(fitnessClassRepository.findAll()).thenReturn(List.of());
 
-        Iterable<FitnessClass> result = fitnessClassService.readAll();
+        List<FitnessClass> result = fitnessClassService.readAll();
 
         assertNotNull(result);
-        assertEquals(0, ((List<FitnessClass>) result).size());
+        assertEquals(0, result.size());
     }
 
     @Test
     void update_Successful() {
-        when(fitnessClassRepository.existsById(1)).thenReturn(true);
+        when(fitnessClassRepository.existsById(1L)).thenReturn(true);
         when(fitnessClassRepository.save(mockFitnessClass)).thenReturn(mockFitnessClass);
 
-        fitnessClassService.update(1, mockFitnessClass);
+        fitnessClassService.update(1L, mockFitnessClass);
 
         verify(fitnessClassRepository).save(mockFitnessClass);
     }
 
     @Test
     void update_ThrowsException_WhenEntityDoesNotExist() {
-        when(fitnessClassRepository.existsById(1)).thenReturn(false);
+        when(fitnessClassRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> fitnessClassService.update(1, mockFitnessClass));
+        assertThrows(IllegalArgumentException.class, () -> fitnessClassService.update(1L, mockFitnessClass));
         verify(fitnessClassRepository, never()).save(any());
     }
 
     @Test
     void deleteById_Successful() {
-        when(fitnessClassRepository.existsById(1)).thenReturn(true);
+        when(fitnessClassRepository.existsById(1L)).thenReturn(true);
 
-        fitnessClassService.deleteById(1);
+        fitnessClassService.deleteById(1L);
 
-        verify(fitnessClassRepository).deleteById(1);
+        verify(fitnessClassRepository).deleteById(1L);
     }
 
     @Test
     void deleteById_ThrowsException_WhenEntityDoesNotExist() {
-        when(fitnessClassRepository.existsById(1)).thenReturn(false);
+        when(fitnessClassRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> fitnessClassService.deleteById(1));
+        assertThrows(IllegalArgumentException.class, () -> fitnessClassService.deleteById(1L));
         verify(fitnessClassRepository, never()).deleteById(any());
     }
 }

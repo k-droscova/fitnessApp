@@ -51,7 +51,7 @@ public class ClassTypeController {
     })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable Integer id, @RequestBody ClassTypeDto classTypeDto) {
+    public void update(@PathVariable Long id, @RequestBody ClassTypeDto classTypeDto) {
         ClassType classType = classTypeMapper.convertToEntity(classTypeDto);
         classTypeService.update(id, classType);
     }
@@ -64,7 +64,7 @@ public class ClassTypeController {
     @GetMapping
     public List<ClassTypeDto> readAllOrByName(@RequestParam Optional<String> name) {
         if (name.isPresent()) {
-            Set<ClassType> classTypes = classTypeService.readAllByName(name.get());
+            List<ClassType> classTypes = classTypeService.readAllByName(name.get());
             return classTypeMapper.convertManyToDto(new ArrayList<>(classTypes));
         } else {
             Iterable<ClassType> classTypes = classTypeService.readAll();
@@ -80,7 +80,7 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}")
-    public ClassTypeDto readById(@PathVariable Integer id) {
+    public ClassTypeDto readById(@PathVariable Long id) {
         ClassType classType = classTypeService.readById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "ClassType not found"));
         return classTypeMapper.convertToDto(classType);
@@ -93,7 +93,7 @@ public class ClassTypeController {
     })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Integer id) {
+    public void deleteById(@PathVariable Long id) {
         try {
             classTypeService.deleteById(id);
         } catch (IllegalArgumentException e) {
@@ -107,7 +107,7 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}/instructors")
-    public Set<Integer> getInstructorsByClassType(@PathVariable Integer id) {
+    public Set<Long> getInstructorsByClassType(@PathVariable Long id) {
         return classTypeService.findInstructorsByClassType(id).stream()
                 .map(Instructor::getId)
                 .collect(Collectors.toSet());
@@ -119,7 +119,7 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}/rooms")
-    public Set<Integer> getRoomsByClassType(@PathVariable Integer id) {
+    public Set<Long> getRoomsByClassType(@PathVariable Long id) {
         return classTypeService.findRoomsByClassType(id).stream()
                 .map(Room::getId)
                 .collect(Collectors.toSet());
@@ -131,7 +131,7 @@ public class ClassTypeController {
             @ApiResponse(responseCode = "404", description = "ClassType not found")
     })
     @GetMapping("/{id}/fitness-classes")
-    public Set<Integer> getFitnessClassesByClassType(@PathVariable Integer id) {
+    public Set<Long> getFitnessClassesByClassType(@PathVariable Long id) {
         return classTypeService.findFitnessClassesByClassType(id).stream()
                 .map(FitnessClass::getId)
                 .collect(Collectors.toSet());

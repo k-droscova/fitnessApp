@@ -5,19 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class Room extends IdentifiableImpl<Integer> {
+public class Room extends IdentifiableImpl<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_room")
-    private Integer id;
+    private Long id;
 
     @Column(name = "max_capacity", nullable = false)
     private int maxCapacity;
@@ -28,7 +28,7 @@ public class Room extends IdentifiableImpl<Integer> {
      * associated FitnessClasses are also deleted.
      */
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FitnessClass> classes = new HashSet<>();
+    private List<FitnessClass> classes = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -36,5 +36,5 @@ public class Room extends IdentifiableImpl<Integer> {
             joinColumns = @JoinColumn(name = "id_room"),  // Foreign key to Room
             inverseJoinColumns = @JoinColumn(name = "id_class_type")  // Foreign key to ClassType
     )
-    private Set<ClassType> classTypes = new HashSet<>();
+    private List<ClassType> classTypes = new ArrayList<>();
 }

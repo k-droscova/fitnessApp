@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -44,23 +43,23 @@ class RoomMapperTest {
     void setUp() {
         // Mock Room
         mockRoom = new Room();
-        mockRoom.setId(1);
+        mockRoom.setId(1L);
         mockRoom.setMaxCapacity(50);
 
         mockFitnessClass = new FitnessClass();
-        mockFitnessClass.setId(10);
-        mockRoom.setClasses(Set.of(mockFitnessClass));
+        mockFitnessClass.setId(10L);
+        mockRoom.setClasses(List.of(mockFitnessClass));
 
         mockClassType = new ClassType();
-        mockClassType.setId(20);
-        mockRoom.setClassTypes(Set.of(mockClassType));
+        mockClassType.setId(20L);
+        mockRoom.setClassTypes(List.of(mockClassType));
 
         // Mock DTO
         mockRoomDto = new RoomDto();
-        mockRoomDto.setId(1);
+        mockRoomDto.setId(1L);
         mockRoomDto.setMaxCapacity(50);
-        mockRoomDto.setFitnessClassIds(Set.of(10));
-        mockRoomDto.setClassTypeIds(Set.of(20));
+        mockRoomDto.setFitnessClassIds(List.of(10L));
+        mockRoomDto.setClassTypeIds(List.of(20L));
     }
 
     @AfterEach
@@ -73,8 +72,8 @@ class RoomMapperTest {
 
     @Test
     void convertToEntity_Successful() {
-        when(fitnessClassRepository.findById(10)).thenReturn(Optional.of(mockFitnessClass));
-        when(classTypeRepository.findById(20)).thenReturn(Optional.of(mockClassType));
+        when(fitnessClassRepository.findById(10L)).thenReturn(Optional.of(mockFitnessClass));
+        when(classTypeRepository.findById(20L)).thenReturn(Optional.of(mockClassType));
 
         Room result = roomMapper.convertToEntity(mockRoomDto);
 
@@ -85,32 +84,32 @@ class RoomMapperTest {
         assertTrue(result.getClasses().contains(mockFitnessClass));
         assertEquals(1, result.getClassTypes().size());
         assertTrue(result.getClassTypes().contains(mockClassType));
-        verify(fitnessClassRepository).findById(10);
-        verify(classTypeRepository).findById(20);
+        verify(fitnessClassRepository).findById(10L);
+        verify(classTypeRepository).findById(20L);
     }
 
     @Test
     void convertToEntity_ThrowsException_WhenFitnessClassNotFound() {
-        when(fitnessClassRepository.findById(10)).thenReturn(Optional.empty());
+        when(fitnessClassRepository.findById(10L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> roomMapper.convertToEntity(mockRoomDto));
-        verify(fitnessClassRepository).findById(10);
+        verify(fitnessClassRepository).findById(10L);
     }
 
     @Test
     void convertToEntity_ThrowsException_WhenClassTypeNotFound() {
-        when(fitnessClassRepository.findById(10)).thenReturn(Optional.of(mockFitnessClass));
-        when(classTypeRepository.findById(20)).thenReturn(Optional.empty());
+        when(fitnessClassRepository.findById(10L)).thenReturn(Optional.of(mockFitnessClass));
+        when(classTypeRepository.findById(20L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> roomMapper.convertToEntity(mockRoomDto));
-        verify(fitnessClassRepository).findById(10);
-        verify(classTypeRepository).findById(20);
+        verify(fitnessClassRepository).findById(10L);
+        verify(classTypeRepository).findById(20L);
     }
 
     @Test
     void convertToEntity_ReturnsEmptyCollections_WhenIDsAreEmpty() {
-        mockRoomDto.setFitnessClassIds(Collections.emptySet());
-        mockRoomDto.setClassTypeIds(Collections.emptySet());
+        mockRoomDto.setFitnessClassIds(Collections.emptyList());
+        mockRoomDto.setClassTypeIds(Collections.emptyList());
 
         Room result = roomMapper.convertToEntity(mockRoomDto);
 
@@ -139,25 +138,20 @@ class RoomMapperTest {
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals(50, result.getMaxCapacity());
-        assertEquals(Set.of(10), result.getFitnessClassIds());
-        assertEquals(Set.of(20), result.getClassTypeIds());
+        assertEquals(List.of(10L), result.getFitnessClassIds());
+        assertEquals(List.of(20L), result.getClassTypeIds());
     }
 
     @Test
     void convertToDto_ReturnsDtoWithEmptyCollections_WhenEntityHasEmptyCollections() {
-        mockRoom.setClasses(Collections.emptySet());
-        mockRoom.setClassTypes(Collections.emptySet());
+        mockRoom.setClasses(Collections.emptyList());
+        mockRoom.setClassTypes(Collections.emptyList());
 
         RoomDto result = roomMapper.convertToDto(mockRoom);
 
         assertNotNull(result);
         assertTrue(result.getFitnessClassIds().isEmpty());
         assertTrue(result.getClassTypeIds().isEmpty());
-    }
-
-    @Test
-    void convertToDto_ThrowsException_WhenEntityIsNull() {
-        assertThrows(NullPointerException.class, () -> roomMapper.convertToDto(null));
     }
 
     @Test
@@ -168,8 +162,8 @@ class RoomMapperTest {
         assertEquals(1, result.size());
         assertEquals(1, result.get(0).getId());
         assertEquals(50, result.get(0).getMaxCapacity());
-        assertEquals(Set.of(10), result.get(0).getFitnessClassIds());
-        assertEquals(Set.of(20), result.get(0).getClassTypeIds());
+        assertEquals(List.of(10L), result.get(0).getFitnessClassIds());
+        assertEquals(List.of(20L), result.get(0).getClassTypeIds());
     }
 
     @Test

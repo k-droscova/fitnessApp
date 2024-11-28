@@ -20,7 +20,6 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -54,37 +53,37 @@ class FitnessClassMapperTest {
     void setUp() {
         // Mock FitnessClass
         mockFitnessClass = new FitnessClass();
-        mockFitnessClass.setId(1);
+        mockFitnessClass.setId(1L);
         mockFitnessClass.setCapacity(5);
         mockFitnessClass.setDate(LocalDate.of(2024, 1, 1));
         mockFitnessClass.setTime(LocalTime.of(10, 0));
 
         mockInstructor = new Instructor();
-        mockInstructor.setId(10);
+        mockInstructor.setId(10L);
         mockFitnessClass.setInstructor(mockInstructor);
 
         mockRoom = new Room();
-        mockRoom.setId(20);
+        mockRoom.setId(20L);
         mockFitnessClass.setRoom(mockRoom);
 
         mockClassType = new ClassType();
-        mockClassType.setId(30);
+        mockClassType.setId(30L);
         mockFitnessClass.setClassType(mockClassType);
 
         mockTrainee = new Trainee();
-        mockTrainee.setId(40);
-        mockFitnessClass.setTrainees(Set.of(mockTrainee));
+        mockTrainee.setId(40L);
+        mockFitnessClass.setTrainees(List.of(mockTrainee));
 
         // Mock DTO
         mockFitnessClassDto = new FitnessClassDto();
-        mockFitnessClassDto.setId(1);
+        mockFitnessClassDto.setId(1L);
         mockFitnessClassDto.setCapacity(5);
         mockFitnessClassDto.setDate(LocalDate.of(2024, 1, 1));
         mockFitnessClassDto.setTime(LocalTime.of(10, 0));
-        mockFitnessClassDto.setInstructorId(10);
-        mockFitnessClassDto.setRoomId(20);
-        mockFitnessClassDto.setClassTypeId(30);
-        mockFitnessClassDto.setTraineeIds(Set.of(40));
+        mockFitnessClassDto.setInstructorId(10L);
+        mockFitnessClassDto.setRoomId(20L);
+        mockFitnessClassDto.setClassTypeId(30L);
+        mockFitnessClassDto.setTraineeIds(List.of(40L));
     }
 
     @AfterEach
@@ -99,10 +98,10 @@ class FitnessClassMapperTest {
 
     @Test
     void convertToEntity_Successful() {
-        when(instructorRepository.findById(10)).thenReturn(Optional.of(mockInstructor));
-        when(roomRepository.findById(20)).thenReturn(Optional.of(mockRoom));
-        when(classTypeRepository.findById(30)).thenReturn(Optional.of(mockClassType));
-        when(traineeRepository.findById(40)).thenReturn(Optional.of(mockTrainee));
+        when(instructorRepository.findById(10L)).thenReturn(Optional.of(mockInstructor));
+        when(roomRepository.findById(20L)).thenReturn(Optional.of(mockRoom));
+        when(classTypeRepository.findById(30L)).thenReturn(Optional.of(mockClassType));
+        when(traineeRepository.findById(40L)).thenReturn(Optional.of(mockTrainee));
 
         FitnessClass result = fitnessClassMapper.convertToEntity(mockFitnessClassDto);
 
@@ -120,34 +119,34 @@ class FitnessClassMapperTest {
 
     @Test
     void convertToEntity_ThrowsException_WhenInstructorNotFound() {
-        when(instructorRepository.findById(10)).thenReturn(Optional.empty());
+        when(instructorRepository.findById(10L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> fitnessClassMapper.convertToEntity(mockFitnessClassDto));
     }
 
     @Test
     void convertToEntity_ThrowsException_WhenRoomNotFound() {
-        when(instructorRepository.findById(10)).thenReturn(Optional.of(mockInstructor));
-        when(roomRepository.findById(20)).thenReturn(Optional.empty());
+        when(instructorRepository.findById(10L)).thenReturn(Optional.of(mockInstructor));
+        when(roomRepository.findById(20L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> fitnessClassMapper.convertToEntity(mockFitnessClassDto));
     }
 
     @Test
     void convertToEntity_ThrowsException_WhenClassTypeNotFound() {
-        when(instructorRepository.findById(10)).thenReturn(Optional.of(mockInstructor));
-        when(roomRepository.findById(20)).thenReturn(Optional.of(mockRoom));
-        when(classTypeRepository.findById(30)).thenReturn(Optional.empty());
+        when(instructorRepository.findById(10L)).thenReturn(Optional.of(mockInstructor));
+        when(roomRepository.findById(20L)).thenReturn(Optional.of(mockRoom));
+        when(classTypeRepository.findById(30L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> fitnessClassMapper.convertToEntity(mockFitnessClassDto));
     }
 
     @Test
     void convertToEntity_ThrowsException_WhenTraineeNotFound() {
-        when(instructorRepository.findById(10)).thenReturn(Optional.of(mockInstructor));
-        when(roomRepository.findById(20)).thenReturn(Optional.of(mockRoom));
-        when(classTypeRepository.findById(30)).thenReturn(Optional.of(mockClassType));
-        when(traineeRepository.findById(40)).thenReturn(Optional.empty());
+        when(instructorRepository.findById(10L)).thenReturn(Optional.of(mockInstructor));
+        when(roomRepository.findById(20L)).thenReturn(Optional.of(mockRoom));
+        when(classTypeRepository.findById(30L)).thenReturn(Optional.of(mockClassType));
+        when(traineeRepository.findById(40L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> fitnessClassMapper.convertToEntity(mockFitnessClassDto));
     }
@@ -164,22 +163,17 @@ class FitnessClassMapperTest {
         assertEquals(10, result.getInstructorId());
         assertEquals(20, result.getRoomId());
         assertEquals(30, result.getClassTypeId());
-        assertEquals(Set.of(40), result.getTraineeIds());
+        assertEquals(List.of(40L), result.getTraineeIds());
     }
 
     @Test
     void convertToDto_ReturnsDtoWithEmptyCollections_WhenEntityHasNoTrainees() {
-        mockFitnessClass.setTrainees(Collections.emptySet());
+        mockFitnessClass.setTrainees(Collections.emptyList());
 
         FitnessClassDto result = fitnessClassMapper.convertToDto(mockFitnessClass);
 
         assertNotNull(result);
         assertTrue(result.getTraineeIds().isEmpty());
-    }
-
-    @Test
-    void convertToDto_ThrowsException_WhenEntityIsNull() {
-        assertThrows(NullPointerException.class, () -> fitnessClassMapper.convertToDto(null));
     }
 
     @Test

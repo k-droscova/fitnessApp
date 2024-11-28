@@ -31,7 +31,7 @@ class TraineeServiceImplTest {
     @BeforeEach
     void setUp() {
         mockTrainee = new Trainee();
-        mockTrainee.setId(1);
+        mockTrainee.setId(1L);
         mockTrainee.setEmail("trainee@example.com");
         mockTrainee.setName("Jane");
         mockTrainee.setSurname("Doe");
@@ -44,7 +44,7 @@ class TraineeServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(traineeRepository.existsById(1)).thenReturn(false);
+        when(traineeRepository.existsById(1L)).thenReturn(false);
         when(traineeRepository.save(mockTrainee)).thenReturn(mockTrainee);
 
         Trainee result = traineeService.create(mockTrainee);
@@ -59,7 +59,7 @@ class TraineeServiceImplTest {
 
     @Test
     void create_ThrowsException_WhenIdExists() {
-        when(traineeRepository.existsById(1)).thenReturn(true);
+        when(traineeRepository.existsById(1L)).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> traineeService.create(mockTrainee));
         verify(traineeRepository, never()).save(any());
@@ -67,9 +67,9 @@ class TraineeServiceImplTest {
 
     @Test
     void readById_ReturnsEntity_WhenFound() {
-        when(traineeRepository.findById(1)).thenReturn(Optional.of(mockTrainee));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(mockTrainee));
 
-        Optional<Trainee> result = traineeService.readById(1);
+        Optional<Trainee> result = traineeService.readById(1L);
 
         assertTrue(result.isPresent());
         assertEquals("Jane", result.get().getName());
@@ -78,9 +78,9 @@ class TraineeServiceImplTest {
 
     @Test
     void readById_ReturnsEmpty_WhenNotFound() {
-        when(traineeRepository.findById(1)).thenReturn(Optional.empty());
+        when(traineeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<Trainee> result = traineeService.readById(1);
+        Optional<Trainee> result = traineeService.readById(1L);
 
         assertTrue(result.isEmpty());
     }
@@ -89,54 +89,54 @@ class TraineeServiceImplTest {
     void readAll_ReturnsEntities() {
         when(traineeRepository.findAll()).thenReturn(List.of(mockTrainee));
 
-        Iterable<Trainee> result = traineeService.readAll();
+        List<Trainee> result = traineeService.readAll();
 
         assertNotNull(result);
-        assertEquals(1, ((List<Trainee>) result).size());
+        assertEquals(1, result.size());
     }
 
     @Test
     void readAll_ReturnsEmpty_WhenNoEntities() {
         when(traineeRepository.findAll()).thenReturn(List.of());
 
-        Iterable<Trainee> result = traineeService.readAll();
+        List<Trainee> result = traineeService.readAll();
 
         assertNotNull(result);
-        assertEquals(0, ((List<Trainee>) result).size());
+        assertEquals(0, result.size());
     }
 
     @Test
     void update_Successful() {
-        when(traineeRepository.existsById(1)).thenReturn(true);
+        when(traineeRepository.existsById(1L)).thenReturn(true);
         when(traineeRepository.save(mockTrainee)).thenReturn(mockTrainee);
 
-        traineeService.update(1, mockTrainee);
+        traineeService.update(1L, mockTrainee);
 
         verify(traineeRepository).save(mockTrainee);
     }
 
     @Test
     void update_ThrowsException_WhenEntityDoesNotExist() {
-        when(traineeRepository.existsById(1)).thenReturn(false);
+        when(traineeRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> traineeService.update(1, mockTrainee));
+        assertThrows(IllegalArgumentException.class, () -> traineeService.update(1L, mockTrainee));
         verify(traineeRepository, never()).save(any());
     }
 
     @Test
     void deleteById_Successful() {
-        when(traineeRepository.existsById(1)).thenReturn(true);
+        when(traineeRepository.existsById(1L)).thenReturn(true);
 
-        traineeService.deleteById(1);
+        traineeService.deleteById(1L);
 
-        verify(traineeRepository).deleteById(1);
+        verify(traineeRepository).deleteById(1L);
     }
 
     @Test
     void deleteById_ThrowsException_WhenEntityDoesNotExist() {
-        when(traineeRepository.existsById(1)).thenReturn(false);
+        when(traineeRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> traineeService.deleteById(1));
+        assertThrows(IllegalArgumentException.class, () -> traineeService.deleteById(1L));
         verify(traineeRepository, never()).deleteById(any());
     }
 }

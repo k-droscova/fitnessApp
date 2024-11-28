@@ -1,11 +1,12 @@
 package cz.cvut.fit.tjv.fitnessApp.repository;
 
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
-import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.CrudRepository;
-import java.util.Optional;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
-public interface InstructorRepository extends CrudRepository<Instructor, Integer> {
-    Optional<Instructor> findByName(String name);
+public interface InstructorRepository extends CrudRepository<Instructor, Long> {
+    List<Instructor> findByName(String name);
 }

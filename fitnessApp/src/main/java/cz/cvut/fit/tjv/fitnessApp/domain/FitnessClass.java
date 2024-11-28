@@ -7,19 +7,19 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class FitnessClass extends IdentifiableImpl<Integer> {
+public class FitnessClass extends IdentifiableImpl<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_class")
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false)
     private int capacity;
@@ -48,5 +48,5 @@ public class FitnessClass extends IdentifiableImpl<Integer> {
             joinColumns = @JoinColumn(name = "id_class"),
             inverseJoinColumns = @JoinColumn(name = "id_trainee")
     )
-    private Set<Trainee> trainees = new HashSet<>();
+    private List<Trainee> trainees = new ArrayList<>();
 }

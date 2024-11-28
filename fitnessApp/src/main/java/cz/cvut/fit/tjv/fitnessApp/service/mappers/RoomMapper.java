@@ -9,7 +9,6 @@ import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,19 +31,19 @@ public class RoomMapper implements EntityMapper<Room, RoomDto> {
 
         // Map FitnessClass IDs to entities
         if (roomDto.getFitnessClassIds() != null) {
-            Set<FitnessClass> classes = roomDto.getFitnessClassIds().stream()
+            List<FitnessClass> classes = roomDto.getFitnessClassIds().stream()
                     .map(id -> fitnessClassRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("FitnessClass not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             room.setClasses(classes);
         }
 
         // Map ClassType IDs to entities
         if (roomDto.getClassTypeIds() != null) {
-            Set<ClassType> classTypes = roomDto.getClassTypeIds().stream()
+            List<ClassType> classTypes = roomDto.getClassTypeIds().stream()
                     .map(id -> classTypeRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("ClassType not found for ID: " + id)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             room.setClassTypes(classTypes);
         }
 
@@ -59,17 +58,17 @@ public class RoomMapper implements EntityMapper<Room, RoomDto> {
 
         // Map FitnessClass entities to IDs
         if (room.getClasses() != null) {
-            Set<Integer> fitnessClassIds = room.getClasses().stream()
+            List<Long> fitnessClassIds = room.getClasses().stream()
                     .map(FitnessClass::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             roomDto.setFitnessClassIds(fitnessClassIds);
         }
 
         // Map ClassType entities to IDs
         if (room.getClassTypes() != null) {
-            Set<Integer> classTypeIds = room.getClassTypes().stream()
+            List<Long> classTypeIds = room.getClassTypes().stream()
                     .map(ClassType::getId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             roomDto.setClassTypeIds(classTypeIds);
         }
 

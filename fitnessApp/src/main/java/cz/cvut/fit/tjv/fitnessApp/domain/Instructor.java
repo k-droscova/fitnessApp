@@ -6,19 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class Instructor extends IdentifiableImpl<Integer> {
+public class Instructor extends IdentifiableImpl<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_employee")
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -35,8 +35,8 @@ public class Instructor extends IdentifiableImpl<Integer> {
             joinColumns = @JoinColumn(name = "id_employee"),  // Instructor's foreign key column
             inverseJoinColumns = @JoinColumn(name = "id_class_type")  // ClassType's foreign key column
     )
-    private Set<ClassType> specializations = new HashSet<>();
+    private List<ClassType> specializations = new ArrayList<>();
 
     @OneToMany(mappedBy = "instructor")
-    private Set<FitnessClass> classes = new HashSet<>();
+    private List<FitnessClass> classes = new ArrayList<>();
 }

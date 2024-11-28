@@ -1,18 +1,19 @@
 package cz.cvut.fit.tjv.fitnessApp.service;
 
+import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
+import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
-import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
+
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Service
-public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Integer> implements ClassTypeService {
+public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Long> implements ClassTypeService {
 
     private final ClassTypeRepository classTypeRepository;
 
@@ -27,28 +28,28 @@ public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Integer> im
     }
 
     @Override
-    public Set<Instructor> findInstructorsByClassType(Integer classTypeId) {
+    public List<Instructor> findInstructorsByClassType(Long classTypeId) {
         return classTypeRepository.findById(classTypeId)
                 .map(ClassType::getInstructors)
-                .orElse(Collections.emptySet());
+                .orElse(Collections.emptyList());
     }
 
     @Override
-    public Set<FitnessClass> findFitnessClassesByClassType(Integer classTypeId) {
+    public List<FitnessClass> findFitnessClassesByClassType(Long classTypeId) {
         return classTypeRepository.findById(classTypeId)
                 .map(ClassType::getClasses)
-                .orElse(Collections.emptySet());
+                .orElse(Collections.emptyList());
     }
 
     @Override
-    public Set<Room> findRoomsByClassType(Integer classTypeId) {
+    public List<Room> findRoomsByClassType(Long classTypeId) {
         return classTypeRepository.findById(classTypeId)
                 .map(ClassType::getRooms)
-                .orElse(Collections.emptySet());
+                .orElse(Collections.emptyList());
     }
 
     @Override
-    public Set<ClassType> readAllByName(String name) {
-        return new HashSet<>(classTypeRepository.findByNameContainingIgnoreCase(name));
+    public List<ClassType> readAllByName(String name) {
+        return new ArrayList<>(classTypeRepository.findByNameContainingIgnoreCase(name));
     }
 }

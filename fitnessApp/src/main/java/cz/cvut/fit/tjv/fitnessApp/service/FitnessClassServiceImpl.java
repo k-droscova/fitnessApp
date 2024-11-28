@@ -7,7 +7,7 @@ import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import org.springframework.data.repository.CrudRepository;
 
 @Service
-public class FitnessClassServiceImpl extends CrudServiceImpl<FitnessClass, Integer> implements FitnessClassService {
+public class FitnessClassServiceImpl extends CrudServiceImpl<FitnessClass, Long> implements FitnessClassService {
 
     private final FitnessClassRepository fitnessClassRepository;
 
@@ -17,7 +17,7 @@ public class FitnessClassServiceImpl extends CrudServiceImpl<FitnessClass, Integ
     }
 
     @Override
-    protected CrudRepository<FitnessClass, Integer> getRepository() {
+    protected CrudRepository<FitnessClass, Long> getRepository() {
         return fitnessClassRepository;
     }
 }
