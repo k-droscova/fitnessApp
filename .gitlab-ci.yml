@@ -1,0 +1,32 @@
+stages:
+  - build
+  - test
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle" # Cache Gradle dependencies
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  stage: build
+  script:
+    - cd fitnessApp
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - fitnessApp/build/libs/
+
+test:
+  stage: test
+  script:
+    - cd fitnessApp
+    - ./gradlew clean test jacocoTestReport
+  artifacts:
+    paths:
+      - fitnessApp/build/reports/jacoco/test/html # Save coverage report for download
+      - fitnessApp/build/reports/jacoco/test/jacocoTestReport.xml # Save XML for coverage parsing
+    when: always
+  coverage: '/^TOTAL\s*LINE\s*([\d.]+)%/' # Extract coverage percentage from the report
