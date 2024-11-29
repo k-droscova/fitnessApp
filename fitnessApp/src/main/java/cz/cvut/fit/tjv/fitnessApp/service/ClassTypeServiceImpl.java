@@ -28,21 +28,21 @@ public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Long> imple
     }
 
     @Override
-    public List<Instructor> findInstructorsByClassType(Long classTypeId) {
+    public List<Instructor> findInstructorsById(Long classTypeId) {
         return classTypeRepository.findById(classTypeId)
                 .map(ClassType::getInstructors)
                 .orElse(Collections.emptyList());
     }
 
     @Override
-    public List<FitnessClass> findFitnessClassesByClassType(Long classTypeId) {
+    public List<FitnessClass> findFitnessClassesById(Long classTypeId) {
         return classTypeRepository.findById(classTypeId)
                 .map(ClassType::getClasses)
                 .orElse(Collections.emptyList());
     }
 
     @Override
-    public List<Room> findRoomsByClassType(Long classTypeId) {
+    public List<Room> findRoomsById(Long classTypeId) {
         return classTypeRepository.findById(classTypeId)
                 .map(ClassType::getRooms)
                 .orElse(Collections.emptyList());

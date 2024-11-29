@@ -8,8 +8,8 @@ import cz.cvut.fit.tjv.fitnessApp.domain.Room;
 import java.util.List;
 
 public interface ClassTypeService extends CrudService<ClassType, Long> {
-    List<Instructor> findInstructorsByClassType(Long classTypeId);
-    List<Room> findRoomsByClassType(Long classTypeId);
-    List<FitnessClass> findFitnessClassesByClassType(Long classTypeId);
+    List<Instructor> findInstructorsById(Long classTypeId);
+    List<Room> findRoomsById(Long classTypeId);
+    List<FitnessClass> findFitnessClassesById(Long classTypeId);
     List<ClassType> readAllByName(String name);
 }

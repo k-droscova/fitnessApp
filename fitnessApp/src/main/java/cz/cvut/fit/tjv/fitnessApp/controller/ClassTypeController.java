@@ -108,7 +108,7 @@ public class ClassTypeController {
     })
     @GetMapping("/{id}/instructors")
     public Set<Long> getInstructorsByClassType(@PathVariable Long id) {
-        return classTypeService.findInstructorsByClassType(id).stream()
+        return classTypeService.findInstructorsById(id).stream()
                 .map(Instructor::getId)
                 .collect(Collectors.toSet());
     }
@@ -120,7 +120,7 @@ public class ClassTypeController {
     })
     @GetMapping("/{id}/rooms")
     public Set<Long> getRoomsByClassType(@PathVariable Long id) {
-        return classTypeService.findRoomsByClassType(id).stream()
+        return classTypeService.findRoomsById(id).stream()
                 .map(Room::getId)
                 .collect(Collectors.toSet());
     }
@@ -132,7 +132,7 @@ public class ClassTypeController {
     })
     @GetMapping("/{id}/fitness-classes")
     public Set<Long> getFitnessClassesByClassType(@PathVariable Long id) {
-        return classTypeService.findFitnessClassesByClassType(id).stream()
+        return classTypeService.findFitnessClassesById(id).stream()
                 .map(FitnessClass::getId)
                 .collect(Collectors.toSet());
     }

@@ -145,7 +145,7 @@ class ClassTypeServiceImplTest {
 
         when(classTypeRepository.findById(1L)).thenReturn(Optional.of(mockClassType));
 
-        List<Instructor> result = classTypeService.findInstructorsByClassType(1L);
+        List<Instructor> result = classTypeService.findInstructorsById(1L);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -153,10 +153,10 @@ class ClassTypeServiceImplTest {
     }
 
     @Test
-    void findInstructorsByClassType_ReturnsEmpty_WhenClassTypeNotFound() {
+    void findInstructorsByClassType_ReturnsEmpty_WhenIdNotFound() {
         when(classTypeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        List<Instructor> result = classTypeService.findInstructorsByClassType(1L);
+        List<Instructor> result = classTypeService.findInstructorsById(1L);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
