@@ -5,6 +5,8 @@ import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.service.InstructorService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.InstructorMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/instructor")
@@ -29,6 +32,11 @@ public class InstructorController {
     }
 
     @Operation(summary = "Create a new Instructor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Instructor created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping
     public InstructorDto create(@RequestBody InstructorDto instructorDto) {
         Instructor instructor = instructorMapper.convertToEntity(instructorDto);
@@ -36,6 +44,12 @@ public class InstructorController {
     }
 
     @Operation(summary = "Update an existing Instructor by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Instructor updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "404", description = "Instructor not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Long id, @RequestBody InstructorDto instructorDto) {
@@ -44,11 +58,21 @@ public class InstructorController {
     }
 
     @Operation(summary = "Retrieve all Instructors or search by name/surname")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Instructors retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping
     public List<InstructorDto> readAllOrSearch(
             @RequestParam Optional<String> name,
             @RequestParam Optional<String> surname,
             @RequestParam Optional<String> input) {
+
+        if (Stream.of(name, surname, input).filter(Optional::isPresent).count() > 1) {
+            throw new IllegalArgumentException("Only one search parameter (name, surname, or input) can be specified.");
+        }
+
         List<Instructor> instructors;
         if (name.isPresent()) {
             instructors = instructorService.readAllByName(name.get());
@@ -59,10 +83,16 @@ public class InstructorController {
         } else {
             instructors = instructorService.readAll();
         }
+
         return instructorMapper.convertManyToDto(instructors);
     }
 
     @Operation(summary = "Retrieve an Instructor by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Instructor retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Instructor not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/{id}")
     public InstructorDto readById(@PathVariable Long id) {
         Instructor instructor = instructorService.readById(id).orElseThrow(() ->
@@ -71,6 +101,11 @@ public class InstructorController {
     }
 
     @Operation(summary = "Delete an Instructor by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Instructor deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Instructor not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) {
@@ -78,11 +113,21 @@ public class InstructorController {
     }
 
     @Operation(summary = "Retrieve available Instructors for a given date, time, and optional ClassType")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of available Instructors retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/available")
     public List<Long> findAvailableInstructors(
             @RequestParam Optional<Long> classTypeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time) {
+
+        if (date == null || time == null) {
+            throw new IllegalArgumentException("Both 'date' and 'time' parameters are required.");
+        }
+
         return instructorService.findAvailableInstructors(classTypeId, date, time).stream()
                 .map(Instructor::getId)
                 .collect(Collectors.toList());

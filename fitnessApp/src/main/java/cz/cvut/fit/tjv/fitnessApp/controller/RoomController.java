@@ -5,6 +5,8 @@ import cz.cvut.fit.tjv.fitnessApp.domain.Room;
 import cz.cvut.fit.tjv.fitnessApp.service.RoomService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.RoomMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,11 @@ public class RoomController {
     }
 
     @Operation(summary = "Create a new Room")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Room created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping
     public RoomDto create(@RequestBody RoomDto roomDto) {
         Room room = roomMapper.convertToEntity(roomDto);
@@ -36,6 +43,12 @@ public class RoomController {
     }
 
     @Operation(summary = "Update an existing Room by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Room updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "404", description = "Room not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Long id, @RequestBody RoomDto roomDto) {
@@ -44,6 +57,10 @@ public class RoomController {
     }
 
     @Operation(summary = "Retrieve all Rooms")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Rooms retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping
     public List<RoomDto> readAll() {
         List<Room> rooms = roomService.readAll();
@@ -51,6 +68,11 @@ public class RoomController {
     }
 
     @Operation(summary = "Retrieve a Room by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Room retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Room not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/{id}")
     public RoomDto readById(@PathVariable Long id) {
         Room room = roomService.readById(id).orElseThrow(() ->
@@ -59,6 +81,11 @@ public class RoomController {
     }
 
     @Operation(summary = "Delete a Room by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Room deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Room not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) {
@@ -66,11 +93,21 @@ public class RoomController {
     }
 
     @Operation(summary = "Retrieve available Rooms for a given date, time, and optional ClassType")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of available Rooms retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/available")
     public List<Long> findAvailableRooms(
             @RequestParam Optional<Long> classTypeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time) {
+
+        if (date == null || time == null) {
+            throw new IllegalArgumentException("Both 'date' and 'time' parameters are required.");
+        }
+
         return roomService.findAvailableRooms(classTypeId, date, time).stream()
                 .map(Room::getId)
                 .collect(Collectors.toList());
