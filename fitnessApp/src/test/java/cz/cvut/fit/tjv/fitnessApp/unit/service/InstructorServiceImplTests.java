@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -136,5 +138,76 @@ class InstructorServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> instructorService.deleteById(1L));
         verify(instructorRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void readAllByName_ShouldReturnMatchingInstructors() {
+        when(instructorRepository.findInstructorByNameStartingWithIgnoreCase("Jo"))
+                .thenReturn(List.of(mockInstructor));
+
+        List<Instructor> result = instructorService.readAllByName("Jo");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John", result.get(0).getName());
+    }
+
+    @Test
+    void readAllBySurname_ShouldReturnMatchingInstructors() {
+        when(instructorRepository.findInstructorsBySurnameStartingWithIgnoreCase("Do"))
+                .thenReturn(List.of(mockInstructor));
+
+        List<Instructor> result = instructorService.readAllBySurname("Do");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Doe", result.get(0).getSurname());
+    }
+
+    @Test
+    void readAllByNameOrSurname_ShouldReturnMatchingInstructors() {
+        when(instructorRepository.findInstructorsByNameOrSurnameStartingWithIgnoreCase("Jo"))
+                .thenReturn(List.of(mockInstructor));
+
+        List<Instructor> result = instructorService.readAllByNameOrSurname("Jo");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John", result.get(0).getName());
+    }
+
+    @Test
+    void findAvailableInstructors_ShouldReturnInstructors_WhenClassTypeIdIsNull() {
+        when(instructorRepository.findAvailableInstructorsByOptionalClassType(null, LocalDate.of(2024, 12, 1), LocalTime.of(10, 0)))
+                .thenReturn(List.of(mockInstructor));
+
+        List<Instructor> result = instructorService.findAvailableInstructors(Optional.empty(), LocalDate.of(2024, 12, 1), LocalTime.of(10, 0));
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John", result.get(0).getName());
+    }
+
+    @Test
+    void findAvailableInstructors_ShouldReturnInstructors_WhenClassTypeIdIsProvided() {
+        when(instructorRepository.findAvailableInstructorsByOptionalClassType(1L, LocalDate.of(2024, 12, 1), LocalTime.of(10, 0)))
+                .thenReturn(List.of(mockInstructor));
+
+        List<Instructor> result = instructorService.findAvailableInstructors(Optional.of(1L), LocalDate.of(2024, 12, 1), LocalTime.of(10, 0));
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John", result.get(0).getName());
+    }
+
+    @Test
+    void findAvailableInstructors_ShouldReturnEmptyList_WhenNoInstructorsAvailable() {
+        when(instructorRepository.findAvailableInstructorsByOptionalClassType(1L, LocalDate.of(2024, 12, 1), LocalTime.of(10, 0)))
+                .thenReturn(List.of());
+
+        List<Instructor> result = instructorService.findAvailableInstructors(Optional.of(1L), LocalDate.of(2024, 12, 1), LocalTime.of(10, 0));
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }

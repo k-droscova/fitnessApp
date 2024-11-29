@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,5 +139,34 @@ class TraineeServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> traineeService.deleteById(1L));
         verify(traineeRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void findTraineesByFitnessClassId_ShouldReturnTrainees_WhenFitnessClassExists() {
+        when(traineeRepository.findByFitnessClassId(1L)).thenReturn(List.of(mockTrainee));
+
+        List<Trainee> result = traineeService.findTraineesByFitnessClassId(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Jane", result.get(0).getName());
+        assertEquals("Doe", result.get(0).getSurname());
+    }
+
+    @Test
+    void findTraineesByFitnessClassId_ShouldReturnEmptyList_WhenNoTraineesFound() {
+        when(traineeRepository.findByFitnessClassId(1L)).thenReturn(Collections.emptyList());
+
+        List<Trainee> result = traineeService.findTraineesByFitnessClassId(1L);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void findTraineesByFitnessClassId_ShouldThrowException_WhenFitnessClassIdIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> traineeService.findTraineesByFitnessClassId(null));
+
+        verify(traineeRepository, never()).findByFitnessClassId(any());
     }
 }

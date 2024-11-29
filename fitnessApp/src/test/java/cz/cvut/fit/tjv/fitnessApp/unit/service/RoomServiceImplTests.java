@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -133,5 +135,40 @@ class RoomServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> roomService.deleteById(1L));
         verify(roomRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void findAvailableRooms_ShouldReturnRooms_WhenClassTypeIdIsNull() {
+        when(roomRepository.findAvailableRoomsByOptionalClassType(null, LocalDate.of(2024, 12, 1), LocalTime.of(10, 0)))
+                .thenReturn(List.of(mockRoom));
+
+        List<Room> result = roomService.findAvailableRooms(Optional.empty(), LocalDate.of(2024, 12, 1), LocalTime.of(10, 0));
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(50, result.get(0).getMaxCapacity());
+    }
+
+    @Test
+    void findAvailableRooms_ShouldReturnRooms_WhenClassTypeIdIsProvided() {
+        when(roomRepository.findAvailableRoomsByOptionalClassType(1L, LocalDate.of(2024, 12, 1), LocalTime.of(10, 0)))
+                .thenReturn(List.of(mockRoom));
+
+        List<Room> result = roomService.findAvailableRooms(Optional.of(1L), LocalDate.of(2024, 12, 1), LocalTime.of(10, 0));
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(50, result.get(0).getMaxCapacity());
+    }
+
+    @Test
+    void findAvailableRooms_ShouldReturnEmptyList_WhenNoRoomsAvailable() {
+        when(roomRepository.findAvailableRoomsByOptionalClassType(1L, LocalDate.of(2024, 12, 1), LocalTime.of(10, 0)))
+                .thenReturn(List.of());
+
+        List<Room> result = roomService.findAvailableRooms(Optional.of(1L), LocalDate.of(2024, 12, 1), LocalTime.of(10, 0));
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }
