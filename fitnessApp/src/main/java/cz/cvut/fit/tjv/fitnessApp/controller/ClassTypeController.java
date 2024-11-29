@@ -36,7 +36,8 @@ public class ClassTypeController {
     @Operation(summary = "Create a new ClassType")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ClassType created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data")
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
     public ClassTypeDto create(@RequestBody ClassTypeDto classTypeDto) {
@@ -47,7 +48,9 @@ public class ClassTypeController {
     @Operation(summary = "Update an existing ClassType by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "ClassType updated successfully"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found")
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -59,7 +62,8 @@ public class ClassTypeController {
     @Operation(summary = "Retrieve all ClassTypes or search by name")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of ClassTypes retrieved"),
-            @ApiResponse(responseCode = "400", description = "Invalid search query")
+            @ApiResponse(responseCode = "400", description = "Invalid search query"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
     public List<ClassTypeDto> readAllOrByName(@RequestParam Optional<String> name) {
@@ -77,7 +81,8 @@ public class ClassTypeController {
     @Operation(summary = "Retrieve a ClassType by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ClassType retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found")
+            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
     public ClassTypeDto readById(@PathVariable Long id) {
@@ -89,22 +94,20 @@ public class ClassTypeController {
     @Operation(summary = "Delete a ClassType by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "ClassType deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found")
+            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) {
-        try {
-            classTypeService.deleteById(id);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ClassType not found");
-        }
+        classTypeService.deleteById(id);
     }
 
     @Operation(summary = "Retrieve instructors by ClassType ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of instructors retrieved"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found")
+            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}/instructors")
     public Set<Long> getInstructorsByClassType(@PathVariable Long id) {
@@ -116,7 +119,8 @@ public class ClassTypeController {
     @Operation(summary = "Retrieve rooms by ClassType ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of rooms retrieved"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found")
+            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}/rooms")
     public Set<Long> getRoomsByClassType(@PathVariable Long id) {
@@ -128,7 +132,8 @@ public class ClassTypeController {
     @Operation(summary = "Retrieve fitness classes by ClassType ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of fitness classes retrieved"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found")
+            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}/fitness-classes")
     public Set<Long> getFitnessClassesByClassType(@PathVariable Long id) {
