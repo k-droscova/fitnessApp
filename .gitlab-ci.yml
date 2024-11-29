@@ -1,3 +1,5 @@
+image: gradle:jdk17
+
 stages:
   - build
   - test
@@ -14,7 +16,7 @@ build:
   stage: build
   script:
     - cd fitnessApp
-    - ./gradlew assemble
+    - gradle assemble
   artifacts:
     paths:
       - fitnessApp/build/libs/
@@ -23,10 +25,10 @@ test:
   stage: test
   script:
     - cd fitnessApp
-    - ./gradlew clean test jacocoTestReport
+    - gradle clean test jacocoTestReport
   artifacts:
     paths:
-      - fitnessApp/build/reports/jacoco/test/html # Save coverage report for download
-      - fitnessApp/build/reports/jacoco/test/jacocoTestReport.xml # Save XML for coverage parsing
+      - fitnessApp/build/reports/jacoco/test/html
+      - fitnessApp/build/reports/jacoco/test/jacocoTestReport.xml
     when: always
-  coverage: '/^TOTAL\s*LINE\s*([\d.]+)%/' # Extract coverage percentage from the report
+  coverage: '/^TOTAL\s*LINE\s*([\d.]+)%/'
