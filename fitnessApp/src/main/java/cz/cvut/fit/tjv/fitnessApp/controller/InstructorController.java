@@ -123,11 +123,6 @@ public class InstructorController {
             @RequestParam Optional<Long> classTypeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time) {
-
-        if (date == null || time == null) {
-            throw new IllegalArgumentException("Both 'date' and 'time' parameters are required.");
-        }
-
         return instructorService.findAvailableInstructors(classTypeId, date, time).stream()
                 .map(Instructor::getId)
                 .collect(Collectors.toList());
