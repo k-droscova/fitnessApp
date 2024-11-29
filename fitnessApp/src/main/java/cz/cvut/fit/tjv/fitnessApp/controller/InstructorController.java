@@ -103,7 +103,7 @@ public class InstructorController {
     @Operation(summary = "Delete an Instructor by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Instructor deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Instructor not found"),
+            @ApiResponse(responseCode = "400", description = "Instructor not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")

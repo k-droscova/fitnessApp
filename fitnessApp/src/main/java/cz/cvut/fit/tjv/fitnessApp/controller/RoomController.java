@@ -46,7 +46,6 @@ public class RoomController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Room updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "404", description = "Room not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}")
@@ -83,7 +82,7 @@ public class RoomController {
     @Operation(summary = "Delete a Room by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Room deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Room not found"),
+            @ApiResponse(responseCode = "400", description = "Room not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")

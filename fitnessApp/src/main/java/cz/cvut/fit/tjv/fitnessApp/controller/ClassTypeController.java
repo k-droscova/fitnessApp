@@ -49,7 +49,6 @@ public class ClassTypeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "ClassType updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}")
@@ -94,7 +93,7 @@ public class ClassTypeController {
     @Operation(summary = "Delete a ClassType by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "ClassType deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "400", description = "ClassType not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
@@ -106,7 +105,7 @@ public class ClassTypeController {
     @Operation(summary = "Retrieve instructors by ClassType ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of instructors retrieved"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "400", description = "ClassType not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}/instructors")
@@ -119,7 +118,7 @@ public class ClassTypeController {
     @Operation(summary = "Retrieve rooms by ClassType ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of rooms retrieved"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "400", description = "ClassType not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}/rooms")
@@ -132,7 +131,7 @@ public class ClassTypeController {
     @Operation(summary = "Retrieve fitness classes by ClassType ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of fitness classes retrieved"),
-            @ApiResponse(responseCode = "404", description = "ClassType not found"),
+            @ApiResponse(responseCode = "400", description = "ClassType not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}/fitness-classes")
