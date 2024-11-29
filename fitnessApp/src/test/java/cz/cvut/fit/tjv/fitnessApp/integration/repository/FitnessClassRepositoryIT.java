@@ -34,7 +34,7 @@ public class FitnessClassRepositoryIT {
         List<FitnessClass> results = fitnessClassRepository.findFitnessClassesByDate(LocalDate.of(2024, 12, 1));
 
         assertNotNull(results);
-        assertEquals(2, results.size());
+        assertEquals(3, results.size());
         assertTrue(results.stream().anyMatch(fc -> fc.getTime().equals(LocalTime.of(10, 0))));
         assertTrue(results.stream().anyMatch(fc -> fc.getTime().equals(LocalTime.of(15, 0))));
     }

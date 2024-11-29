@@ -96,9 +96,10 @@ public class InstructorRepositoryIT {
     void findInstructorsByNameOrSurnameStartingWithIgnoreCase_ShouldReturnBothInstructorsWhenInputIsJ() {
         List<Instructor> result = instructorRepository.findInstructorsByNameOrSurnameStartingWithIgnoreCase("j");
         assertNotNull(result);
-        assertEquals(2, result.size(), "Expected two matches for name or surname starting with 'j'");
+        assertEquals(3, result.size(), "Expected two matches for name or surname starting with 'j'");
         assertTrue(result.stream().anyMatch(i -> "John".equals(i.getName())), "Expected one of the matches to be 'John'");
         assertTrue(result.stream().anyMatch(i -> "Jane".equals(i.getName())), "Expected one of the matches to be 'Jane'");
+        assertTrue(result.stream().anyMatch(i -> "Johnson".equals(i.getSurname())), "Expected one of the matches to be 'Johnson'");
     }
 
     @Test

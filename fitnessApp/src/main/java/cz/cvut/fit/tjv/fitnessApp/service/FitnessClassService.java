@@ -12,4 +12,7 @@ public interface FitnessClassService extends CrudService<FitnessClass, Long> {
     List<FitnessClass> readAllByDate(LocalDate date);
     List<FitnessClass> readAllByDateAndTimeBetween(LocalDate date, LocalTime start, LocalTime end);
     List<FitnessClass> readAllByDateAndRoomId(LocalDate date, Long roomId);
+    void scheduleClass(FitnessClass fitnessClass);
+    void validateAndUpdate(Long id, FitnessClass updatedClass);
+    void addTraineeToClass(Long fitnessClassId, Long traineeId);
 }
