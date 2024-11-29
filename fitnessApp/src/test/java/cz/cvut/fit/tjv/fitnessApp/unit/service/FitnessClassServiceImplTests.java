@@ -1,7 +1,11 @@
 package cz.cvut.fit.tjv.fitnessApp.unit.service;
 
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
+import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
+import cz.cvut.fit.tjv.fitnessApp.domain.Room;
+import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
 import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
+import cz.cvut.fit.tjv.fitnessApp.repository.TraineeRepository;
 import cz.cvut.fit.tjv.fitnessApp.service.FitnessClassServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,23 +29,41 @@ class FitnessClassServiceImplTest {
     @Mock
     private FitnessClassRepository fitnessClassRepository;
 
+    @Mock
+    private TraineeRepository traineeRepository;
+
     @InjectMocks
     private FitnessClassServiceImpl fitnessClassService;
 
     private FitnessClass mockFitnessClass;
+    private Room mockRoom;
+    private Instructor mockInstructor;
 
     @BeforeEach
     void setUp() {
         mockFitnessClass = new FitnessClass();
         mockFitnessClass.setId(1L);
         mockFitnessClass.setCapacity(20);
+        mockFitnessClass.setDate(LocalDate.now().plusDays(1));
+        mockFitnessClass.setTime(LocalTime.now().plusHours(2));
+
+        mockRoom = new Room();
+        mockRoom.setId(1L);
+        mockRoom.setMaxCapacity(30);
+        mockFitnessClass.setRoom(mockRoom);
+
+        mockInstructor = new Instructor();
+        mockInstructor.setId(1L);
+        mockFitnessClass.setInstructor(mockInstructor);
     }
 
     @AfterEach
     void tearDown() {
         mockFitnessClass = null;
+        mockRoom = null;
+        mockInstructor = null;
     }
-
+    
     @Test
     void create_Successful() {
         when(fitnessClassRepository.existsById(1L)).thenReturn(false);
@@ -133,5 +157,168 @@ class FitnessClassServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> fitnessClassService.deleteById(1L));
         verify(fitnessClassRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void scheduleClass_ShouldScheduleSuccessfully() {
+        when(fitnessClassRepository.findFitnessClassesByDateAndRoom_Id(any(), any())).thenReturn(List.of());
+        when(fitnessClassRepository.findFitnessClassesByDate(any())).thenReturn(List.of());
+        when(fitnessClassRepository.save(mockFitnessClass)).thenReturn(mockFitnessClass);
+
+        fitnessClassService.scheduleClass(mockFitnessClass);
+
+        verify(fitnessClassRepository).save(mockFitnessClass);
+    }
+
+    @Test
+    void scheduleClass_ShouldThrowException_WhenRoomUnavailable() {
+        when(fitnessClassRepository.findFitnessClassesByDateAndRoom_Id(any(), any()))
+                .thenReturn(List.of(mockFitnessClass));
+
+        assertThrows(IllegalArgumentException.class, () -> fitnessClassService.scheduleClass(mockFitnessClass));
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void scheduleClass_ShouldThrowException_WhenInstructorUnavailable() {
+        when(fitnessClassRepository.findFitnessClassesByDate(any())).thenReturn(List.of(mockFitnessClass));
+
+        assertThrows(IllegalArgumentException.class, () -> fitnessClassService.scheduleClass(mockFitnessClass));
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void scheduleClass_ShouldThrowException_WhenDateInPast() {
+        mockFitnessClass.setDate(LocalDate.now().minusDays(1));
+
+        assertThrows(IllegalArgumentException.class, () -> fitnessClassService.scheduleClass(mockFitnessClass));
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void scheduleClass_ShouldThrowException_WhenClassCapacityExceedsRoomCapacity() {
+        mockFitnessClass.setCapacity(35);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.scheduleClass(mockFitnessClass),
+                "Expected IllegalArgumentException when class capacity exceeds room's maximum capacity.");
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void scheduleClass_ShouldThrowException_WhenClassCapacityBelowZero() {
+        mockFitnessClass.setCapacity(-5);
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.scheduleClass(mockFitnessClass),
+                "Expected IllegalArgumentException when class capacity is below zero.");
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void validateAndUpdate_ShouldUpdateSuccessfully() {
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(fitnessClassRepository.findFitnessClassesByDateAndRoom_Id(any(), any())).thenReturn(List.of());
+        when(fitnessClassRepository.findFitnessClassesByDate(any())).thenReturn(List.of());
+
+        mockFitnessClass.setCapacity(25);
+        fitnessClassService.validateAndUpdate(1L, mockFitnessClass);
+
+        verify(fitnessClassRepository).save(mockFitnessClass);
+    }
+
+
+    @Test
+    void validateAndUpdate_ShouldThrowException_WhenRoomConflict() {
+        FitnessClass conflict = new FitnessClass();
+        conflict.setId(100L);
+        conflict.setTime(mockFitnessClass.getTime());
+        conflict.setRoom(mockRoom);
+        conflict.setDate(mockFitnessClass.getDate());
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(fitnessClassRepository.findFitnessClassesByDateAndRoom_Id(any(), any()))
+                .thenReturn(List.of(conflict));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.validateAndUpdate(1L, mockFitnessClass));
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void validateAndUpdate_ShouldThrowException_WhenInstructorConflict() {
+        FitnessClass existingClass = new FitnessClass();
+        existingClass.setId(2L); // Different ID
+        existingClass.setDate(mockFitnessClass.getDate());
+        existingClass.setTime(mockFitnessClass.getTime());
+        existingClass.setInstructor(mockInstructor); // Same instructor
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(fitnessClassRepository.findFitnessClassesByDate(mockFitnessClass.getDate())).thenReturn(List.of(existingClass));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.validateAndUpdate(1L, mockFitnessClass));
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void validateAndUpdate_ShouldThrowException_WhenDateInPast() {
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        mockFitnessClass.setDate(LocalDate.of(2023, 12, 1));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.validateAndUpdate(1L, mockFitnessClass));
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void addTraineeToClass_ShouldAddTraineeSuccessfully() {
+        Trainee mockTrainee = new Trainee();
+        mockTrainee.setId(1L);
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(mockTrainee));
+
+        fitnessClassService.addTraineeToClass(1L, 1L);
+
+        assertTrue(mockFitnessClass.getTrainees().contains(mockTrainee));
+        verify(fitnessClassRepository).save(mockFitnessClass);
+    }
+
+    @Test
+    void addTraineeToClass_ShouldThrowException_WhenCapacityFull() {
+        Trainee mockTrainee = new Trainee();
+        mockTrainee.setId(1L);
+        mockFitnessClass.setCapacity(1);
+        mockFitnessClass.setTrainees(List.of(mockTrainee));
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.addTraineeToClass(1L, 2L));
+
+        verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void addTraineeToClass_ShouldThrowException_WhenTraineeAlreadyEnrolled() {
+        Trainee mockTrainee = new Trainee();
+        mockTrainee.setId(1L);
+        mockFitnessClass.getTrainees().add(mockTrainee);
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(mockTrainee));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.addTraineeToClass(1L, 1L));
+
+        verify(fitnessClassRepository, never()).save(any());
     }
 }
