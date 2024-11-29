@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -86,6 +87,15 @@ class InstructorControllerTest {
     }
 
     @Test
+    void create_ShouldReturnBadRequest_WhenRequestBodyIsMalformed() throws Exception {
+        mockMvc.perform(post("/instructor")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"invalid json\"}")) // Malformed JSON
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Malformed JSON request")));
+    }
+
+    @Test
     void create_ShouldReturnBadRequest_WhenMapperFails() throws Exception {
         Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class)))
                 .thenThrow(new IllegalArgumentException("Invalid InstructorDto"));
@@ -95,6 +105,19 @@ class InstructorControllerTest {
                         .content(objectMapper.writeValueAsString(mockInstructorDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid argument: Invalid InstructorDto"));
+    }
+
+    @Test
+    void create_ShouldReturnBadRequest_WhenDuplicateInstructor() throws Exception {
+        Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class))).thenReturn(mockInstructor);
+        Mockito.when(instructorService.create(any(Instructor.class)))
+                .thenThrow(new IllegalArgumentException("Instructor already exists"));
+
+        mockMvc.perform(post("/instructor")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mockInstructorDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Invalid argument: Instructor already exists"));
     }
 
     @Test
@@ -167,6 +190,43 @@ class InstructorControllerTest {
     }
 
     @Test
+    void readAllOrSearch_ShouldReturnBadRequest_WhenMultipleQueryParametersProvided() throws Exception {
+        mockMvc.perform(get("/instructor")
+                        .param("name", "John")
+                        .param("surname", "Doe"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Invalid argument: Only one search parameter (name, surname, or input) can be specified."));
+    }
+
+    @Test
+    void readAllOrSearch_ShouldReturnBadRequest_WhenAllQueryParamsProvided() throws Exception {
+        mockMvc.perform(get("/instructor")
+                        .param("name", "John")
+                        .param("surname", "Doe")
+                        .param("input", "JD"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Invalid argument: Only one search parameter (name, surname, or input) can be specified."));
+    }
+
+    @Test
+    void readAllOrSearch_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
+        Mockito.when(instructorService.readAll()).thenThrow(new RuntimeException("Unexpected error"));
+
+        mockMvc.perform(get("/instructor"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("A runtime error occurred: Unexpected error"));
+    }
+
+    @Test
+    void readAllOrSearch_ShouldReturnEmptyList_WhenNoInstructorsMatch() throws Exception {
+        Mockito.when(instructorService.readAllByName("NonExistent")).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/instructor").param("name", "NonExistent"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
     void readById_ShouldReturnInstructor() throws Exception {
         Mockito.when(instructorService.readById(1L)).thenReturn(Optional.of(mockInstructor));
         Mockito.when(instructorMapper.convertToDto(mockInstructor)).thenReturn(mockInstructorDto);
@@ -221,5 +281,21 @@ class InstructorControllerTest {
                         .param("time", "10:00"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void findAvailableInstructors_ShouldReturnBadRequest_WhenDateIsMissing() throws Exception {
+        mockMvc.perform(get("/instructor/available")
+                        .param("time", "10:00"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Missing required parameter: date"));
+    }
+
+    @Test
+    void findAvailableInstructors_ShouldReturnBadRequest_WhenTimeIsMissing() throws Exception {
+        mockMvc.perform(get("/instructor/available")
+                        .param("date", "2024-12-01"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Missing required parameter: time"));
     }
 }
