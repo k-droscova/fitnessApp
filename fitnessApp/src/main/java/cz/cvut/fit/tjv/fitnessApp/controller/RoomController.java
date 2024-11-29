@@ -103,11 +103,6 @@ public class RoomController {
             @RequestParam Optional<Long> classTypeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time) {
-
-        if (date == null || time == null) {
-            throw new IllegalArgumentException("Both 'date' and 'time' parameters are required.");
-        }
-
         return roomService.findAvailableRooms(classTypeId, date, time).stream()
                 .map(Room::getId)
                 .collect(Collectors.toList());

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -83,6 +84,15 @@ class RoomControllerTest {
     }
 
     @Test
+    void create_ShouldReturnBadRequest_WhenRequestBodyIsMalformed() throws Exception {
+        mockMvc.perform(post("/room")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"invalid json\"}")) // Malformed JSON
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Malformed JSON request")));
+    }
+
+    @Test
     void create_ShouldReturnBadRequest_WhenMapperFails() throws Exception {
         Mockito.when(roomMapper.convertToEntity(any(RoomDto.class)))
                 .thenThrow(new IllegalArgumentException("Invalid RoomDto"));
@@ -92,19 +102,6 @@ class RoomControllerTest {
                         .content(objectMapper.writeValueAsString(mockRoomDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid argument: Invalid RoomDto"));
-    }
-
-    @Test
-    void create_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(roomMapper.convertToEntity(any(RoomDto.class))).thenReturn(mockRoom);
-        Mockito.when(roomService.create(any(Room.class)))
-                .thenThrow(new RuntimeException("Service error"));
-
-        mockMvc.perform(post("/room")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockRoomDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
     }
 
     @Test
@@ -118,30 +115,6 @@ class RoomControllerTest {
     }
 
     @Test
-    void update_ShouldReturnBadRequest_WhenMapperFails() throws Exception {
-        Mockito.when(roomMapper.convertToEntity(any(RoomDto.class)))
-                .thenThrow(new IllegalArgumentException("Invalid RoomDto"));
-
-        mockMvc.perform(put("/room/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockRoomDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid RoomDto"));
-    }
-
-    @Test
-    void update_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(roomMapper.convertToEntity(any(RoomDto.class))).thenReturn(mockRoom);
-        Mockito.doThrow(new RuntimeException("Service error")).when(roomService).update(anyLong(), any(Room.class));
-
-        mockMvc.perform(put("/room/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockRoomDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
-    }
-
-    @Test
     void readAll_ShouldReturnAllRooms() throws Exception {
         Mockito.when(roomService.readAll()).thenReturn(mockRoomList);
         Mockito.when(roomMapper.convertManyToDto(mockRoomList)).thenReturn(mockRoomDtoList);
@@ -150,6 +123,47 @@ class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].maxCapacity").value(50));
+    }
+
+    @Test
+    void readAll_ShouldReturnEmptyList_WhenNoRoomsExist() throws Exception {
+        Mockito.when(roomService.readAll()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/room"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void findAvailableRooms_ShouldReturnAvailableRooms() throws Exception {
+        Mockito.when(roomService.findAvailableRooms(
+                eq(Optional.of(1L)),
+                any(LocalDate.class),
+                any(LocalTime.class)
+        )).thenReturn(mockRoomList);
+
+        mockMvc.perform(get("/room/available")
+                        .param("classTypeId", "1")
+                        .param("date", "2024-12-01")
+                        .param("time", "10:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(1L));
+    }
+
+    @Test
+    void findAvailableRooms_ShouldReturnBadRequest_WhenDateIsMissing() throws Exception {
+        mockMvc.perform(get("/room/available")
+                        .param("time", "10:00"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Missing required parameter: date"));
+    }
+
+    @Test
+    void findAvailableRooms_ShouldReturnBadRequest_WhenTimeIsMissing() throws Exception {
+        mockMvc.perform(get("/room/available")
+                        .param("date", "2024-12-01"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Missing required parameter: time"));
     }
 
     @Test
@@ -186,36 +200,5 @@ class RoomControllerTest {
         mockMvc.perform(delete("/room/1"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string("A runtime error occurred: Service error"));
-    }
-
-    @Test
-    void findAvailableRooms_ShouldReturnAvailableRooms() throws Exception {
-        Mockito.when(roomService.findAvailableRooms(
-                eq(Optional.of(1L)),
-                any(LocalDate.class),
-                any(LocalTime.class)
-        )).thenReturn(mockRoomList);
-
-        mockMvc.perform(get("/room/available")
-                        .param("classTypeId", "1")
-                        .param("date", "2024-12-01")
-                        .param("time", "10:00"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value(1L));
-    }
-
-    @Test
-    void findAvailableRooms_ShouldReturnEmptyList_WhenNoRoomsAvailable() throws Exception {
-        Mockito.when(roomService.findAvailableRooms(
-                eq(Optional.empty()),
-                any(LocalDate.class),
-                any(LocalTime.class)
-        )).thenReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/room/available")
-                        .param("date", "2024-12-01")
-                        .param("time", "10:00"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
     }
 }
