@@ -88,6 +88,3 @@ INSERT INTO attended_trainees (id_class, id_trainee) VALUES (4, 4); -- Dave atte
 INSERT INTO attended_trainees (id_class, id_trainee) VALUES (4, 1); -- Alice attends Power Yoga
 INSERT INTO attended_trainees (id_class, id_trainee) VALUES (4, 3); -- Carol attends Power Yoga
 INSERT INTO attended_trainees (id_class, id_trainee) VALUES (4, 2); -- Bob attends Power Yoga
-
-INSERT INTO attended_trainees (id_class, id_trainee) VALUES (5, 1); -- Alice attends Spin
-INSERT INTO attended_trainees (id_class, id_trainee) VALUES (5, 3); -- Carol attends Spin
