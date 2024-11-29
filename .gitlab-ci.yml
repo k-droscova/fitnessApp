@@ -31,4 +31,4 @@ test:
       - fitnessApp/build/reports/jacoco/test/html
       - fitnessApp/build/reports/jacoco/test/jacocoTestReport.xml
     when: always
-  coverage: '/^TOTAL\s*LINE\s*([\d.]+)%/'
+  coverage: '/Total.*?([0-9]{1,3})%/'
