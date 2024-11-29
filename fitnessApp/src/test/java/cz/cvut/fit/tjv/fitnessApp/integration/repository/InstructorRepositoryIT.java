@@ -113,15 +113,16 @@ public class InstructorRepositoryIT {
     }
 
     @Test
-    void findAvailableInstructorsByOptionalClassType_ShouldReturnAllAvailableWhenClassTypeIdIsNull() {
+    void findAvailableInstructorsByOptionalClassType_ShouldReturnAllAvailableWhenClassTypeIdIsNullAndAllAreUnbookedAtThatTime() {
         List<Instructor> results = instructorRepository.findAvailableInstructorsByOptionalClassType(
                 null, // No classTypeId filter
                 LocalDate.of(2024, 12, 1),
-                LocalTime.of(10, 0)
+                LocalTime.of(12, 0) // A time when no instructors are booked
         );
 
         assertNotNull(results);
-        assertEquals(3, results.size(), "Expected 3 available instructors (excluding John who is booked)");
+        assertEquals(4, results.size(), "Expected 4 available instructors since none are booked at this time");
+        assertTrue(results.stream().anyMatch(i -> "John".equals(i.getName())));
         assertTrue(results.stream().anyMatch(i -> "Jane".equals(i.getName())));
         assertTrue(results.stream().anyMatch(i -> "Alice".equals(i.getName())));
         assertTrue(results.stream().anyMatch(i -> "Bob".equals(i.getName())));
