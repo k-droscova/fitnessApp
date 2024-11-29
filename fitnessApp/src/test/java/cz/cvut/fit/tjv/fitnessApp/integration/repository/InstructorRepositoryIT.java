@@ -9,7 +9,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -107,5 +110,47 @@ public class InstructorRepositoryIT {
         List<Instructor> result = instructorRepository.findInstructorsByNameOrSurnameStartingWithIgnoreCase("z");
         assertNotNull(result);
         assertTrue(result.isEmpty(), "Expected no matches for name or surname starting with 'z'");
+    }
+
+    @Test
+    void findAvailableInstructorsByOptionalClassType_ShouldReturnAllAvailableWhenClassTypeIdIsNull() {
+        List<Instructor> results = instructorRepository.findAvailableInstructorsByOptionalClassType(
+                null, // No classTypeId filter
+                LocalDate.of(2024, 12, 1),
+                LocalTime.of(10, 0)
+        );
+
+        assertNotNull(results);
+        assertEquals(3, results.size(), "Expected 3 available instructors (excluding John who is booked)");
+        assertTrue(results.stream().anyMatch(i -> "Jane".equals(i.getName())));
+        assertTrue(results.stream().anyMatch(i -> "Alice".equals(i.getName())));
+        assertTrue(results.stream().anyMatch(i -> "Bob".equals(i.getName())));
+    }
+
+    @Test
+    void findAvailableInstructorsByOptionalClassType_ShouldFilterByClassType() {
+        List<Instructor> results = instructorRepository.findAvailableInstructorsByOptionalClassType(
+                1L, // ClassTypeId for Yoga
+                LocalDate.of(2024, 12, 1),
+                LocalTime.of(10, 0)
+        );
+
+        assertNotNull(results);
+        assertEquals(1, results.size(), "Expected 1 available instructor specializing in Yoga (excluding John)");
+        assertTrue(results.stream().anyMatch(i -> "Bob".equals(i.getName())));
+    }
+
+    @Test
+    void findAvailableInstructorsByOptionalClassType_ShouldReturnAllUnbookedInstructorsWhenClassTypeIdIsNull() {
+        List<Instructor> results = instructorRepository.findAvailableInstructorsByOptionalClassType(
+                null, // No classTypeId filter
+                LocalDate.of(2024, 12, 1),
+                LocalTime.of(15, 0)
+        );
+
+        assertNotNull(results);
+        assertEquals(2, results.size(), "Expected 2 available instructors (John and Bob)");
+        assertTrue(results.stream().anyMatch(i -> "John".equals(i.getName())), "Expected John to be available");
+        assertTrue(results.stream().anyMatch(i -> "Bob".equals(i.getName())), "Expected Bob to be available");
     }
 }
