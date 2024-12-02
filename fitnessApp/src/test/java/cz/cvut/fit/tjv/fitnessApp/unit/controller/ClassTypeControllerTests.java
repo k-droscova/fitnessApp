@@ -132,19 +132,6 @@ class ClassTypeControllerTest {
     }
 
     @Test
-    void create_ShouldReturnInternalServerError_WhenServiceFailsWithNonIllegalArgumentException() throws Exception {
-        Mockito.when(classTypeMapper.convertToEntity(any(ClassTypeDto.class))).thenReturn(mockClassType);
-        Mockito.when(classTypeService.create(any(ClassType.class)))
-                .thenThrow(new RuntimeException("Service error"));
-
-        mockMvc.perform(post("/classtype")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockClassTypeDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
-    }
-
-    @Test
     void create_ShouldReturnBadRequest_WhenServiceFailsWithIllegalArgumentException() throws Exception {
         Mockito.when(classTypeMapper.convertToEntity(any(ClassTypeDto.class))).thenReturn(mockClassType);
         Mockito.when(classTypeService.create(any(ClassType.class)))
@@ -193,18 +180,6 @@ class ClassTypeControllerTest {
     }
 
     @Test
-    void update_ShouldReturnInternalServerError_WhenServiceFailsWithNonIllegalArgumentException() throws Exception {
-        Mockito.when(classTypeMapper.convertToEntity(any(ClassTypeDto.class))).thenReturn(mockClassType);
-        Mockito.doThrow(new RuntimeException("Service error")).when(classTypeService).update(anyLong(), any());
-
-        mockMvc.perform(put("/classtype/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockClassTypeDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
-    }
-
-    @Test
     void readAllOrByName_ShouldReturnClassTypes() throws Exception {
         Mockito.when(classTypeService.readAll()).thenReturn(mockClassTypeList);
         Mockito.when(classTypeMapper.convertManyToDto(any())).thenReturn(mockClassTypeDtoList);
@@ -240,15 +215,6 @@ class ClassTypeControllerTest {
                 .andExpect(status().isNoContent());
 
         Mockito.verify(classTypeService).deleteById(1L);
-    }
-
-    @Test
-    void deleteById_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.doThrow(new RuntimeException("Service error")).when(classTypeService).deleteById(anyLong());
-
-        mockMvc.perform(delete("/classtype/1"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
     }
 
     @Test

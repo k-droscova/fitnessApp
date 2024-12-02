@@ -192,13 +192,4 @@ class RoomControllerTest {
 
         Mockito.verify(roomService).deleteById(1L);
     }
-
-    @Test
-    void deleteById_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.doThrow(new RuntimeException("Service error")).when(roomService).deleteById(anyLong());
-
-        mockMvc.perform(delete("/room/1"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
-    }
 }

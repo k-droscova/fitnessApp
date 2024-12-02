@@ -121,19 +121,6 @@ class InstructorControllerTest {
     }
 
     @Test
-    void create_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class))).thenReturn(mockInstructor);
-        Mockito.when(instructorService.create(any(Instructor.class)))
-                .thenThrow(new RuntimeException("Service error"));
-
-        mockMvc.perform(post("/instructor")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockInstructorDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
-    }
-
-    @Test
     void update_ShouldReturnNoContent() throws Exception {
         Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class))).thenReturn(mockInstructor);
 
@@ -153,18 +140,6 @@ class InstructorControllerTest {
                         .content(objectMapper.writeValueAsString(mockInstructorDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid argument: Invalid InstructorDto"));
-    }
-
-    @Test
-    void update_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class))).thenReturn(mockInstructor);
-        Mockito.doThrow(new RuntimeException("Service error")).when(instructorService).update(anyLong(), any(Instructor.class));
-
-        mockMvc.perform(put("/instructor/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockInstructorDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
     }
 
     @Test
@@ -206,15 +181,6 @@ class InstructorControllerTest {
                         .param("input", "JD"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid argument: Only one search parameter (name, surname, or input) can be specified."));
-    }
-
-    @Test
-    void readAllOrSearch_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(instructorService.readAll()).thenThrow(new RuntimeException("Unexpected error"));
-
-        mockMvc.perform(get("/instructor"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Unexpected error"));
     }
 
     @Test

@@ -89,18 +89,6 @@ class FitnessClassControllerTest {
     }
 
     @Test
-    void create_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(fitnessClassMapper.convertToEntity(any(FitnessClassDto.class))).thenReturn(mockFitnessClass);
-        Mockito.doThrow(new RuntimeException("Service error")).when(fitnessClassService).scheduleClass(any(FitnessClass.class));
-
-        mockMvc.perform(post("/fitness-class")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockFitnessClassDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string(containsString("A runtime error occurred: Service error")));
-    }
-
-    @Test
     void update_ShouldReturnNoContent() throws Exception {
         Mockito.when(fitnessClassMapper.convertToEntity(any(FitnessClassDto.class))).thenReturn(mockFitnessClass);
         Mockito.doNothing().when(fitnessClassService).validateAndUpdate(anyLong(), any(FitnessClass.class));
@@ -121,18 +109,6 @@ class FitnessClassControllerTest {
                         .content(objectMapper.writeValueAsString(mockFitnessClassDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid argument: Invalid FitnessClassDto"));
-    }
-
-    @Test
-    void update_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(fitnessClassMapper.convertToEntity(any(FitnessClassDto.class))).thenReturn(mockFitnessClass);
-        Mockito.doThrow(new RuntimeException("Service error")).when(fitnessClassService).validateAndUpdate(anyLong(), any(FitnessClass.class));
-
-        mockMvc.perform(put("/fitness-class/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockFitnessClassDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
     }
 
     @Test

@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("A runtime error occurred: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A runtime error occurred: " + ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

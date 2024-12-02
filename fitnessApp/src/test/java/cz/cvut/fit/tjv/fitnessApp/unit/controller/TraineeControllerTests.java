@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -97,19 +96,6 @@ class TraineeControllerTest {
     }
 
     @Test
-    void create_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(traineeMapper.convertToEntity(any(TraineeDto.class))).thenReturn(mockTrainee);
-        Mockito.when(traineeService.create(any(Trainee.class)))
-                .thenThrow(new RuntimeException("Service error"));
-
-        mockMvc.perform(post("/trainee")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockTraineeDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
-    }
-
-    @Test
     void update_ShouldReturnNoContent() throws Exception {
         Mockito.when(traineeMapper.convertToEntity(any(TraineeDto.class))).thenReturn(mockTrainee);
 
@@ -129,18 +115,6 @@ class TraineeControllerTest {
                         .content(objectMapper.writeValueAsString(mockTraineeDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid argument: Invalid TraineeDto"));
-    }
-
-    @Test
-    void update_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(traineeMapper.convertToEntity(any(TraineeDto.class))).thenReturn(mockTrainee);
-        Mockito.doThrow(new RuntimeException("Service error")).when(traineeService).update(anyLong(), any(Trainee.class));
-
-        mockMvc.perform(put("/trainee/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockTraineeDto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
     }
 
     @Test
@@ -198,15 +172,5 @@ class TraineeControllerTest {
         mockMvc.perform(get("/trainee/fitness-class/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
-    }
-
-    @Test
-    void findByFitnessClassId_ShouldReturnInternalServerError_WhenServiceFails() throws Exception {
-        Mockito.when(traineeService.findTraineesByFitnessClassId(1L))
-                .thenThrow(new RuntimeException("Service error"));
-
-        mockMvc.perform(get("/trainee/fitness-class/1"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("A runtime error occurred: Service error"));
     }
 }

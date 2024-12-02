@@ -1,10 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.service;
 
-import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
-import cz.cvut.fit.tjv.fitnessApp.domain.Room;
-import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
-import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
-import cz.cvut.fit.tjv.fitnessApp.repository.TraineeRepository;
+import cz.cvut.fit.tjv.fitnessApp.domain.*;
+import cz.cvut.fit.tjv.fitnessApp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -20,11 +17,17 @@ public class FitnessClassServiceImpl extends CrudServiceImpl<FitnessClass, Long>
 
     private final FitnessClassRepository fitnessClassRepository;
     private final TraineeRepository traineeRepository;
+    private final InstructorRepository instructorRepository;
+    private final RoomRepository roomRepository;
+    private final ClassTypeRepository classTypeRepository;
 
     @Autowired
-    public FitnessClassServiceImpl(FitnessClassRepository fitnessClassRepository, TraineeRepository traineeRepository) {
+    public FitnessClassServiceImpl(FitnessClassRepository fitnessClassRepository, TraineeRepository traineeRepository, InstructorRepository instructorRepository, RoomRepository roomRepository, ClassTypeRepository classTypeRepository) {
         this.fitnessClassRepository = fitnessClassRepository;
         this.traineeRepository = traineeRepository;
+        this.instructorRepository = instructorRepository;
+        this.roomRepository = roomRepository;
+        this.classTypeRepository = classTypeRepository;
     }
 
     @Override
@@ -83,13 +86,44 @@ public class FitnessClassServiceImpl extends CrudServiceImpl<FitnessClass, Long>
             throw new IllegalArgumentException(formatConflictError(roomConflict, instructorConflict));
         }
 
+        // Update associations
+        // Update Room association
+        if (existingClass.getRoom() != null) {
+            existingClass.getRoom().getClasses().remove(existingClass);
+        }
+        if (updatedClass.getRoom() != null) {
+            Room room = roomRepository.findById(updatedClass.getRoom().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Room with ID " + updatedClass.getRoom().getId() + " not found."));
+            room.getClasses().add(existingClass);
+            existingClass.setRoom(room);
+        }
+
+        // Update Instructor association
+        if (existingClass.getInstructor() != null) {
+            existingClass.getInstructor().getClasses().remove(existingClass);
+        }
+        if (updatedClass.getInstructor() != null) {
+            Instructor instructor = instructorRepository.findById(updatedClass.getInstructor().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Instructor with ID " + updatedClass.getInstructor().getId() + " not found."));
+            instructor.getClasses().add(existingClass);
+            existingClass.setInstructor(instructor);
+        }
+
+        // Update ClassType association
+        if (existingClass.getClassType() != null) {
+            existingClass.getClassType().getClasses().remove(existingClass);
+        }
+        if (updatedClass.getClassType() != null) {
+            ClassType classType = classTypeRepository.findById(updatedClass.getClassType().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("ClassType with ID " + updatedClass.getClassType().getId() + " not found."));
+            classType.getClasses().add(existingClass);
+            existingClass.setClassType(classType);
+        }
+
         // Update the existing class with new details
         existingClass.setCapacity(updatedClass.getCapacity());
         existingClass.setDate(updatedClass.getDate());
         existingClass.setTime(updatedClass.getTime());
-        existingClass.setInstructor(updatedClass.getInstructor());
-        existingClass.setRoom(updatedClass.getRoom());
-        existingClass.setClassType(updatedClass.getClassType());
 
         fitnessClassRepository.save(existingClass);
     }
@@ -118,6 +152,8 @@ public class FitnessClassServiceImpl extends CrudServiceImpl<FitnessClass, Long>
 
         // Add the trainee and save
         fitnessClass.getTrainees().add(trainee);
+        trainee.getClasses().add(fitnessClass);
+        traineeRepository.save(trainee);
         fitnessClassRepository.save(fitnessClass);
     }
 

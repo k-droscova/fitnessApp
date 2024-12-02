@@ -1,11 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.unit.service;
 
-import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
-import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
-import cz.cvut.fit.tjv.fitnessApp.domain.Room;
-import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
-import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
-import cz.cvut.fit.tjv.fitnessApp.repository.TraineeRepository;
+import cz.cvut.fit.tjv.fitnessApp.domain.*;
+import cz.cvut.fit.tjv.fitnessApp.repository.*;
 import cz.cvut.fit.tjv.fitnessApp.service.FitnessClassServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +27,15 @@ class FitnessClassServiceImplTest {
 
     @Mock
     private TraineeRepository traineeRepository;
+
+    @Mock
+    private InstructorRepository instructorRepository;
+
+    @Mock
+    private RoomRepository roomRepository;
+
+    @Mock
+    private ClassTypeRepository classTypeRepository;
 
     @InjectMocks
     private FitnessClassServiceImpl fitnessClassService;
@@ -224,6 +229,9 @@ class FitnessClassServiceImplTest {
         when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
         when(fitnessClassRepository.findFitnessClassesByDateAndRoom_Id(any(), any())).thenReturn(List.of());
         when(fitnessClassRepository.findFitnessClassesByDate(any())).thenReturn(List.of());
+
+        when(roomRepository.findById(any())).thenReturn(Optional.of(mockRoom));
+        when(instructorRepository.findById(any())).thenReturn(Optional.of(mockInstructor));
 
         mockFitnessClass.setCapacity(25);
         fitnessClassService.validateAndUpdate(1L, mockFitnessClass);
