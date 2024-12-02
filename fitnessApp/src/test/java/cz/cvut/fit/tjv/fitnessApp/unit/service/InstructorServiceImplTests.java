@@ -45,22 +45,20 @@ class InstructorServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(instructorRepository.existsById(1L)).thenReturn(false);
-        when(instructorRepository.save(mockInstructor)).thenReturn(mockInstructor);
+        Instructor instructor = new Instructor();
+        when(instructorRepository.save(any(Instructor.class))).thenReturn(mockInstructor);
 
-        Instructor result = instructorService.create(mockInstructor);
+        Instructor result = instructorService.create(instructor);
 
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals("John", result.getName());
         assertEquals("Doe", result.getSurname());
-        verify(instructorRepository).save(mockInstructor);
+        verify(instructorRepository).save(instructor);
     }
 
     @Test
     void create_ThrowsException_WhenIdExists() {
-        when(instructorRepository.existsById(1L)).thenReturn(true);
-
         assertThrows(IllegalArgumentException.class, () -> instructorService.create(mockInstructor));
         verify(instructorRepository, never()).save(any());
     }

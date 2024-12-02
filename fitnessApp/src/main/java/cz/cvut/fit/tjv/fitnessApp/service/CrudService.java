@@ -9,6 +9,6 @@ public interface CrudService<T extends Identifiable<ID>, ID> {
     T create(T entity);
     Optional<T> readById(ID id);
     List<T> readAll();
-    void update(ID id, T entity);
+    T update(ID id, T entity);
     void deleteById(ID id);
 }

@@ -12,8 +12,8 @@ public abstract class CrudServiceImpl<T extends Identifiable<ID>, ID> implements
     protected abstract CrudRepository<T, ID> getRepository();
     @Override
     public T create(T entity) {
-        if (getRepository().existsById(entity.getId())) {
-            throw new IllegalArgumentException("Entity with ID " + entity.getId() + " already exists.");
+        if (entity.getId() != null) {
+            throw new IllegalArgumentException("Id should not be set during creation");
         }
         return getRepository().save(entity);
     }
@@ -31,11 +31,12 @@ public abstract class CrudServiceImpl<T extends Identifiable<ID>, ID> implements
     }
 
     @Override
-    public void update(ID id, T entity) {
+    public T update(ID id, T entity) {
         if (!getRepository().existsById(id)) {
             throw new IllegalArgumentException("Entity with ID " + id + " does not exist.");
         }
-        getRepository().save(entity);
+        entity.setId(id);
+        return getRepository().save(entity);
     }
 
     @Override

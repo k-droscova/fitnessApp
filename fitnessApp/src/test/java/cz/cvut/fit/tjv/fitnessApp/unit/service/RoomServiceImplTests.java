@@ -44,21 +44,19 @@ class RoomServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(roomRepository.existsById(1L)).thenReturn(false);
-        when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
+        Room room = new Room();
+        when(roomRepository.save(any(Room.class))).thenReturn(mockRoom);
 
-        Room result = roomService.create(mockRoom);
+        Room result = roomService.create(room);
 
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals(50, result.getMaxCapacity());
-        verify(roomRepository).save(mockRoom);
+        verify(roomRepository).save(room);
     }
 
     @Test
     void create_ThrowsException_WhenIdExists() {
-        when(roomRepository.existsById(1L)).thenReturn(true);
-
         assertThrows(IllegalArgumentException.class, () -> roomService.create(mockRoom));
         verify(roomRepository, never()).save(any());
     }

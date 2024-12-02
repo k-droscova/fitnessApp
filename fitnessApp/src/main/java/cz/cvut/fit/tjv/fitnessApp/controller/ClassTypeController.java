@@ -55,7 +55,8 @@ public class ClassTypeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Long id, @RequestBody ClassTypeDto classTypeDto) {
         ClassType classType = classTypeMapper.convertToEntity(classTypeDto);
-        classTypeService.update(id, classType);
+        ClassType newClassType = classTypeService.update(id, classType);
+        return;
     }
 
     @Operation(summary = "Retrieve all ClassTypes or search by name")

@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Trainee extends IdentifiableImpl<Long> {
+public class Trainee implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +30,11 @@ public class Trainee extends IdentifiableImpl<Long> {
 
     @ManyToMany(mappedBy = "trainees")
     private List<FitnessClass> classes = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (FitnessClass fitnessClass : classes) {
+            fitnessClass.getTrainees().remove(this);
+        }
+    }
 }

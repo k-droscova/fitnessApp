@@ -44,21 +44,20 @@ class ClassTypeServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(classTypeRepository.existsById(1L)).thenReturn(false);
-        when(classTypeRepository.save(mockClassType)).thenReturn(mockClassType);
+        ClassType classType = new ClassType();
+        classType.setName(mockClassType.getName());
+        when(classTypeRepository.save(any(ClassType.class))).thenReturn(mockClassType);
 
-        ClassType result = classTypeService.create(mockClassType);
+        ClassType result = classTypeService.create(classType);
 
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals("Yoga", result.getName());
-        verify(classTypeRepository).save(mockClassType);
+        verify(classTypeRepository).save(classType);
     }
 
     @Test
-    void create_ThrowsException_WhenIdExists() {
-        when(classTypeRepository.existsById(1L)).thenReturn(true);
-
+    void create_ThrowsException_WhenIdIsSet() {
         assertThrows(IllegalArgumentException.class, () -> classTypeService.create(mockClassType));
         verify(classTypeRepository, never()).save(any());
     }

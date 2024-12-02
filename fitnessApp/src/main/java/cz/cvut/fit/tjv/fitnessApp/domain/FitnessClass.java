@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class FitnessClass extends IdentifiableImpl<Long> {
+public class FitnessClass implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,4 +49,11 @@ public class FitnessClass extends IdentifiableImpl<Long> {
             inverseJoinColumns = @JoinColumn(name = "id_trainee")
     )
     private List<Trainee> trainees = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (Trainee trainee : trainees) {
+            trainee.getClasses().remove(this);
+        }
+    }
 }

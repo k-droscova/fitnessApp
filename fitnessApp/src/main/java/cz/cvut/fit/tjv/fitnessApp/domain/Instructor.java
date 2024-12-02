@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Instructor extends IdentifiableImpl<Long> {
+public class Instructor implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +37,13 @@ public class Instructor extends IdentifiableImpl<Long> {
     )
     private List<ClassType> specializations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "instructor")
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FitnessClass> classes = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (ClassType classType : specializations) {
+            classType.getInstructors().remove(this);
+        }
+    }
 }

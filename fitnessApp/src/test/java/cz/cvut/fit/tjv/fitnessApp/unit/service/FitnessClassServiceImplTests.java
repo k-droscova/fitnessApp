@@ -66,21 +66,19 @@ class FitnessClassServiceImplTest {
     
     @Test
     void create_Successful() {
-        when(fitnessClassRepository.existsById(1L)).thenReturn(false);
-        when(fitnessClassRepository.save(mockFitnessClass)).thenReturn(mockFitnessClass);
+        FitnessClass fitnessClass = new FitnessClass();
+        when(fitnessClassRepository.save(any(FitnessClass.class))).thenReturn(mockFitnessClass);
 
-        FitnessClass result = fitnessClassService.create(mockFitnessClass);
+        FitnessClass result = fitnessClassService.create(fitnessClass);
 
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals(20, result.getCapacity());
-        verify(fitnessClassRepository).save(mockFitnessClass);
+        verify(fitnessClassRepository).save(fitnessClass);
     }
 
     @Test
-    void create_ThrowsException_WhenIdExists() {
-        when(fitnessClassRepository.existsById(1L)).thenReturn(true);
-
+    void create_ThrowsException_WhenIdIsPassed() {
         assertThrows(IllegalArgumentException.class, () -> fitnessClassService.create(mockFitnessClass));
         verify(fitnessClassRepository, never()).save(any());
     }
@@ -161,13 +159,15 @@ class FitnessClassServiceImplTest {
 
     @Test
     void scheduleClass_ShouldScheduleSuccessfully() {
+        FitnessClass fitnessClass = mockFitnessClass;
+        fitnessClass.setId(null);
         when(fitnessClassRepository.findFitnessClassesByDateAndRoom_Id(any(), any())).thenReturn(List.of());
         when(fitnessClassRepository.findFitnessClassesByDate(any())).thenReturn(List.of());
-        when(fitnessClassRepository.save(mockFitnessClass)).thenReturn(mockFitnessClass);
+        when(fitnessClassRepository.save(any(FitnessClass.class))).thenReturn(mockFitnessClass);
 
-        fitnessClassService.scheduleClass(mockFitnessClass);
+        fitnessClassService.scheduleClass(fitnessClass);
 
-        verify(fitnessClassRepository).save(mockFitnessClass);
+        verify(fitnessClassRepository).save(fitnessClass);
     }
 
     @Test

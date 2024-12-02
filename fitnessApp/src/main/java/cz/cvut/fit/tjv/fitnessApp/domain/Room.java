@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Room extends IdentifiableImpl<Long> {
+public class Room implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +37,11 @@ public class Room extends IdentifiableImpl<Long> {
             inverseJoinColumns = @JoinColumn(name = "id_class_type")  // Foreign key to ClassType
     )
     private List<ClassType> classTypes = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (ClassType classType : classTypes) {
+            classType.getRooms().remove(this);
+        }
+    }
 }

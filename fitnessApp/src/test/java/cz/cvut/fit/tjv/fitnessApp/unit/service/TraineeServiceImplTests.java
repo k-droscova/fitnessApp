@@ -45,23 +45,21 @@ class TraineeServiceImplTest {
 
     @Test
     void create_Successful() {
-        when(traineeRepository.existsById(1L)).thenReturn(false);
-        when(traineeRepository.save(mockTrainee)).thenReturn(mockTrainee);
+        Trainee trainee = new Trainee();
+        when(traineeRepository.save(any(Trainee.class))).thenReturn(mockTrainee);
 
-        Trainee result = traineeService.create(mockTrainee);
+        Trainee result = traineeService.create(trainee);
 
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals("trainee@example.com", result.getEmail());
         assertEquals("Jane", result.getName());
         assertEquals("Doe", result.getSurname());
-        verify(traineeRepository).save(mockTrainee);
+        verify(traineeRepository).save(trainee);
     }
 
     @Test
-    void create_ThrowsException_WhenIdExists() {
-        when(traineeRepository.existsById(1L)).thenReturn(true);
-
+    void create_ThrowsException_WhenIdIsNotNull() {
         assertThrows(IllegalArgumentException.class, () -> traineeService.create(mockTrainee));
         verify(traineeRepository, never()).save(any());
     }
