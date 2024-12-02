@@ -85,6 +85,6 @@ public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Long> imple
         });
 
         // Save changes and return the updated entity
-        return getRepository().save(savedClassType);
+        return savedClassType;
     }
 }
