@@ -18,9 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -84,6 +86,63 @@ class ClassTypeControllerIT {
     }
 
     @Test
+    void createAndUpdateClassType_ShouldReflectChangesInAssociations() throws Exception {
+        // Arrange: Create DTO
+        ClassTypeDto createDto = new ClassTypeDto();
+        createDto.setName("New ClassType");
+
+        // Act: Create the ClassType
+        MvcResult createResult = mockMvc.perform(post("/classtype")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createDto)))
+                .andExpect(status().isOk()) // Assuming `200 OK` for the creation response
+                .andReturn();
+
+        // Parse the created DTO from the response
+        ClassTypeDto createdDto = objectMapper.readValue(createResult.getResponse().getContentAsString(), ClassTypeDto.class);
+
+        // Verify creation
+        assertNotNull(createdDto.getId());
+        assertEquals("New ClassType", createdDto.getName());
+
+        // Arrange: Update the ClassType with associations
+        createdDto.setName("Updated ClassType");
+        createdDto.setInstructorIds(List.of(1L, 2L));
+        createdDto.setRoomIds(List.of(3L));
+
+        // Act: Update the ClassType
+        mockMvc.perform(put("/classtype/" + createdDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createdDto)))
+                .andExpect(status().isNoContent());
+
+        // Verify Update: Retrieve the updated ClassType from the database
+        ClassType updatedClassType = classTypeRepository.findById(createdDto.getId())
+                .orElseThrow(() -> new AssertionError("Updated ClassType not found in the database"));
+        assertEquals("Updated ClassType", updatedClassType.getName());
+
+        // Verify associations
+        assertEquals(2, updatedClassType.getInstructors().size());
+        assertTrue(updatedClassType.getInstructors().stream().anyMatch(instructor -> instructor.getId() == 1L));
+        assertTrue(updatedClassType.getInstructors().stream().anyMatch(instructor -> instructor.getId() == 2L));
+        assertEquals(1, updatedClassType.getRooms().size());
+        assertEquals(3L, updatedClassType.getRooms().get(0).getId());
+
+        // Verify the reverse associations
+        Instructor instructor = instructorRepository.findById(1L)
+                .orElseThrow(() -> new AssertionError("Instructor not found in the database"));
+        assertTrue(instructor.getSpecializations().stream().anyMatch(specialization -> Objects.equals(specialization.getId(), updatedClassType.getId())));
+        // Verify the reverse associations
+        Instructor instructor2 = instructorRepository.findById(2L)
+                .orElseThrow(() -> new AssertionError("Instructor not found in the database"));
+        assertTrue(instructor.getSpecializations().stream().anyMatch(specialization -> Objects.equals(specialization.getId(), updatedClassType.getId())));
+        // Verify the reverse associations
+        Room room = roomRepository.findById(3L)
+                .orElseThrow(() -> new AssertionError("Room not found in the database"));
+        assertTrue(room.getClassTypes().stream().anyMatch(classType -> Objects.equals(classType.getId(), updatedClassType.getId())));
+    }
+
+    @Test
     void readAllOrByName_ShouldReturnClassTypes() throws Exception {
         // Act & Assert
         mockMvc.perform(get("/classtype"))
@@ -120,7 +179,7 @@ class ClassTypeControllerIT {
     }
 
     @Test
-    void update_ShouldModifyClassType() throws Exception {
+    void update_ShouldModifyClassTypeAndUpdateAssociations() throws Exception {
         // Arrange
         ClassTypeDto classTypeDto = new ClassTypeDto();
         classTypeDto.setName("Yoga Updated");
@@ -134,6 +193,32 @@ class ClassTypeControllerIT {
         // Verify update in the database
         ClassType updatedClassType = classTypeRepository.findById(1L).orElseThrow();
         assertEquals("Yoga Updated", updatedClassType.getName());
+
+        // Verify that associated FitnessClasses reference the updated ClassType
+        List<FitnessClass> associatedClasses = (List<FitnessClass>) fitnessClassRepository.findAll();
+        for (FitnessClass fitnessClass : associatedClasses) {
+            if (fitnessClass.getClassType().getId().equals(1L)) {
+                assertEquals("Yoga Updated", fitnessClass.getClassType().getName());
+            }
+        }
+
+        // Verify that associated Rooms reference the updated ClassType
+        List<Room> associatedRooms = (List<Room>) roomRepository.findAll();
+        for (Room room : associatedRooms) {
+            room.getClassTypes().stream()
+                    .filter(ct -> ct.getId().equals(1L)) // Filter ClassTypes with id=1L
+                    .forEach(ct -> assertEquals("Yoga Updated", ct.getName(),
+                            "ClassType with id=1L in room must have name 'Yoga Updated'"));
+        }
+
+        // Verify that associated Instructors reference the updated ClassType
+        List<Instructor> associatedInstructors = (List<Instructor>) instructorRepository.findAll();
+        for (Instructor instructor : associatedInstructors) {
+            instructor.getSpecializations().stream()
+                    .filter(ct -> ct.getId().equals(1L)) // Filter ClassTypes with id=1L
+                    .forEach(ct -> assertEquals("Yoga Updated", ct.getName(),
+                            "ClassType with id=1L in instructor specializations must have name 'Yoga Updated'"));
+        }
     }
 
     // TODO: fix the updates

@@ -52,4 +52,39 @@ public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Long> imple
     public List<ClassType> readAllByName(String name) {
         return new ArrayList<>(classTypeRepository.findByNameContainingIgnoreCase(name));
     }
+
+    @Override
+    public ClassType update(Long id, ClassType updatedClassType) {
+        // Call the parent update method to handle the basic update logic
+        ClassType savedClassType = super.update(id, updatedClassType);
+
+        // Update reverse associations (instructors and rooms)
+
+        // Update instructors
+        savedClassType.getInstructors().forEach(instructor -> instructor.getSpecializations().remove(savedClassType));
+        savedClassType.getInstructors().clear();
+        updatedClassType.getInstructors().forEach(instructor -> {
+            instructor.getSpecializations().add(savedClassType);
+            savedClassType.getInstructors().add(instructor);
+        });
+
+        // Update rooms
+        savedClassType.getRooms().forEach(room -> room.getClassTypes().remove(savedClassType));
+        savedClassType.getRooms().clear();
+        updatedClassType.getRooms().forEach(room -> {
+            room.getClassTypes().add(savedClassType);
+            savedClassType.getRooms().add(room);
+        });
+
+        // Update fitness classes
+        savedClassType.getClasses().forEach(fitnessClass -> fitnessClass.setClassType(null));
+        savedClassType.getClasses().clear();
+        updatedClassType.getClasses().forEach(fitnessClass -> {
+            fitnessClass.setClassType(savedClassType);
+            savedClassType.getClasses().add(fitnessClass);
+        });
+
+        // Save changes and return the updated entity
+        return getRepository().save(savedClassType);
+    }
 }

@@ -25,7 +25,7 @@ public class ClassType implements Identifiable<Long> {
     private List<Instructor> instructors = new ArrayList<>();
     @ManyToMany(mappedBy = "classTypes")
     private List<Room> rooms = new ArrayList<>();
-    @OneToMany(mappedBy = "classType", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "classType", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FitnessClass> classes = new ArrayList<>();
 
     @PreRemove
