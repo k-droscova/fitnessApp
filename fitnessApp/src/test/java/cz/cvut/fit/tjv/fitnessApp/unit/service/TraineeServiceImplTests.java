@@ -1,6 +1,8 @@
 package cz.cvut.fit.tjv.fitnessApp.unit.service;
 
+import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
+import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.TraineeRepository;
 import cz.cvut.fit.tjv.fitnessApp.service.TraineeServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +25,9 @@ class TraineeServiceImplTest {
 
     @Mock
     private TraineeRepository traineeRepository;
+
+    @Mock
+    private FitnessClassRepository fitnessClassRepository;
 
     @InjectMocks
     private TraineeServiceImpl traineeService;
@@ -106,19 +111,52 @@ class TraineeServiceImplTest {
 
     @Test
     void update_Successful() {
-        when(traineeRepository.existsById(1L)).thenReturn(true);
-        when(traineeRepository.save(mockTrainee)).thenReturn(mockTrainee);
+        // Arrange
+        Trainee updatedTrainee = new Trainee();
+        updatedTrainee.setEmail("newemail@example.com");
+        updatedTrainee.setName("UpdatedName");
+        updatedTrainee.setSurname("UpdatedSurname");
 
-        traineeService.update(1L, mockTrainee);
+        // Mock existing trainee
+        Trainee existingTrainee = new Trainee();
+        existingTrainee.setId(1L);
+        existingTrainee.setEmail("oldemail@example.com");
+        existingTrainee.setName("OldName");
+        existingTrainee.setSurname("OldSurname");
 
-        verify(traineeRepository).save(mockTrainee);
+        // Mock fitness classes
+        FitnessClass existingClass = new FitnessClass();
+        existingClass.setId(1L);
+
+        FitnessClass newClass = new FitnessClass();
+        newClass.setId(2L);
+
+        updatedTrainee.setClasses(List.of(newClass));
+
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(existingTrainee));
+        when(fitnessClassRepository.findById(2L)).thenReturn(Optional.of(newClass));
+        when(traineeRepository.save(existingTrainee)).thenReturn(existingTrainee);
+
+        // Act
+        Trainee result = traineeService.update(1L, updatedTrainee);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("newemail@example.com", existingTrainee.getEmail());
+        assertEquals("UpdatedName", existingTrainee.getName());
+        assertEquals("UpdatedSurname", existingTrainee.getSurname());
+        assertEquals(1, existingTrainee.getClasses().size());
+        assertEquals(2L, existingTrainee.getClasses().get(0).getId());
+        verify(traineeRepository).save(existingTrainee);
     }
 
     @Test
-    void update_ThrowsException_WhenEntityDoesNotExist() {
-        when(traineeRepository.existsById(1L)).thenReturn(false);
+    void update_ThrowsException_WhenTraineeDoesNotExist() {
+        // Arrange
+        when(traineeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> traineeService.update(1L, mockTrainee));
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> traineeService.update(1L, new Trainee()));
         verify(traineeRepository, never()).save(any());
     }
 
