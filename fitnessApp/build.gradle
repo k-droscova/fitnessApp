@@ -45,6 +45,7 @@ dependencies {
     // Rest API documentation
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
 
+    implementation 'org.postgresql:postgresql:42.7.2'
     // H2 in-memory database for testing
     runtimeOnly 'com.h2database:h2'
 
