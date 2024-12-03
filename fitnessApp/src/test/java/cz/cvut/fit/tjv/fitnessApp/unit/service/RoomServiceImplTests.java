@@ -1,6 +1,10 @@
 package cz.cvut.fit.tjv.fitnessApp.unit.service;
 
+import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
+import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
+import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
+import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.RoomRepository;
 import cz.cvut.fit.tjv.fitnessApp.service.RoomServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -24,6 +28,12 @@ class RoomServiceImplTest {
 
     @Mock
     private RoomRepository roomRepository;
+
+    @Mock
+    private FitnessClassRepository fitnessClassRepository;
+
+    @Mock
+    private ClassTypeRepository classTypeRepository;
 
     @InjectMocks
     private RoomServiceImpl roomService;
@@ -102,20 +112,55 @@ class RoomServiceImplTest {
 
     @Test
     void update_Successful() {
-        when(roomRepository.existsById(1L)).thenReturn(true);
-        when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
+        // Arrange
+        Room updatedRoom = new Room();
+        updatedRoom.setMaxCapacity(50);
+        ClassType classType = new ClassType();
+        classType.setId(1L);
+        classType.setName("Yoga");
+        updatedRoom.setClassTypes(List.of(classType));
+        FitnessClass fitnessClass = new FitnessClass();
+        fitnessClass.setId(2L);
+        fitnessClass.setClassType(classType);
+        fitnessClass.setDate(LocalDate.now());
+        fitnessClass.setTime(LocalTime.now());
+        fitnessClass.setCapacity(10);
+        updatedRoom.setClasses(List.of(fitnessClass));
 
-        roomService.update(1L, mockRoom);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
+        when(classTypeRepository.findById(1L)).thenReturn(Optional.of(classType));
+        when(fitnessClassRepository.findById(2L)).thenReturn(Optional.of(fitnessClass));
+        when(roomRepository.save(any(Room.class))).thenReturn(mockRoom);
 
+        // Act
+        Room result = roomService.update(1L, updatedRoom);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(50, result.getMaxCapacity());
+        verify(classTypeRepository).findById(1L);
+        verify(fitnessClassRepository).findById(2L);
         verify(roomRepository).save(mockRoom);
+
+        // Verify associations
+        assertEquals(1, mockRoom.getClassTypes().size());
+        assertEquals(1L, mockRoom.getClassTypes().get(0).getId());
+        assertEquals(1, mockRoom.getClasses().size());
+        assertEquals(2L, mockRoom.getClasses().get(0).getId());
     }
 
     @Test
-    void update_ThrowsException_WhenEntityDoesNotExist() {
-        when(roomRepository.existsById(1L)).thenReturn(false);
+    void update_ThrowsException_WhenRoomNotFound() {
+        // Arrange
+        when(roomRepository.findById(1L)).thenReturn(Optional.empty());
 
+        // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> roomService.update(1L, mockRoom));
+
+        // Verify
         verify(roomRepository, never()).save(any());
+        verify(classTypeRepository, never()).findById(anyLong());
+        verify(fitnessClassRepository, never()).findById(anyLong());
     }
 
     @Test
