@@ -27,7 +27,7 @@ public class Room implements Identifiable<Long> {
      * CascadeType.ALL and orphanRemoval ensure that when a Room is deleted,
      * associated FitnessClasses are also deleted.
      */
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FitnessClass> classes = new ArrayList<>();
 
     @ManyToMany
