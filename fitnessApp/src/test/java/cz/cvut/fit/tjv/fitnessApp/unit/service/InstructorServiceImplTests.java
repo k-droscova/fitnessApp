@@ -1,6 +1,10 @@
 package cz.cvut.fit.tjv.fitnessApp.unit.service;
 
+import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
+import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
+import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
+import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.InstructorRepository;
 import cz.cvut.fit.tjv.fitnessApp.service.InstructorServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +29,12 @@ class InstructorServiceImplTest {
 
     @Mock
     private InstructorRepository instructorRepository;
+
+    @Mock
+    private ClassTypeRepository classTypeRepository;
+
+    @Mock
+    private FitnessClassRepository fitnessClassRepository;
 
     @InjectMocks
     private InstructorServiceImpl instructorService;
@@ -45,16 +56,43 @@ class InstructorServiceImplTest {
 
     @Test
     void create_Successful() {
-        Instructor instructor = new Instructor();
+        // Arrange
+        // Mock new instructor to be created
+        Instructor newInstructor = new Instructor();
+        newInstructor.setName("Jane");
+        newInstructor.setSurname("Smith");
+        newInstructor.setBirthDate(LocalDate.of(1985, 5, 20));
+
+        // Mock ClassType association
+        ClassType mockClassType = new ClassType();
+        mockClassType.setId(1L);
+
+        newInstructor.setSpecializations(List.of(mockClassType));
+
+        // Mock FitnessClass association
+        FitnessClass mockFitnessClass = new FitnessClass();
+        mockFitnessClass.setId(2L);
+
+        newInstructor.setClasses(List.of(mockFitnessClass));
+
+        // Mock repositories
+        when(classTypeRepository.findById(1L)).thenReturn(Optional.of(mockClassType));
+        when(fitnessClassRepository.findById(2L)).thenReturn(Optional.of(mockFitnessClass));
         when(instructorRepository.save(any(Instructor.class))).thenReturn(mockInstructor);
 
-        Instructor result = instructorService.create(instructor);
+        // Act
+        Instructor result = instructorService.create(newInstructor);
 
+        // Assert
         assertNotNull(result);
-        assertEquals(1, result.getId());
-        assertEquals("John", result.getName());
-        assertEquals("Doe", result.getSurname());
-        verify(instructorRepository).save(instructor);
+        assertEquals(mockInstructor.getId(), result.getId());
+        assertEquals(mockInstructor.getName(), result.getName());
+        assertEquals(mockInstructor.getSurname(), result.getSurname());
+        assertEquals(mockInstructor.getSpecializations().size(), result.getSpecializations().size());
+        assertEquals(mockInstructor.getClasses().size(), result.getClasses().size());
+
+        // Verify persistence
+        verify(instructorRepository).save(newInstructor);
     }
 
     @Test
@@ -105,17 +143,70 @@ class InstructorServiceImplTest {
 
     @Test
     void update_Successful() {
-        when(instructorRepository.existsById(1L)).thenReturn(true);
-        when(instructorRepository.save(mockInstructor)).thenReturn(mockInstructor);
+        // Arrange
+        // Mock existing instructor
+        Instructor mockExistingInstructor = new Instructor();
+        mockExistingInstructor.setId(1L);
+        mockExistingInstructor.setName("John");
+        mockExistingInstructor.setSurname("Doe");
+        mockExistingInstructor.setBirthDate(LocalDate.of(1980, 1, 1));
+        mockExistingInstructor.setSpecializations(new ArrayList<>());
+        mockExistingInstructor.setClasses(new ArrayList<>());
 
-        instructorService.update(1L, mockInstructor);
+        // Mock updated instructor
+        Instructor updatedInstructor = new Instructor();
+        updatedInstructor.setName("Jane");
+        updatedInstructor.setSurname("Smith");
+        updatedInstructor.setBirthDate(LocalDate.of(1985, 5, 20));
 
-        verify(instructorRepository).save(mockInstructor);
+        // Mock updated associations
+        ClassType mockClassType = new ClassType();
+        mockClassType.setId(1L);
+        updatedInstructor.setSpecializations(List.of(mockClassType));
+
+        FitnessClass mockFitnessClass = new FitnessClass();
+        mockFitnessClass.setId(2L);
+        updatedInstructor.setClasses(List.of(mockFitnessClass));
+
+        // Mock repositories
+        when(instructorRepository.findById(1L)).thenReturn(Optional.of(mockExistingInstructor));
+        when(classTypeRepository.findById(1L)).thenReturn(Optional.of(mockClassType));
+        when(fitnessClassRepository.findById(2L)).thenReturn(Optional.of(mockFitnessClass));
+        when(instructorRepository.save(any(Instructor.class))).thenReturn(mockExistingInstructor);
+
+        // Act
+        instructorService.update(1L, updatedInstructor);
+
+        // Assert
+        verify(instructorRepository).save(argThat(savedInstructor -> {
+            // Verify basic attributes
+            assertEquals("Jane", savedInstructor.getName());
+            assertEquals("Smith", savedInstructor.getSurname());
+            assertEquals(LocalDate.of(1985, 5, 20), savedInstructor.getBirthDate());
+
+            // Verify specializations
+            assertEquals(1, savedInstructor.getSpecializations().size());
+            assertTrue(savedInstructor.getSpecializations().stream().anyMatch(ct -> ct.getId() == 1L));
+
+            // Verify fitness classes
+            assertEquals(1, savedInstructor.getClasses().size());
+            assertTrue(savedInstructor.getClasses().stream().anyMatch(fc -> fc.getId() == 2L));
+
+            // Verify inverse relationships
+            assertTrue(mockClassType.getInstructors().contains(savedInstructor));
+            assertEquals(savedInstructor, mockFitnessClass.getInstructor());
+
+            return true;
+        }));
+
+        // Verify inverse updates on associations
+        assertTrue(mockClassType.getInstructors().contains(mockExistingInstructor));
+        assertEquals(mockExistingInstructor, mockFitnessClass.getInstructor());
     }
 
     @Test
     void update_ThrowsException_WhenEntityDoesNotExist() {
-        when(instructorRepository.existsById(1L)).thenReturn(false);
+        when(instructorRepository.findById(1L)).thenThrow(new IllegalArgumentException());
 
         assertThrows(IllegalArgumentException.class, () -> instructorService.update(1L, mockInstructor));
         verify(instructorRepository, never()).save(any());
