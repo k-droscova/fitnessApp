@@ -37,7 +37,7 @@ public class Instructor implements Identifiable<Long> {
     )
     private List<ClassType> specializations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FitnessClass> classes = new ArrayList<>();
 
     @PreRemove
