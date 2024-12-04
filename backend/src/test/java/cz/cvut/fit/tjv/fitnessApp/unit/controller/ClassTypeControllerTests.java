@@ -172,11 +172,11 @@ class ClassTypeControllerTest {
     }
 
     @Test
-    void readById_ShouldReturnNotFound_WhenServiceFails() throws Exception {
+    void readById_ShouldReturnBadRequest_WhenServiceReturnsEmpty() throws Exception {
         Mockito.when(classTypeService.readById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/classtype/1"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

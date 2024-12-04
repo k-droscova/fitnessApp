@@ -83,11 +83,6 @@ public class ClassTypeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of ClassTypes retrieved"),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid request data",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
-            ),
-            @ApiResponse(
                     responseCode = "500",
                     description = "Internal server error",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
@@ -110,8 +105,8 @@ public class ClassTypeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ClassType retrieved successfully"),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "ClassType not found",
+                    responseCode = "400",
+                    description = "Invalid request (e.g., ClassType not found)",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
             ),
             @ApiResponse(
@@ -123,7 +118,7 @@ public class ClassTypeController {
     @GetMapping("/{id}")
     public ClassTypeDto readById(@PathVariable Long id) {
         ClassType classType = classTypeService.readById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "ClassType not found"));
+                new IllegalArgumentException("ClassType not found for ID: " + id));
         return classTypeMapper.convertToDto(classType);
     }
 

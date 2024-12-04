@@ -91,7 +91,7 @@ public class TraineeController {
             @ApiResponse(responseCode = "200", description = "Trainee retrieved successfully"),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request data",
+                    description = "Invalid request (e.g., Trainee not found)",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
             ),
             @ApiResponse(
@@ -103,7 +103,7 @@ public class TraineeController {
     @GetMapping("/{id}")
     public TraineeDto readById(@PathVariable Long id) {
         Trainee trainee = traineeService.readById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Trainee not found"));
+                new IllegalArgumentException("Trainee not found for ID: " + id));
         return traineeMapper.convertToDto(trainee);
     }
 

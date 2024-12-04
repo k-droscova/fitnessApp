@@ -96,7 +96,7 @@ public class RoomController {
             @ApiResponse(responseCode = "200", description = "Room retrieved successfully"),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request data",
+                    description = "Invalid request (e.g., Room not found)",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
             ),
             @ApiResponse(
@@ -108,7 +108,7 @@ public class RoomController {
     @GetMapping("/{id}")
     public RoomDto readById(@PathVariable Long id) {
         Room room = roomService.readById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+                new IllegalArgumentException("Room not found for ID: " + id));
         return roomMapper.convertToDto(room);
     }
 

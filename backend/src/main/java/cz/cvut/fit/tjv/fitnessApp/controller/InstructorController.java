@@ -65,11 +65,6 @@ public class InstructorController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
             ),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Instructor not found",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
-            ),
-            @ApiResponse(
                     responseCode = "500",
                     description = "Internal server error",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
@@ -125,7 +120,7 @@ public class InstructorController {
             @ApiResponse(responseCode = "200", description = "Instructor retrieved successfully"),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request data",
+                    description = "Invalid request (e.g., Instructor not found)",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
             ),
             @ApiResponse(
@@ -137,7 +132,7 @@ public class InstructorController {
     @GetMapping("/{id}")
     public InstructorDto readById(@PathVariable Long id) {
         Instructor instructor = instructorService.readById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found"));
+                new IllegalArgumentException("Instructor not found for ID: " + id));
         return instructorMapper.convertToDto(instructor);
     }
 

@@ -185,11 +185,11 @@ class RoomControllerTest {
     }
 
     @Test
-    void readById_ShouldReturnNotFound() throws Exception {
+    void readById_ShouldReturnBadRequest() throws Exception {
         Mockito.when(roomService.readById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/room/1"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

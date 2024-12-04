@@ -157,11 +157,11 @@ class TraineeControllerTest {
     }
 
     @Test
-    void readById_ShouldReturnNotFound() throws Exception {
+    void readById_ShouldReturnBadRequest() throws Exception {
         Mockito.when(traineeService.readById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/trainee/1"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

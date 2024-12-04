@@ -121,7 +121,7 @@ public class FitnessClassController {
             @ApiResponse(responseCode = "200", description = "FitnessClass retrieved successfully"),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request data",
+                    description = "Invalid request (e.g., FitnessClass not found)",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
             ),
             @ApiResponse(
@@ -133,7 +133,7 @@ public class FitnessClassController {
     @GetMapping("/{id}")
     public FitnessClassDto readById(@PathVariable Long id) {
         FitnessClass fitnessClass = fitnessClassService.readById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "FitnessClass not found"));
+                new IllegalArgumentException("FitnessClass not found for ID: " + id));
         return fitnessClassMapper.convertToDto(fitnessClass);
     }
 

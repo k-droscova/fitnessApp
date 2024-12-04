@@ -163,10 +163,10 @@ class InstructorControllerIT {
     }
 
     @Test
-    void readById_ShouldReturnNotFound_ForInvalidId() throws Exception {
+    void readById_ShouldReturnBadRequest_ForInvalidId() throws Exception {
         // Act & Assert
         mockMvc.perform(get("/instructor/999"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
