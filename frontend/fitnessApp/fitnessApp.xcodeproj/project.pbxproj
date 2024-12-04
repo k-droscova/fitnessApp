@@ -41,6 +41,20 @@
 			);
 			target = 27BEA45E2CFF9A6900C39013 /* fitnessApp */;
 		};
+		27F32E042D00559900A83C5A /* Exceptions for "fitnessApp" folder in "fitnessAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				config.xcconfig,
+			);
+			target = 27BEA4742CFF9A6A00C39013 /* fitnessAppTests */;
+		};
+		27F32E052D00559900A83C5A /* Exceptions for "fitnessApp" folder in "fitnessAppUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				config.xcconfig,
+			);
+			target = 27BEA47E2CFF9A6A00C39013 /* fitnessAppUITests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -48,6 +62,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				27BEA4872CFF9A6A00C39013 /* Exceptions for "fitnessApp" folder in "fitnessApp" target */,
+				27F32E042D00559900A83C5A /* Exceptions for "fitnessApp" folder in "fitnessAppTests" target */,
+				27F32E052D00559900A83C5A /* Exceptions for "fitnessApp" folder in "fitnessAppUITests" target */,
 			);
 			path = fitnessApp;
 			sourceTree = "<group>";
