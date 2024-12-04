@@ -29,9 +29,12 @@ enum Endpoint: Endpointing {
             
         case .classType(let action):
             switch action {
-            case .getById(let id):
+            case .getById(let id), .delete(let id), .update(let id):
                 return "/classtype/\(id)"
-            case .getAll, .create, .update, .delete:
+            case .getByName(name: let name):
+                var basePath = "/classtype"
+                return basePath.appendQueryItem(name: "name", value: name)
+            case .get, .create:
                 return "/classtype"
             case .getRooms(let id):
                 return "/classtype/\(id)/rooms"
@@ -45,30 +48,58 @@ enum Endpoint: Endpointing {
             switch action {
             case .getById(let id):
                 return "/room/\(id)"
-            case .getAll, .create, .update, .delete:
+            case .getAll, .create:
                 return "/room"
-            case .getAvailable:
-                return "/room/available"
+            case .update(let id):
+                return "/room/\(id)"
+            case .delete(let id):
+                return "/room/\(id)"
+            case .getAvailable(let classTypeId, let date, let time):
+                var basePath = "/room/available"
+                let queryItems: [String: String?] = [
+                    "classTypeId": classTypeId.map { "\($0)" },
+                    "date": date,
+                    "time": time
+                ]
+                return basePath.appendQueryItems(queryItems)
             }
             
         case .fitnessClass(let action):
             switch action {
             case .getById(let id):
                 return "/fitness-class/\(id)"
-            case .getAll, .create, .update, .delete:
+            case .getAll:
                 return "/fitness-class"
+            case .create:
+                return "/fitness-class"
+            case .update(let id):
+                return "/fitness-class/\(id)"
+            case .delete(let id):
+                return "/fitness-class/\(id)"
             case .addTrainee(let id, let traineeId):
                 return "/fitness-class/\(id)/add-trainee/\(traineeId)"
             case .getTrainees(let id):
                 return "/fitness-class/\(id)/trainees"
+            case .getByFilter(let date, let startTime, let endTime, let roomId):
+                let queryItems: [String: String?] = [
+                    "date": date,
+                    "startTime": startTime,
+                    "endTime": endTime,
+                    "roomId": roomId.map { "\($0)" }
+                ]
+                return "/fitness-class".appendQueryItems(queryItems)
             }
             
         case .trainee(let action):
             switch action {
             case .getById(let id):
                 return "/trainee/\(id)"
-            case .getAll, .create, .update, .delete:
+            case .getAll, .create:
                 return "/trainee"
+            case .update(let id):
+                return "/trainee/\(id)"
+            case .delete(let id):
+                return "/trainee/\(id)"
             case .getByFitnessClassId(let fitnessClassId):
                 return "/trainee/fitness-class/\(fitnessClassId)"
             }
@@ -77,13 +108,29 @@ enum Endpoint: Endpointing {
             switch action {
             case .getById(let id):
                 return "/instructor/\(id)"
-            case .getAll, .create, .update, .delete:
+            case .getAll, .create:
                 return "/instructor"
-            case .getAvailable:
-                return "/instructor/available"
+            case .update(let id):
+                return "/instructor/\(id)"
+            case .delete(let id):
+                return "/instructor/\(id)"
+            case .getAvailable(let classTypeId, let date, let time):
+                return "/instructor/available".appendQueryItems([
+                    "classTypeId": classTypeId.map { "\($0)" },
+                    "date": date,
+                    "time": time
+                ])
+            case .search(let name, let surname, let input):
+                var queryItems: [String: String?] = [
+                    "name": name,
+                    "surname": surname,
+                    "input": input
+                ]
+                return "/instructor".appendQueryItems(queryItems)
             }
         }
     }
+    
     
     var isUserTokenRequired: Bool {
         switch self {
@@ -119,14 +166,16 @@ enum Endpoint: Endpointing {
     }
 }
 
+
 // MARK: - Nested Action Enums for Each Entity
 extension Endpoint {
     enum ClassTypeAction {
         case getById(id: Int)
-        case getAll
+        case getByName(name: String)
+        case get
         case create
-        case update
-        case delete
+        case update(id: Int)
+        case delete(id: Int)
         case getRooms(id: Int)
         case getInstructors(id: Int)
         case getFitnessClasses(id: Int)
@@ -136,27 +185,28 @@ extension Endpoint {
         case getById(id: Int)
         case getAll
         case create
-        case update
-        case delete
-        case getAvailable
+        case update(id: Int)
+        case delete(id: Int)
+        case getAvailable(classTypeId: Int?, date: String, time: String)
     }
     
     enum FitnessClassAction {
         case getById(id: Int)
         case getAll
         case create
-        case update
-        case delete
+        case update(id: Int)
+        case delete(id: Int)
         case addTrainee(id: Int, traineeId: Int)
         case getTrainees(id: Int)
+        case getByFilter(date: String?, startTime: String?, endTime: String?, roomId: Int?)
     }
     
     enum TraineeAction {
         case getById(id: Int)
         case getAll
         case create
-        case update
-        case delete
+        case update(id: Int)
+        case delete(id: Int)
         case getByFitnessClassId(fitnessClassId: Int)
     }
     
@@ -164,8 +214,9 @@ extension Endpoint {
         case getById(id: Int)
         case getAll
         case create
-        case update
-        case delete
-        case getAvailable
+        case update(id: Int)
+        case delete(id: Int)
+        case getAvailable(classTypeId: Int?, date: String, time: String)
+        case search(name: String?, surname: String?, input: String?)
     }
 }

@@ -47,8 +47,8 @@ extension Networking {
     private func authorizedHeaders(endpointHeaders: [String: String]? = nil) -> [String: String] {
         var finalHeaders = endpointHeaders ?? [:]
         /*[APIHeader.authorizationHeader, APIHeader.apiKeyHeader].forEach {
-            finalHeaders.merge($0) { (_, new) in new }
-        }*/
+         finalHeaders.merge($0) { (_, new) in new }
+         }*/
         return finalHeaders
     }
 }
