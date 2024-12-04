@@ -2,13 +2,15 @@ package cz.cvut.fit.tjv.fitnessApp.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.fit.tjv.fitnessApp.controller.ClassTypeController;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.ClassTypeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.classType.ClassTypeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.classType.CreateClassTypeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
 import cz.cvut.fit.tjv.fitnessApp.service.ClassTypeService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.ClassTypeMapper;
+import cz.cvut.fit.tjv.fitnessApp.testUtils.ErrorMatcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,15 +45,9 @@ class ClassTypeControllerTest {
 
     private ClassType mockClassType;
     private ClassTypeDto mockClassTypeDto;
+    private CreateClassTypeDto mockCreateClassTypeDto;
     private List<ClassType> mockClassTypeList;
     private List<ClassTypeDto> mockClassTypeDtoList;
-
-    private Instructor mockInstructor1;
-    private Instructor mockInstructor2;
-    private Room mockRoom1;
-    private Room mockRoom2;
-    private FitnessClass mockFitnessClass1;
-    private FitnessClass mockFitnessClass2;
 
     @BeforeEach
     void setUp() {
@@ -63,29 +59,8 @@ class ClassTypeControllerTest {
         mockClassTypeDto.setId(1L);
         mockClassTypeDto.setName("Yoga");
 
-        mockInstructor1 = new Instructor();
-        mockInstructor1.setId(1L);
-        mockInstructor1.setName("John");
-        mockInstructor1.setSurname("Doe");
-
-        mockInstructor2 = new Instructor();
-        mockInstructor2.setId(2L);
-        mockInstructor2.setName("Jane");
-        mockInstructor2.setSurname("Smith");
-
-        mockRoom1 = new Room();
-        mockRoom1.setId(1L);
-        mockRoom1.setMaxCapacity(20);
-
-        mockRoom2 = new Room();
-        mockRoom2.setId(2L);
-        mockRoom2.setMaxCapacity(15);
-
-        mockFitnessClass1 = new FitnessClass();
-        mockFitnessClass1.setId(1L);
-
-        mockFitnessClass2 = new FitnessClass();
-        mockFitnessClass2.setId(2L);
+        mockCreateClassTypeDto = new CreateClassTypeDto();
+        mockCreateClassTypeDto.setName("Yoga");
 
         mockClassTypeList = List.of(mockClassType);
         mockClassTypeDtoList = List.of(mockClassTypeDto);
@@ -95,25 +70,20 @@ class ClassTypeControllerTest {
     void tearDown() {
         mockClassType = null;
         mockClassTypeDto = null;
+        mockCreateClassTypeDto = null;
         mockClassTypeList = null;
         mockClassTypeDtoList = null;
-        mockInstructor1 = null;
-        mockInstructor2 = null;
-        mockRoom1 = null;
-        mockRoom2 = null;
-        mockFitnessClass1 = null;
-        mockFitnessClass2 = null;
     }
 
     @Test
     void create_ShouldReturnCreatedClassType() throws Exception {
-        Mockito.when(classTypeMapper.convertToEntity(any(ClassTypeDto.class))).thenReturn(mockClassType);
+        Mockito.when(classTypeMapper.convertToEntity(any(CreateClassTypeDto.class))).thenReturn(mockClassType);
         Mockito.when(classTypeService.create(any(ClassType.class))).thenReturn(mockClassType);
         Mockito.when(classTypeMapper.convertToDto(mockClassType)).thenReturn(mockClassTypeDto);
 
         mockMvc.perform(post("/classtype")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockClassTypeDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateClassTypeDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Yoga"));
@@ -121,27 +91,27 @@ class ClassTypeControllerTest {
 
     @Test
     void create_ShouldReturnBadRequest_WhenMapperFailsWithIllegalArgumentException() throws Exception {
-        Mockito.when(classTypeMapper.convertToEntity(any(ClassTypeDto.class)))
-                .thenThrow(new IllegalArgumentException("Invalid ClassTypeDto"));
+        Mockito.when(classTypeMapper.convertToEntity(any(CreateClassTypeDto.class)))
+                .thenThrow(new IllegalArgumentException("Invalid CreateClassTypeDto"));
 
         mockMvc.perform(post("/classtype")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockClassTypeDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateClassTypeDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid ClassTypeDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid CreateClassTypeDto"));
     }
 
     @Test
     void create_ShouldReturnBadRequest_WhenServiceFailsWithIllegalArgumentException() throws Exception {
-        Mockito.when(classTypeMapper.convertToEntity(any(ClassTypeDto.class))).thenReturn(mockClassType);
+        Mockito.when(classTypeMapper.convertToEntity(any(CreateClassTypeDto.class))).thenReturn(mockClassType);
         Mockito.when(classTypeService.create(any(ClassType.class)))
                 .thenThrow(new IllegalArgumentException("Invalid ClassType entity"));
 
         mockMvc.perform(post("/classtype")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockClassTypeDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateClassTypeDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid ClassType entity"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid ClassType entity"));
     }
 
     @Test
@@ -163,7 +133,7 @@ class ClassTypeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mockClassTypeDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid ClassTypeDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid ClassTypeDto"));
     }
 
     @Test
@@ -176,7 +146,7 @@ class ClassTypeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mockClassTypeDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid update operation"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid update operation"));
     }
 
     @Test
@@ -224,6 +194,6 @@ class ClassTypeControllerTest {
 
         mockMvc.perform(delete("/classtype/1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Cannot delete ClassType"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Cannot delete ClassType"));
     }
 }

@@ -2,11 +2,13 @@ package cz.cvut.fit.tjv.fitnessApp.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.fit.tjv.fitnessApp.controller.FitnessClassController;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.FitnessClassDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.fitnessClass.CreateFitnessClassDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.fitnessClass.FitnessClassDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
 import cz.cvut.fit.tjv.fitnessApp.service.FitnessClassService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.FitnessClassMapper;
+import cz.cvut.fit.tjv.fitnessApp.testUtils.ErrorMatcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,7 @@ class FitnessClassControllerTest {
 
     private FitnessClass mockFitnessClass;
     private FitnessClassDto mockFitnessClassDto;
+    private CreateFitnessClassDto mockCreateFitnessClassDto;
     private List<FitnessClass> mockFitnessClassList;
     private List<FitnessClassDto> mockFitnessClassDtoList;
 
@@ -54,6 +57,9 @@ class FitnessClassControllerTest {
         mockFitnessClassDto = new FitnessClassDto();
         mockFitnessClassDto.setId(1L);
 
+        mockCreateFitnessClassDto = new CreateFitnessClassDto();
+        mockCreateFitnessClassDto.setCapacity(20);
+
         mockFitnessClassList = List.of(mockFitnessClass);
         mockFitnessClassDtoList = List.of(mockFitnessClassDto);
     }
@@ -62,19 +68,20 @@ class FitnessClassControllerTest {
     void tearDown() {
         mockFitnessClass = null;
         mockFitnessClassDto = null;
+        mockCreateFitnessClassDto = null;
         mockFitnessClassList = null;
         mockFitnessClassDtoList = null;
     }
 
     @Test
     void create_ShouldReturnCreatedFitnessClass() throws Exception {
-        Mockito.when(fitnessClassMapper.convertToEntity(any(FitnessClassDto.class))).thenReturn(mockFitnessClass);
+        Mockito.when(fitnessClassMapper.convertToEntity(any(CreateFitnessClassDto.class))).thenReturn(mockFitnessClass);
         Mockito.doNothing().when(fitnessClassService).scheduleClass(any(FitnessClass.class));
         Mockito.when(fitnessClassMapper.convertToDto(any(FitnessClass.class))).thenReturn(mockFitnessClassDto);
 
         mockMvc.perform(post("/fitness-class")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockFitnessClassDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateFitnessClassDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
     }
@@ -85,7 +92,7 @@ class FitnessClassControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"invalid json\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Malformed JSON request")));
+                .andExpect(ErrorMatcher.containsErrorMessage("Malformed JSON request"));
     }
 
     @Test
@@ -108,7 +115,7 @@ class FitnessClassControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mockFitnessClassDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid FitnessClassDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid FitnessClassDto"));
     }
 
     @Test
@@ -161,7 +168,7 @@ class FitnessClassControllerTest {
 
         mockMvc.perform(post("/fitness-class/1/add-trainee/2"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid Trainee"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid Trainee"));
     }
 
     @Test
@@ -176,10 +183,11 @@ class FitnessClassControllerTest {
     }
 
     @Test
-    void getTraineesByFitnessClass_ShouldReturnNotFound() throws Exception {
+    void getTraineesByFitnessClass_ShouldReturnBadRequest() throws Exception {
         Mockito.when(fitnessClassService.findTraineesById(1L)).thenThrow(new IllegalArgumentException("FitnessClass not found"));
 
         mockMvc.perform(get("/fitness-class/1/trainees"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: FitnessClass not found"));
     }
 }

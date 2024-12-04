@@ -2,10 +2,12 @@ package cz.cvut.fit.tjv.fitnessApp.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.fit.tjv.fitnessApp.controller.RoomController;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.RoomDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.room.CreateRoomDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.room.RoomDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
 import cz.cvut.fit.tjv.fitnessApp.service.RoomService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.RoomMapper;
+import cz.cvut.fit.tjv.fitnessApp.testUtils.ErrorMatcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,7 @@ class RoomControllerTest {
 
     private Room mockRoom;
     private RoomDto mockRoomDto;
+    private CreateRoomDto mockCreateRoomDto;
     private List<Room> mockRoomList;
     private List<RoomDto> mockRoomDtoList;
 
@@ -57,6 +60,9 @@ class RoomControllerTest {
         mockRoomDto.setId(1L);
         mockRoomDto.setMaxCapacity(50);
 
+        mockCreateRoomDto = new CreateRoomDto();
+        mockCreateRoomDto.setMaxCapacity(50);
+
         mockRoomList = List.of(mockRoom);
         mockRoomDtoList = List.of(mockRoomDto);
     }
@@ -65,19 +71,20 @@ class RoomControllerTest {
     void tearDown() {
         mockRoom = null;
         mockRoomDto = null;
+        mockCreateRoomDto = null;
         mockRoomList = null;
         mockRoomDtoList = null;
     }
 
     @Test
     void create_ShouldReturnCreatedRoom() throws Exception {
-        Mockito.when(roomMapper.convertToEntity(any(RoomDto.class))).thenReturn(mockRoom);
+        Mockito.when(roomMapper.convertToEntity(any(CreateRoomDto.class))).thenReturn(mockRoom);
         Mockito.when(roomService.create(any(Room.class))).thenReturn(mockRoom);
         Mockito.when(roomMapper.convertToDto(mockRoom)).thenReturn(mockRoomDto);
 
         mockMvc.perform(post("/room")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockRoomDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateRoomDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.maxCapacity").value(50));
@@ -87,21 +94,21 @@ class RoomControllerTest {
     void create_ShouldReturnBadRequest_WhenRequestBodyIsMalformed() throws Exception {
         mockMvc.perform(post("/room")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"invalid json\"}")) // Malformed JSON
+                        .content("{\"invalid json\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Malformed JSON request")));
+                .andExpect(ErrorMatcher.containsErrorMessage("Malformed JSON request"));
     }
 
     @Test
     void create_ShouldReturnBadRequest_WhenMapperFails() throws Exception {
-        Mockito.when(roomMapper.convertToEntity(any(RoomDto.class)))
+        Mockito.when(roomMapper.convertToEntity(any(CreateRoomDto.class)))
                 .thenThrow(new IllegalArgumentException("Invalid RoomDto"));
 
         mockMvc.perform(post("/room")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockRoomDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateRoomDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid RoomDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid RoomDto"));
     }
 
     @Test
@@ -155,7 +162,7 @@ class RoomControllerTest {
         mockMvc.perform(get("/room/available")
                         .param("time", "10:00"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Missing required parameter: date"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Missing required parameter: date"));
     }
 
     @Test
@@ -163,7 +170,7 @@ class RoomControllerTest {
         mockMvc.perform(get("/room/available")
                         .param("date", "2024-12-01"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Missing required parameter: time"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Missing required parameter: time"));
     }
 
     @Test

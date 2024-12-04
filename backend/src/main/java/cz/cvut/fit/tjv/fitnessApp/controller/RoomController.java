@@ -1,6 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.controller;
 
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.RoomDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.room.CreateRoomDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.room.RoomDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
 import cz.cvut.fit.tjv.fitnessApp.errorHandling.ErrorResponseImpl;
 import cz.cvut.fit.tjv.fitnessApp.service.RoomService;
@@ -49,7 +50,7 @@ public class RoomController {
             )
     })
     @PostMapping
-    public RoomDto create(@RequestBody RoomDto roomDto) {
+    public RoomDto create(@RequestBody CreateRoomDto roomDto) {
         Room room = roomMapper.convertToEntity(roomDto);
         return roomMapper.convertToDto(roomService.create(room));
     }

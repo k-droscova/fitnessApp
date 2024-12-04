@@ -1,4 +1,4 @@
-package cz.cvut.fit.tjv.fitnessApp.controller.dto;
+package cz.cvut.fit.tjv.fitnessApp.controller.dto.room;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,10 +13,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 
-public class ClassTypeDto {
+public class RoomDto {
     private Long id;
-    private String name;
-    private List<Long> instructorIds = new ArrayList<>();
-    private List<Long> roomIds = new ArrayList<>();
+    private int maxCapacity;
     private List<Long> fitnessClassIds = new ArrayList<>();
+    private List<Long> classTypeIds = new ArrayList<>();
 }

@@ -1,7 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.ClassTypeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.classType.ClassTypeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;

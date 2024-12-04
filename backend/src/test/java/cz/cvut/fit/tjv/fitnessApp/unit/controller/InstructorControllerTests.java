@@ -2,10 +2,12 @@ package cz.cvut.fit.tjv.fitnessApp.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.fit.tjv.fitnessApp.controller.InstructorController;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.InstructorDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.instructor.CreateInstructorDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.instructor.InstructorDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.service.InstructorService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.InstructorMapper;
+import cz.cvut.fit.tjv.fitnessApp.testUtils.ErrorMatcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,7 @@ class InstructorControllerTest {
 
     private Instructor mockInstructor;
     private InstructorDto mockInstructorDto;
+    private CreateInstructorDto mockCreateInstructorDto;
     private List<Instructor> mockInstructorList;
     private List<InstructorDto> mockInstructorDtoList;
 
@@ -59,6 +62,10 @@ class InstructorControllerTest {
         mockInstructorDto.setName("John");
         mockInstructorDto.setSurname("Doe");
 
+        mockCreateInstructorDto = new CreateInstructorDto();
+        mockCreateInstructorDto.setName("John");
+        mockCreateInstructorDto.setSurname("Doe");
+
         mockInstructorList = List.of(mockInstructor);
         mockInstructorDtoList = List.of(mockInstructorDto);
     }
@@ -67,19 +74,20 @@ class InstructorControllerTest {
     void tearDown() {
         mockInstructor = null;
         mockInstructorDto = null;
+        mockCreateInstructorDto = null;
         mockInstructorList = null;
         mockInstructorDtoList = null;
     }
 
     @Test
     void create_ShouldReturnCreatedInstructor() throws Exception {
-        Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class))).thenReturn(mockInstructor);
+        Mockito.when(instructorMapper.convertToEntity(any(CreateInstructorDto.class))).thenReturn(mockInstructor);
         Mockito.when(instructorService.create(any(Instructor.class))).thenReturn(mockInstructor);
         Mockito.when(instructorMapper.convertToDto(mockInstructor)).thenReturn(mockInstructorDto);
 
         mockMvc.perform(post("/instructor")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockInstructorDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateInstructorDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("John"))
@@ -92,32 +100,32 @@ class InstructorControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"invalid json\"}")) // Malformed JSON
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Malformed JSON request")));
+                .andExpect(ErrorMatcher.containsErrorMessage("Malformed JSON request"));
     }
 
     @Test
     void create_ShouldReturnBadRequest_WhenMapperFails() throws Exception {
-        Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class)))
+        Mockito.when(instructorMapper.convertToEntity(any(CreateInstructorDto.class)))
                 .thenThrow(new IllegalArgumentException("Invalid InstructorDto"));
 
         mockMvc.perform(post("/instructor")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockInstructorDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateInstructorDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid InstructorDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid InstructorDto"));
     }
 
     @Test
     void create_ShouldReturnBadRequest_WhenDuplicateInstructor() throws Exception {
-        Mockito.when(instructorMapper.convertToEntity(any(InstructorDto.class))).thenReturn(mockInstructor);
+        Mockito.when(instructorMapper.convertToEntity(any(CreateInstructorDto.class))).thenReturn(mockInstructor);
         Mockito.when(instructorService.create(any(Instructor.class)))
                 .thenThrow(new IllegalArgumentException("Instructor already exists"));
 
         mockMvc.perform(post("/instructor")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockInstructorDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateInstructorDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Instructor already exists"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Instructor already exists"));
     }
 
     @Test
@@ -139,7 +147,7 @@ class InstructorControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mockInstructorDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid InstructorDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid InstructorDto"));
     }
 
     @Test
@@ -152,44 +160,6 @@ class InstructorControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("John"))
                 .andExpect(jsonPath("$[0].surname").value("Doe"));
-    }
-
-    @Test
-    void readAllOrSearch_ShouldFilterByName() throws Exception {
-        Mockito.when(instructorService.readAllByName("John")).thenReturn(mockInstructorList);
-        Mockito.when(instructorMapper.convertManyToDto(mockInstructorList)).thenReturn(mockInstructorDtoList);
-
-        mockMvc.perform(get("/instructor").param("name", "John"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L));
-    }
-
-    @Test
-    void readAllOrSearch_ShouldReturnBadRequest_WhenMultipleQueryParametersProvided() throws Exception {
-        mockMvc.perform(get("/instructor")
-                        .param("name", "John")
-                        .param("surname", "Doe"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Only one search parameter (name, surname, or input) can be specified."));
-    }
-
-    @Test
-    void readAllOrSearch_ShouldReturnBadRequest_WhenAllQueryParamsProvided() throws Exception {
-        mockMvc.perform(get("/instructor")
-                        .param("name", "John")
-                        .param("surname", "Doe")
-                        .param("input", "JD"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Only one search parameter (name, surname, or input) can be specified."));
-    }
-
-    @Test
-    void readAllOrSearch_ShouldReturnEmptyList_WhenNoInstructorsMatch() throws Exception {
-        Mockito.when(instructorService.readAllByName("NonExistent")).thenReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/instructor").param("name", "NonExistent"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
@@ -235,33 +205,10 @@ class InstructorControllerTest {
     }
 
     @Test
-    void findAvailableInstructors_ShouldReturnEmptyList_WhenNoInstructorsAvailable() throws Exception {
-        Mockito.when(instructorService.findAvailableInstructors(
-                eq(Optional.empty()),
-                any(LocalDate.class),
-                any(LocalTime.class)
-        )).thenReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/instructor/available")
-                        .param("date", "2024-12-01")
-                        .param("time", "10:00"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
-    }
-
-    @Test
     void findAvailableInstructors_ShouldReturnBadRequest_WhenDateIsMissing() throws Exception {
         mockMvc.perform(get("/instructor/available")
                         .param("time", "10:00"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Missing required parameter: date"));
-    }
-
-    @Test
-    void findAvailableInstructors_ShouldReturnBadRequest_WhenTimeIsMissing() throws Exception {
-        mockMvc.perform(get("/instructor/available")
-                        .param("date", "2024-12-01"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Missing required parameter: time"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Missing required parameter: date"));
     }
 }

@@ -1,4 +1,4 @@
-package cz.cvut.fit.tjv.fitnessApp.controller.dto;
+package cz.cvut.fit.tjv.fitnessApp.controller.dto.fitnessClass;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

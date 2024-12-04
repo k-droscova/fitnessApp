@@ -2,10 +2,12 @@ package cz.cvut.fit.tjv.fitnessApp.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.fit.tjv.fitnessApp.controller.TraineeController;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.TraineeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.trainee.CreateTraineeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.trainee.TraineeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
 import cz.cvut.fit.tjv.fitnessApp.service.TraineeService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.TraineeMapper;
+import cz.cvut.fit.tjv.fitnessApp.testUtils.ErrorMatcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,7 @@ class TraineeControllerTest {
 
     private Trainee mockTrainee;
     private TraineeDto mockTraineeDto;
+    private CreateTraineeDto mockCreateTraineeDto;
     private List<Trainee> mockTraineeList;
     private List<TraineeDto> mockTraineeDtoList;
 
@@ -56,6 +59,10 @@ class TraineeControllerTest {
         mockTraineeDto.setName("Jane");
         mockTraineeDto.setSurname("Doe");
 
+        mockCreateTraineeDto = new CreateTraineeDto();
+        mockCreateTraineeDto.setName("Jane");
+        mockCreateTraineeDto.setSurname("Doe");
+
         mockTraineeList = List.of(mockTrainee);
         mockTraineeDtoList = List.of(mockTraineeDto);
     }
@@ -64,19 +71,20 @@ class TraineeControllerTest {
     void tearDown() {
         mockTrainee = null;
         mockTraineeDto = null;
+        mockCreateTraineeDto = null;
         mockTraineeList = null;
         mockTraineeDtoList = null;
     }
 
     @Test
     void create_ShouldReturnCreatedTrainee() throws Exception {
-        Mockito.when(traineeMapper.convertToEntity(any(TraineeDto.class))).thenReturn(mockTrainee);
+        Mockito.when(traineeMapper.convertToEntity(any(CreateTraineeDto.class))).thenReturn(mockTrainee);
         Mockito.when(traineeService.create(any(Trainee.class))).thenReturn(mockTrainee);
         Mockito.when(traineeMapper.convertToDto(mockTrainee)).thenReturn(mockTraineeDto);
 
         mockMvc.perform(post("/trainee")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockTraineeDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateTraineeDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Jane"))
@@ -85,14 +93,23 @@ class TraineeControllerTest {
 
     @Test
     void create_ShouldReturnBadRequest_WhenMapperFails() throws Exception {
-        Mockito.when(traineeMapper.convertToEntity(any(TraineeDto.class)))
+        Mockito.when(traineeMapper.convertToEntity(any(CreateTraineeDto.class)))
                 .thenThrow(new IllegalArgumentException("Invalid TraineeDto"));
 
         mockMvc.perform(post("/trainee")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockTraineeDto)))
+                        .content(objectMapper.writeValueAsString(mockCreateTraineeDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid TraineeDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid TraineeDto"));
+    }
+
+    @Test
+    void create_ShouldReturnBadRequest_WhenRequestBodyIsMalformed() throws Exception {
+        mockMvc.perform(post("/trainee")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"invalid json\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(ErrorMatcher.containsErrorMessage("Malformed JSON request"));
     }
 
     @Test
@@ -114,7 +131,7 @@ class TraineeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mockTraineeDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid argument: Invalid TraineeDto"));
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid TraineeDto"));
     }
 
     @Test

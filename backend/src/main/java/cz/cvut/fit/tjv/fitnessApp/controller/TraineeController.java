@@ -1,6 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.controller;
 
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.TraineeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.trainee.CreateTraineeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.trainee.TraineeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
 import cz.cvut.fit.tjv.fitnessApp.errorHandling.ErrorResponseImpl;
 import cz.cvut.fit.tjv.fitnessApp.service.TraineeService;
@@ -44,7 +45,7 @@ public class TraineeController {
             )
     })
     @PostMapping
-    public TraineeDto create(@RequestBody TraineeDto traineeDto) {
+    public TraineeDto create(@RequestBody CreateTraineeDto traineeDto) {
         Trainee trainee = traineeMapper.convertToEntity(traineeDto);
         return traineeMapper.convertToDto(traineeService.create(trainee));
     }

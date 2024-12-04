@@ -1,6 +1,6 @@
 package cz.cvut.fit.tjv.fitnessApp.unit.service.mappers;
 
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.RoomDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.room.RoomDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;

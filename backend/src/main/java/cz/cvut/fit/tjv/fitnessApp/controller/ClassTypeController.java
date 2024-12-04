@@ -1,10 +1,11 @@
 package cz.cvut.fit.tjv.fitnessApp.controller;
 
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.classType.CreateClassTypeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.domain.Room;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.ClassTypeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.classType.ClassTypeDto;
 import cz.cvut.fit.tjv.fitnessApp.errorHandling.ErrorResponseImpl;
 import cz.cvut.fit.tjv.fitnessApp.service.ClassTypeService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.ClassTypeMapper;
@@ -52,7 +53,7 @@ public class ClassTypeController {
             )
     })
     @PostMapping
-    public ClassTypeDto create(@RequestBody ClassTypeDto classTypeDto) {
+    public ClassTypeDto create(@RequestBody CreateClassTypeDto classTypeDto) {
         ClassType classType = classTypeMapper.convertToEntity(classTypeDto);
         return classTypeMapper.convertToDto(classTypeService.create(classType));
     }

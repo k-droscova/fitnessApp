@@ -1,6 +1,6 @@
 package cz.cvut.fit.tjv.fitnessApp.unit.service.mappers;
 
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.FitnessClassDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.fitnessClass.FitnessClassDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.*;
 import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.InstructorRepository;

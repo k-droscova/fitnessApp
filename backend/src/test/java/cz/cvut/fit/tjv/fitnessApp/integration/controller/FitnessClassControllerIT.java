@@ -1,7 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.FitnessClassDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.fitnessClass.FitnessClassDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.*;
 import cz.cvut.fit.tjv.fitnessApp.repository.*;
 import org.junit.jupiter.api.Test;

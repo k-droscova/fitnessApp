@@ -1,6 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.controller;
 
-import cz.cvut.fit.tjv.fitnessApp.controller.dto.InstructorDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.instructor.CreateInstructorDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.instructor.InstructorDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
 import cz.cvut.fit.tjv.fitnessApp.errorHandling.ErrorResponseImpl;
 import cz.cvut.fit.tjv.fitnessApp.service.InstructorService;
@@ -50,7 +51,7 @@ public class InstructorController {
             )
     })
     @PostMapping
-    public InstructorDto create(@RequestBody InstructorDto instructorDto) {
+    public InstructorDto create(@RequestBody CreateInstructorDto instructorDto) {
         Instructor instructor = instructorMapper.convertToEntity(instructorDto);
         return instructorMapper.convertToDto(instructorService.create(instructor));
     }
