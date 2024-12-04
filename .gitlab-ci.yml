@@ -24,7 +24,7 @@ build:
 test:
   stage: test
   script:
-    - cd fitnessApp
+    - cd backend
     - gradle clean test jacocoTestReport
   artifacts:
     paths:
