@@ -15,7 +15,7 @@ cache:
 build:
   stage: build
   script:
-    - cd fitnessApp
+    - cd backend
     - gradle assemble
   artifacts:
     paths:
