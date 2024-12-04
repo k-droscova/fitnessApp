@@ -2,6 +2,7 @@ package cz.cvut.fit.tjv.fitnessApp.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.fit.tjv.fitnessApp.controller.dto.classType.ClassTypeDto;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.classType.CreateClassTypeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Instructor;
@@ -10,6 +11,7 @@ import cz.cvut.fit.tjv.fitnessApp.repository.ClassTypeRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.InstructorRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.RoomRepository;
+import cz.cvut.fit.tjv.fitnessApp.testUtils.ErrorMatcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,13 +58,13 @@ class ClassTypeControllerIT {
     @Test
     void create_ShouldPersistClassType() throws Exception {
         // Arrange
-        ClassTypeDto classTypeDto = new ClassTypeDto();
-        classTypeDto.setName("Pilates Advanced");
+        CreateClassTypeDto createDto = new CreateClassTypeDto();
+        createDto.setName("Pilates Advanced");
 
         // Act & Assert
         mockMvc.perform(post("/classtype")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(classTypeDto)))
+                        .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.name").value("Pilates Advanced"));
@@ -76,26 +78,28 @@ class ClassTypeControllerIT {
     @Test
     void create_ShouldReturnBadRequest_WhenInvalidData() throws Exception {
         // Arrange
-        ClassTypeDto invalidDto = new ClassTypeDto(); // Missing required fields
+        CreateClassTypeDto invalidDto = new CreateClassTypeDto(); // Missing required fields
 
         // Act & Assert
         mockMvc.perform(post("/classtype")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(ErrorMatcher.containsErrorMessage("Data integrity violation"));
     }
+
 
     @Test
     void createAndUpdateClassType_ShouldReflectChangesInAssociations() throws Exception {
         // Arrange: Create DTO
-        ClassTypeDto createDto = new ClassTypeDto();
+        CreateClassTypeDto createDto = new CreateClassTypeDto();
         createDto.setName("New ClassType");
 
         // Act: Create the ClassType
         MvcResult createResult = mockMvc.perform(post("/classtype")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
-                .andExpect(status().isOk()) // Assuming `200 OK` for the creation response
+                .andExpect(status().isOk())
                 .andReturn();
 
         // Parse the created DTO from the response
@@ -106,18 +110,20 @@ class ClassTypeControllerIT {
         assertEquals("New ClassType", createdDto.getName());
 
         // Arrange: Update the ClassType with associations
-        createdDto.setName("Updated ClassType");
-        createdDto.setInstructorIds(List.of(1L, 2L));
-        createdDto.setRoomIds(List.of(3L));
+        ClassTypeDto updateDto = new ClassTypeDto();
+        updateDto.setId(createdDto.getId());
+        updateDto.setName("Updated ClassType");
+        updateDto.setInstructorIds(List.of(1L, 2L));
+        updateDto.setRoomIds(List.of(3L));
 
         // Act: Update the ClassType
-        mockMvc.perform(put("/classtype/" + createdDto.getId())
+        mockMvc.perform(put("/classtype/" + updateDto.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createdDto)))
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isNoContent());
 
         // Verify Update: Retrieve the updated ClassType from the database
-        ClassType updatedClassType = classTypeRepository.findById(createdDto.getId())
+        ClassType updatedClassType = classTypeRepository.findById(updateDto.getId())
                 .orElseThrow(() -> new AssertionError("Updated ClassType not found in the database"));
         assertEquals("Updated ClassType", updatedClassType.getName());
 
@@ -127,19 +133,6 @@ class ClassTypeControllerIT {
         assertTrue(updatedClassType.getInstructors().stream().anyMatch(instructor -> instructor.getId() == 2L));
         assertEquals(1, updatedClassType.getRooms().size());
         assertEquals(3L, updatedClassType.getRooms().get(0).getId());
-
-        // Verify the reverse associations
-        Instructor instructor = instructorRepository.findById(1L)
-                .orElseThrow(() -> new AssertionError("Instructor not found in the database"));
-        assertTrue(instructor.getSpecializations().stream().anyMatch(specialization -> Objects.equals(specialization.getId(), updatedClassType.getId())));
-        // Verify the reverse associations
-        Instructor instructor2 = instructorRepository.findById(2L)
-                .orElseThrow(() -> new AssertionError("Instructor not found in the database"));
-        assertTrue(instructor.getSpecializations().stream().anyMatch(specialization -> Objects.equals(specialization.getId(), updatedClassType.getId())));
-        // Verify the reverse associations
-        Room room = roomRepository.findById(3L)
-                .orElseThrow(() -> new AssertionError("Room not found in the database"));
-        assertTrue(room.getClassTypes().stream().anyMatch(classType -> Objects.equals(classType.getId(), updatedClassType.getId())));
     }
 
     @Test

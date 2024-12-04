@@ -1,6 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.instructor.CreateInstructorDto;
 import cz.cvut.fit.tjv.fitnessApp.controller.dto.instructor.InstructorDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
@@ -51,17 +52,17 @@ class InstructorControllerIT {
     @Test
     void create_ShouldPersistInstructor() throws Exception {
         // Arrange
-        InstructorDto instructorDto = new InstructorDto();
-        instructorDto.setName("New");
-        instructorDto.setSurname("Instructor");
-        instructorDto.setBirthDate(LocalDate.of(1990, 1, 1));
-        instructorDto.setClassTypeIds(List.of(1L)); // Preloaded ClassType IDs
-        instructorDto.setFitnessClassIds(List.of(1L));
+        CreateInstructorDto createInstructorDto = new CreateInstructorDto();
+        createInstructorDto.setName("New");
+        createInstructorDto.setSurname("Instructor");
+        createInstructorDto.setBirthDate(LocalDate.of(1990, 1, 1));
+        createInstructorDto.setClassTypeIds(List.of(1L)); // Preloaded ClassType IDs
+        createInstructorDto.setFitnessClassIds(List.of(1L));
 
         // Act
         MvcResult result = mockMvc.perform(post("/instructor")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(instructorDto)))
+                        .content(objectMapper.writeValueAsString(createInstructorDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andReturn();

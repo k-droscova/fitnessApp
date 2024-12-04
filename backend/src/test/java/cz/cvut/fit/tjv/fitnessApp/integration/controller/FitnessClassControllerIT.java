@@ -1,9 +1,11 @@
 package cz.cvut.fit.tjv.fitnessApp.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.fitnessClass.CreateFitnessClassDto;
 import cz.cvut.fit.tjv.fitnessApp.controller.dto.fitnessClass.FitnessClassDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.*;
 import cz.cvut.fit.tjv.fitnessApp.repository.*;
+import cz.cvut.fit.tjv.fitnessApp.testUtils.ErrorMatcher;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -54,18 +56,18 @@ class FitnessClassControllerIT {
     @Test
     void create_ShouldPersistFitnessClassAndVerifyAssociations() throws Exception {
         // Arrange
-        FitnessClassDto fitnessClassDto = new FitnessClassDto();
-        fitnessClassDto.setDate(LocalDate.of(2024, 12, 5));
-        fitnessClassDto.setTime(LocalTime.of(10, 0));
-        fitnessClassDto.setCapacity(15);
-        fitnessClassDto.setInstructorId(1L); // Preloaded instructor
-        fitnessClassDto.setRoomId(2L); // Preloaded room
-        fitnessClassDto.setClassTypeId(1L); // Preloaded class type
+        CreateFitnessClassDto createDto = new CreateFitnessClassDto();
+        createDto.setDate(LocalDate.of(2024, 12, 5));
+        createDto.setTime(LocalTime.of(10, 0));
+        createDto.setCapacity(15);
+        createDto.setInstructorId(1L); // Preloaded instructor
+        createDto.setRoomId(2L); // Preloaded room
+        createDto.setClassTypeId(1L); // Preloaded class type
 
         // Act
         MvcResult result = mockMvc.perform(post("/fitness-class")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(fitnessClassDto)))
+                        .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.date").value("2024-12-05"))
@@ -109,7 +111,7 @@ class FitnessClassControllerIT {
     @Test
     void create_ShouldReturnBadRequest_WhenInvalidData() throws Exception {
         // Arrange
-        FitnessClassDto invalidDto = new FitnessClassDto(); // Missing required fields
+        CreateFitnessClassDto invalidDto = new CreateFitnessClassDto(); // Missing required fields
 
         // Act & Assert
         mockMvc.perform(post("/fitness-class")

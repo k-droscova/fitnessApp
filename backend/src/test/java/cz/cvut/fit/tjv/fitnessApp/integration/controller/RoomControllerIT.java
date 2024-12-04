@@ -1,6 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.room.CreateRoomDto;
 import cz.cvut.fit.tjv.fitnessApp.controller.dto.room.RoomDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.ClassType;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
@@ -49,15 +50,15 @@ class RoomControllerIT {
     @Test
     void create_ShouldPersistRoomAndAssociations() throws Exception {
         // Arrange
-        RoomDto roomDto = new RoomDto();
-        roomDto.setMaxCapacity(25);
-        roomDto.setClassTypeIds(List.of(1L, 2L)); // Preloaded ClassType IDs
-        roomDto.setFitnessClassIds(List.of(3L)); // Preloaded FitnessClass ID
+        CreateRoomDto createRoomDto = new CreateRoomDto();
+        createRoomDto.setMaxCapacity(25);
+        createRoomDto.setClassTypeIds(List.of(1L, 2L)); // Preloaded ClassType IDs
+        createRoomDto.setFitnessClassIds(List.of(3L)); // Preloaded FitnessClass ID
 
         // Act
         MvcResult result = mockMvc.perform(post("/room")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(roomDto)))
+                        .content(objectMapper.writeValueAsString(createRoomDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andReturn();
@@ -77,7 +78,7 @@ class RoomControllerIT {
         assertTrue(createdRoom.getClasses().stream().anyMatch(fc -> fc.getId() == 3L));
 
         // Verify inverse associations for ClassType
-        for (Long classTypeId : roomDto.getClassTypeIds()) {
+        for (Long classTypeId : createRoomDto.getClassTypeIds()) {
             ClassType classType = classTypeRepository.findById(classTypeId)
                     .orElseThrow(() -> new AssertionError("ClassType not found: " + classTypeId));
             assertTrue(classType.getRooms().stream()
@@ -86,7 +87,7 @@ class RoomControllerIT {
         }
 
         // Verify inverse association for FitnessClass
-        for (Long fitnessClassId : roomDto.getFitnessClassIds()) {
+        for (Long fitnessClassId : createRoomDto.getFitnessClassIds()) {
             FitnessClass fitnessClass = fitnessClassRepository.findById(fitnessClassId)
                     .orElseThrow(() -> new AssertionError("FitnessClass not found: " + fitnessClassId));
             assertEquals(createdRoom.getId(), fitnessClass.getRoom().getId(),

@@ -1,6 +1,7 @@
 package cz.cvut.fit.tjv.fitnessApp.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.cvut.fit.tjv.fitnessApp.controller.dto.trainee.CreateTraineeDto;
 import cz.cvut.fit.tjv.fitnessApp.controller.dto.trainee.TraineeDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
@@ -44,16 +45,16 @@ public class TraineeControllerIT {
     @Test
     void create_ShouldPersistTraineeAndAssociations() throws Exception {
         // Arrange
-        TraineeDto traineeDto = new TraineeDto();
-        traineeDto.setEmail("newtrainee@example.com");
-        traineeDto.setName("New");
-        traineeDto.setSurname("Trainee");
-        traineeDto.setFitnessClassIds(List.of(1L, 2L)); // Preloaded FitnessClass IDs
+        CreateTraineeDto createTraineeDto = new CreateTraineeDto();
+        createTraineeDto.setEmail("newtrainee@example.com");
+        createTraineeDto.setName("New");
+        createTraineeDto.setSurname("Trainee");
+        createTraineeDto.setFitnessClassIds(List.of(1L, 2L)); // Preloaded FitnessClass IDs
 
         // Act
         MvcResult result = mockMvc.perform(post("/trainee")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(traineeDto)))
+                        .content(objectMapper.writeValueAsString(createTraineeDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andReturn();
@@ -62,6 +63,8 @@ public class TraineeControllerIT {
         TraineeDto createdTrainee = objectMapper.readValue(result.getResponse().getContentAsString(), TraineeDto.class);
         assertNotNull(createdTrainee.getId());
         assertEquals("newtrainee@example.com", createdTrainee.getEmail());
+        assertEquals("New", createdTrainee.getName());
+        assertEquals("Trainee", createdTrainee.getSurname());
 
         // Verify associations
         Trainee trainee = traineeRepository.findById(createdTrainee.getId())
