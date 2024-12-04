@@ -3,13 +3,17 @@ package cz.cvut.fit.tjv.fitnessApp.controller;
 import cz.cvut.fit.tjv.fitnessApp.controller.dto.FitnessClassDto;
 import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
+import cz.cvut.fit.tjv.fitnessApp.errorHandling.ErrorResponseImpl;
 import cz.cvut.fit.tjv.fitnessApp.service.FitnessClassService;
 import cz.cvut.fit.tjv.fitnessApp.service.mappers.FitnessClassMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/fitness-class")
+@RequestMapping(path = "/fitness-class", produces = MediaType.APPLICATION_JSON_VALUE)
 public class FitnessClassController {
 
     private final FitnessClassService fitnessClassService;
@@ -33,8 +37,16 @@ public class FitnessClassController {
     @Operation(summary = "Create and schedule a new FitnessClass")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "FitnessClass created and scheduled successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
     })
     @PostMapping
     public FitnessClassDto create(@RequestBody FitnessClassDto fitnessClassDto) {
@@ -46,8 +58,16 @@ public class FitnessClassController {
     @Operation(summary = "Update an existing FitnessClass by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "FitnessClass updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
     })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -59,8 +79,16 @@ public class FitnessClassController {
     @Operation(summary = "Retrieve all FitnessClasses or filter by date, time range, or room")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of FitnessClasses retrieved"),
-            @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
     })
     @GetMapping
     public List<FitnessClassDto> readAllWithFilters(
@@ -90,8 +118,16 @@ public class FitnessClassController {
     @Operation(summary = "Retrieve a FitnessClass by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "FitnessClass retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "FitnessClass not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
     })
     @GetMapping("/{id}")
     public FitnessClassDto readById(@PathVariable Long id) {
@@ -103,8 +139,16 @@ public class FitnessClassController {
     @Operation(summary = "Delete a FitnessClass by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "FitnessClass deleted successfully"),
-            @ApiResponse(responseCode = "400", description = "FitnessClass not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
     })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -115,8 +159,16 @@ public class FitnessClassController {
     @Operation(summary = "Add a Trainee to a FitnessClass")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Trainee added to FitnessClass successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
     })
     @PostMapping("/{id}/add-trainee/{traineeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -127,8 +179,16 @@ public class FitnessClassController {
     @Operation(summary = "Retrieve all trainees enrolled in a FitnessClass")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of trainees retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "FitnessClass not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
     })
     @GetMapping("/{id}/trainees")
     public List<Long> getTraineesByFitnessClass(@PathVariable Long id) {
