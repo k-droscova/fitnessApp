@@ -58,4 +58,12 @@ extension ClassType {
         rooms: [101, 102],
         fitnessClasses: [201, 202]
     )
+    
+    static let mock2: ClassType = .init(
+        id: 100,
+        name: "Insanely long name over several lines",
+        instructors: [1, 2],
+        rooms: [101, 102, 000, 7363],
+        fitnessClasses: [201, 202]
+    )
 }

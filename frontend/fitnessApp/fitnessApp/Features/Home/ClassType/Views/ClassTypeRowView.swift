@@ -10,20 +10,38 @@ import SwiftUI
 struct ClassTypeRowView: View {
     private let classType: ClassType
     
-    init (classType: ClassType) {
+    init(classType: ClassType) {
         self.classType = classType
     }
     
     var body: some View {
-        HStack() {
+        HStack {
+            Text(classType.name)
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading) // Align name to the left
             
+            Text("\(classType.instructors.count)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center) // Center instructors count
+            
+            Text("\(classType.rooms.count)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center) // Center rooms count
+            
+            Text("\(classType.fitnessClasses.count)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center) // Align fitness classes count to the right
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8) // Add some vertical padding for better readability
     }
 }
 
 struct ClassTypeRowView_Previews: PreviewProvider {
     static var previews: some View {
         ClassTypeRowView(classType: ClassType.mock)
-            .previewLayout(.sizeThatFits)
     }
 }
