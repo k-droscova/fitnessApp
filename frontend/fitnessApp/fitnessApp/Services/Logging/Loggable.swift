@@ -44,7 +44,7 @@ class LogEvent: Loggable {
         self.message = message
         self.dateString = Date().ISO8601Format()
         self.severity = severity
-        logger.log(event: self)
+        logger.logEvent(self)
     }
 }
 

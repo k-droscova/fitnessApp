@@ -45,3 +45,17 @@ struct ClassType: Codable {
         fitnessClasses = try container.decode([Int].self, forKey: .fitnessClasses)
     }
 }
+
+extension ClassType: Identifiable, Equatable {
+    var identifier: String { id.map(String.init) ?? UUID().uuidString }
+}
+
+extension ClassType {
+    static let mock: ClassType = .init(
+        id: 1,
+        name: "Yoga",
+        instructors: [1, 2],
+        rooms: [101, 102],
+        fitnessClasses: [201, 202]
+    )
+}

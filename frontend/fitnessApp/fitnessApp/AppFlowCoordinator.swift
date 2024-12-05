@@ -24,18 +24,29 @@ final class AppFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordina
     
     private func prepareWindow() {
         childCoordinators.forEach { $0.stop(animated: false) }
-        if appDependencies.userManager.isLoggedIn {
+        showHome()
+        /*if appDependencies.userManager.isLoggedIn {
             showHome()
         } else {
             showLogin()
-        }
+        }*/
     }
     
-    // TODO
-    private func showHome() {}
+    private func showHome() {
+        let mainFC = MainFlowCoordinator()
+        mainFC.delegate = self
+        self.addChild(mainFC)
+        self.mainFC = mainFC
+        let mainVC = mainFC.start()
+        
+        window?.rootViewController = mainVC
+        rootViewController = window?.rootViewController
+        window?.makeKeyAndVisible()
+    }
     
-    // TODO
-    private func showLogin() {}
+    private func showLogin() {
+        
+    }
     
     private func reload() {
         DispatchQueue.main.async { [weak self] in
@@ -49,3 +60,5 @@ extension AppFlowCoordinator: UserManagerFlowDelegate {
         reload()
     }
 }
+
+extension AppFlowCoordinator: MainFlowCoordinatorDelegate {}

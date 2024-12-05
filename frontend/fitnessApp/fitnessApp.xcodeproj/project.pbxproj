@@ -309,6 +309,8 @@
 /* Begin XCBuildConfiguration section */
 		27BEA4892CFF9A6A00C39013 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -319,7 +321,7 @@
 				INFOPLIST_FILE = fitnessApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -336,6 +338,8 @@
 		};
 		27BEA48A2CFF9A6A00C39013 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -346,7 +350,7 @@
 				INFOPLIST_FILE = fitnessApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -363,6 +367,8 @@
 		};
 		27BEA48B2CFF9A6A00C39013 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -426,6 +432,8 @@
 		};
 		27BEA48C2CFF9A6A00C39013 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -482,6 +490,8 @@
 		};
 		27BEA48E2CFF9A6A00C39013 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -501,6 +511,8 @@
 		};
 		27BEA48F2CFF9A6A00C39013 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -520,6 +532,8 @@
 		};
 		27BEA4912CFF9A6A00C39013 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -537,6 +551,8 @@
 		};
 		27BEA4922CFF9A6A00C39013 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 27BEA4612CFF9A6900C39013 /* fitnessApp */;
+			baseConfigurationReferenceRelativePath = config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

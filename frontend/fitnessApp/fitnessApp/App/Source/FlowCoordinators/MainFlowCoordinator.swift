@@ -35,8 +35,12 @@ final class MainFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
     private func setupTabBar() -> UITabBarController{
         // MARK: - SETUP TabBar
         let tabVC = UITabBarController()
-        tabVC.viewControllers = []
-        //tabVC.selectedViewController = homeVC
+        let homeViewController = UIViewController()
+        homeViewController.view.backgroundColor = .red
+        homeViewController.title = "Home"
+        
+        tabVC.viewControllers = [homeViewController]
+        tabVC.selectedViewController = homeViewController
         //customizeTabBarAppearance(tabBar: tabVC.tabBar)
         return tabVC
     }

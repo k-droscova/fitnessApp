@@ -65,6 +65,6 @@ class BaseError: BaseErroring, Loggable {
         self.code = (code ?? .default).code
         self.url = url
         self.message = message
-        logger.log(event: self)
+        logger.logEvent(self)
     }
 }
