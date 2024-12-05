@@ -8,14 +8,14 @@
 import Foundation
 
 struct ClassType: Codable {
-    let id: Int?
+    let classTypeId: Int?
     let name: String
     let instructors: [Int]
     let rooms: [Int]
     let fitnessClasses: [Int]
     
     enum CodingKeys: String, CodingKey {
-        case id
+        case classTypeId = "id"
         case name
         case instructors = "instructorIds"
         case rooms = "roomIds"
@@ -23,13 +23,13 @@ struct ClassType: Codable {
     }
     
     init(
-        id: Int? = nil,
+        classTypeId: Int? = nil,
         name: String,
         instructors: [Int] = [],
         rooms: [Int] = [],
         fitnessClasses: [Int] = []
     ) {
-        self.id = id
+        self.classTypeId = classTypeId
         self.name = name
         self.instructors = instructors
         self.rooms = rooms
@@ -38,7 +38,7 @@ struct ClassType: Codable {
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decodeIfPresent(Int.self, forKey: .id)
+        classTypeId = try container.decodeIfPresent(Int.self, forKey: .classTypeId)
         name = try container.decode(String.self, forKey: .name)
         instructors = try container.decode([Int].self, forKey: .instructors)
         rooms = try container.decode([Int].self, forKey: .rooms)
@@ -47,12 +47,12 @@ struct ClassType: Codable {
 }
 
 extension ClassType: Identifiable, Equatable {
-    var identifier: String { id.map(String.init) ?? UUID().uuidString }
+    var id: String { classTypeId.map(String.init) ?? UUID().uuidString }
 }
 
 extension ClassType {
     static let mock: ClassType = .init(
-        id: 1,
+        classTypeId: 1,
         name: "Yoga",
         instructors: [1, 2],
         rooms: [101, 102],
@@ -60,7 +60,7 @@ extension ClassType {
     )
     
     static let mock2: ClassType = .init(
-        id: 100,
+        classTypeId: 100,
         name: "Insanely long name over several lines",
         instructors: [1, 2],
         rooms: [101, 102, 000, 7363],

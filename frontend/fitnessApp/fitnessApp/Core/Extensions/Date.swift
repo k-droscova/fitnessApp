@@ -24,6 +24,16 @@ extension Date {
             let localTime = Formatters.Backend.localTimeFormatter.string(from: dateTime)
             return (localDate, localTime)
         }
+        
+        /// Parse a `LocalDate` string (`yyyy-MM-dd`) into a `Date`
+        static func fromLocalDateString(_ dateString: String) -> Date? {
+            return Formatters.Backend.localDateFormatter.date(from: dateString)
+        }
+        
+        /// Format a `Date` into a `LocalDate` string (`yyyy-MM-dd`)
+        static func toLocalDateString(_ date: Date) -> String {
+            return Formatters.Backend.localDateFormatter.string(from: date)
+        }
     }
     
     // MARK: - UI Interactions

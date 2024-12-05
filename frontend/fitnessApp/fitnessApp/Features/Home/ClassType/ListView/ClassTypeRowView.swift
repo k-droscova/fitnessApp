@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ClassTypeRowView: View {
     private let classType: ClassType
+    @State private var isHighlighted: Bool = false
     
     init(classType: ClassType) {
         self.classType = classType
@@ -37,11 +38,7 @@ struct ClassTypeRowView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 8) // Add some vertical padding for better readability
-    }
-}
-
-struct ClassTypeRowView_Previews: PreviewProvider {
-    static var previews: some View {
-        ClassTypeRowView(classType: ClassType.mock)
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(8)
     }
 }

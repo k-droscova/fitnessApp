@@ -7,26 +7,21 @@
 
 import Foundation
 
-protocol RoomManagerFlowDelegate: NSObject {
-    func onRoomCreated()
-    func onRoomUpdated()
-    func onRoomDeleted()
-    func onError(_ error: Error)
-}
+protocol RoomManagerFlowDelegate: NSObject {}
 
 protocol HasRoomManager {
-    var roomManager: any RoomManaging { get }
+    var roomManager: RoomManaging { get }
 }
 
 protocol RoomManaging {
     var delegate: RoomManagerFlowDelegate? { get set }
     var allRooms: [Room] { get }
-    func fetchRooms() async
-    func fetchRoomById(_ id: Int) async -> Room?
-    func createRoom(_ room: Room) async
-    func updateRoom(_ id: Int, _ newRoom: Room) async
-    func deleteRoom(_ id: Int) async
-    func findAvailableRooms(classTypeId: Int?, date: String, time: String) async -> [Int]
+    func fetchRooms() async throws
+    func fetchRoomById(_ id: Int) async throws -> Room
+    func createRoom(_ room: Room) async throws
+    func updateRoom(_ id: Int, _ newRoom: Room) async throws
+    func deleteRoom(_ id: Int) async throws
+    func findAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int]
 }
 
 final class RoomManager: BaseClass, RoomManaging {
@@ -43,73 +38,37 @@ final class RoomManager: BaseClass, RoomManaging {
         self.roomAPIService = dependencies.roomAPIService
     }
     
-    // MARK: - Public Interface
-    
-    func fetchRooms() async {
-        do {
-            let result = try await roomAPIService.allRooms()
-            allRooms = result
-        } catch {
-            delegate?.onError(error)
-        }
+    func fetchRooms() async throws {
+        allRooms = try await roomAPIService.allRooms()
     }
     
-    func fetchRoomById(_ id: Int) async -> Room? {
-        do {
-            return try await roomAPIService.room(id)
-        } catch {
-            delegate?.onError(error)
-            return nil
-        }
+    func fetchRoomById(_ id: Int) async throws -> Room {
+        return try await roomAPIService.room(id)
     }
     
-    func createRoom(_ room: Room) async {
-        do {
-            try await roomAPIService.postNewRoom(room)
-            allRooms.append(room)
-            delegate?.onRoomCreated()
-        } catch {
-            delegate?.onError(error)
-        }
+    func createRoom(_ room: Room) async throws {
+        try await roomAPIService.postNewRoom(room)
+        allRooms.append(room)
     }
     
-    func updateRoom(_ id: Int, _ newRoom: Room) async {
-        do {
-            try await roomAPIService.updateRoom(id, newRoom)
-            guard let index = allRooms.firstIndex(where: { $0.id == id }) else {
-                throw BaseError(
-                    context: .system,
-                    message: "Room with id \(id) not found in local cache",
-                    logger: self.logger
-                )
-            }
-            allRooms[index] = newRoom
-            delegate?.onRoomUpdated()
-        } catch {
-            delegate?.onError(error)
-        }
-    }
-    
-    func deleteRoom(_ id: Int) async {
-        do {
-            try await roomAPIService.deleteRoom(id)
-            allRooms.removeAll { $0.id == id }
-            delegate?.onRoomDeleted()
-        } catch {
-            delegate?.onError(error)
-        }
-    }
-    
-    func findAvailableRooms(classTypeId: Int?, date: String, time: String) async -> [Int] {
-        do {
-            return try await roomAPIService.findAvailableRooms(
-                classTypeId: classTypeId,
-                date: date,
-                time: time
+    func updateRoom(_ id: Int, _ newRoom: Room) async throws {
+        try await roomAPIService.updateRoom(id, newRoom)
+        guard let index = allRooms.firstIndex(where: { $0.roomId == id }) else {
+            throw BaseError(
+                context: .system,
+                message: "Room with id \(id) not found in local cache",
+                logger: logger
             )
-        } catch {
-            delegate?.onError(error)
-            return []
         }
+        allRooms[index] = newRoom
+    }
+    
+    func deleteRoom(_ id: Int) async throws {
+        try await roomAPIService.deleteRoom(id)
+        allRooms.removeAll { $0.roomId == id }
+    }
+    
+    func findAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int] {
+        return try await roomAPIService.findAvailableRooms(classTypeId: classTypeId, date: date, time: time)
     }
 }

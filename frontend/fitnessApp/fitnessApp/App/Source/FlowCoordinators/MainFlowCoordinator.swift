@@ -33,89 +33,49 @@ final class MainFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
     // MARK: - Private helpers
     
     private func setupTabBar() -> UITabBarController{
+        // MARK: - Class Types
+        let classTypeFC = ClassTypeFlowCoordinator(delegate: self)
+        addChild(classTypeFC)
+        let classTypeVC = classTypeFC.start()
+        classTypeVC.tabBarItem = UITabBarItem(
+            title: "Class Types",
+            image: UIImage(systemName: "list.bullet"), // Replace with a valid SF Symbol name
+            selectedImage: UIImage(systemName: "list.bullet.circle.fill") // Optional selected image
+        )
+        
         // MARK: - SETUP TabBar
         let tabVC = UITabBarController()
-        let homeViewController = UIViewController()
-        homeViewController.view.backgroundColor = .red
-        homeViewController.title = "Home"
-        
-        tabVC.viewControllers = [homeViewController]
-        tabVC.selectedViewController = homeViewController
+        tabVC.viewControllers = [
+            classTypeVC
+        ]
+        tabVC.selectedViewController = classTypeVC
         //customizeTabBarAppearance(tabBar: tabVC.tabBar)
         return tabVC
     }
     
     /*private func customizeTabBarAppearance(tabBar: UITabBar) {
-        if #available(iOS 15.0, *) {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = CustomColors.TabBar.background.color
-            
-            appearance.stackedLayoutAppearance.selected.iconColor = CustomColors.TabBar.selectedItem.color
-            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: CustomColors.TabBar.selectedItem.color]
-            
-            appearance.stackedLayoutAppearance.normal.iconColor = CustomColors.TabBar.unselectedItem.color
-            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [NSAttributedString.Key.foregroundColor: CustomColors.TabBar.unselectedItem.color]
-            
-            tabBar.standardAppearance = appearance
-            tabBar.scrollEdgeAppearance = appearance
-        } else {
-            tabBar.barTintColor = CustomColors.TabBar.background.color
-            tabBar.tintColor = CustomColors.TabBar.selectedItem.color
-            tabBar.unselectedItemTintColor = CustomColors.TabBar.unselectedItem.color
-        }
-    }
+     if #available(iOS 15.0, *) {
+     let appearance = UITabBarAppearance()
+     appearance.configureWithOpaqueBackground()
+     appearance.backgroundColor = CustomColors.TabBar.background.color
+     
+     appearance.stackedLayoutAppearance.selected.iconColor = CustomColors.TabBar.selectedItem.color
+     appearance.stackedLayoutAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: CustomColors.TabBar.selectedItem.color]
+     
+     appearance.stackedLayoutAppearance.normal.iconColor = CustomColors.TabBar.unselectedItem.color
+     appearance.stackedLayoutAppearance.normal.titleTextAttributes = [NSAttributedString.Key.foregroundColor: CustomColors.TabBar.unselectedItem.color]
+     
+     tabBar.standardAppearance = appearance
+     tabBar.scrollEdgeAppearance = appearance
+     } else {
+     tabBar.barTintColor = CustomColors.TabBar.background.color
+     tabBar.tintColor = CustomColors.TabBar.selectedItem.color
+     tabBar.unselectedItemTintColor = CustomColors.TabBar.unselectedItem.color
+     }
+     }
      */
 }
 
-/*extension MainFlowCoordinator {
-    enum Constants {
-        enum TabBar {
-            enum Home {
-                case selected, unselected
-                var icon: UIImage? {
-                    switch self {
-                    case .selected:
-                        UIImage(named: CustomImages.TabBar.Home.pink.fullPath)
-                    case .unselected:
-                        UIImage(named: CustomImages.TabBar.Home.pink.fullPath)
-                    }
-                }
-            }
-            enum Rank {
-                case selected, unselected
-                var icon: UIImage? {
-                    switch self {
-                    case .selected:
-                        UIImage(named: CustomImages.TabBar.Rank.pink.fullPath)
-                    case .unselected:
-                        UIImage(named: CustomImages.TabBar.Rank.black.fullPath)
-                    }
-                }
-            }
-            enum Points {
-                case selected, unselected
-                var icon: UIImage? {
-                    switch self {
-                    case .selected:
-                        UIImage(named: CustomImages.TabBar.Profile.pink.fullPath)
-                    case .unselected:
-                        UIImage(named: CustomImages.TabBar.Profile.black.fullPath)
-                    }
-                }
-            }
-            enum Map {
-                case selected, unselected
-                var icon: UIImage? {
-                    switch self {
-                    case .selected:
-                        UIImage(named: CustomImages.TabBar.Map.pink.fullPath)
-                    case .unselected:
-                        UIImage(named: CustomImages.TabBar.Map.black.fullPath)
-                    }
-                }
-            }
-        }
-    }
+extension MainFlowCoordinator: ClassTypeFlowCoordinatorDelegate {
+    
 }
-*/

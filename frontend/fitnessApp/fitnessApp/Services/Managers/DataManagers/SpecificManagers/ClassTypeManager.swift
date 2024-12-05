@@ -7,29 +7,24 @@
 
 import Foundation
 
-protocol ClassTypeManagerFlowDelegate: NSObject {
-    func onClassTypeCreated()
-    func onClassTypeUpdated()
-    func onClassTypeDeleted()
-    func onError(_ error: Error)
-}
+protocol ClassTypeManagerFlowDelegate: NSObject {}
 
 protocol HasClassTypeManager {
-    var classTypeManager: any ClassTypeManaging { get }
+    var classTypeManager: ClassTypeManaging { get }
 }
 
 protocol ClassTypeManaging {
     var delegate: ClassTypeManagerFlowDelegate? { get set }
     var allClassTypes: [ClassType] { get }
-    func fetchClassTypes() async
-    func fetchClassTypeById(_ id: Int) async -> ClassType?
-    func fetchClassTypeByName(_ name: String) async -> [ClassType]
-    func fetchInstructorsForClassType(_ id: Int) async -> [Int]
-    func fetchRoomsForClassType(_ id: Int) async -> [Int]
-    func fetchFitnessClassesForClassType(_ id: Int) async -> [Int]
-    func createClassType(_ classType: ClassType) async
-    func updateClassType(_ id: Int, _ newClassType: ClassType) async
-    func deleteClassType(_ id: Int) async
+    func fetchClassTypes() async throws
+    func fetchClassTypeById(_ id: Int) async throws -> ClassType
+    func fetchClassTypeByName(_ name: String) async throws -> [ClassType]
+    func fetchInstructorsForClassType(_ id: Int) async throws -> [Int]
+    func fetchRoomsForClassType(_ id: Int) async throws -> [Int]
+    func fetchFitnessClassesForClassType(_ id: Int) async throws -> [Int]
+    func createClassType(_ classType: ClassType) async throws
+    func updateClassType(_ id: Int, _ newClassType: ClassType) async throws
+    func deleteClassType(_ id: Int) async throws
 }
 
 final class ClassTypeManager: BaseClass, ClassTypeManaging {
@@ -49,94 +44,50 @@ final class ClassTypeManager: BaseClass, ClassTypeManaging {
     
     // MARK: - Public Interface
     
-    func fetchClassTypes() async {
-        do {
-            let result = try await classTypeAPIService.allClassTypes()
-            allClassTypes = result
-        } catch {
-            delegate?.onError(error)
-        }
+    func fetchClassTypes() async throws {
+        let result = try await classTypeAPIService.allClassTypes()
+        allClassTypes = result
     }
     
-    func createClassType(_ classType: ClassType) async {
-        do {
-            let result = try await classTypeAPIService.postNewClassType(classType)
-            allClassTypes.append(result)
-            delegate?.onClassTypeCreated()
-            return
-        } catch {
-            delegate?.onError(error)
-        }
+    func createClassType(_ classType: ClassType) async throws {
+        let result = try await classTypeAPIService.postNewClassType(classType)
+        allClassTypes.append(result)
     }
     
-    func updateClassType(_ id: Int, _ newClassType: ClassType) async {
-        do {
-            try await classTypeAPIService.updateClassType(id, newClassType)
-            guard let index = allClassTypes.firstIndex(where: { $0.id == id }) else {
-                throw BaseError(
-                    context: .system,
-                    message: "Could not find class type with id \(id) during update",
-                    logger: self.logger
-                )
-            }
-            allClassTypes[index] = newClassType
-        } catch {
-            delegate?.onError(error)
+    func updateClassType(_ id: Int, _ newClassType: ClassType) async throws {
+        try await classTypeAPIService.updateClassType(id, newClassType)
+        guard let index = allClassTypes.firstIndex(where: { $0.classTypeId == id }) else {
+            throw BaseError(
+                context: .system,
+                message: "Could not find class type with id \(id) during update",
+                logger: self.logger
+            )
         }
+        allClassTypes[index] = newClassType
     }
     
-    func deleteClassType(_ id: Int) async {
-        do {
-            try await classTypeAPIService.deleteClassType(id)
-            allClassTypes.removeAll { $0.id == id }
-            delegate?.onClassTypeDeleted()
-        } catch {
-            delegate?.onError(error)
-        }
+    func deleteClassType(_ id: Int) async throws {
+        try await classTypeAPIService.deleteClassType(id)
+        allClassTypes.removeAll { $0.classTypeId == id }
     }
     
-    func fetchClassTypeById(_ id: Int) async -> ClassType? {
-        do {
-            return try await classTypeAPIService.classType(id)
-        } catch {
-            delegate?.onError(error)
-            return nil
-        }
+    func fetchClassTypeById(_ id: Int) async throws -> ClassType {
+        return try await classTypeAPIService.classType(id)
     }
     
-    func fetchClassTypeByName(_ name: String) async -> [ClassType] {
-        do {
-            return try await classTypeAPIService.classTypeByName(name)
-        } catch {
-            delegate?.onError(error)
-            return []
-        }
+    func fetchClassTypeByName(_ name: String) async throws -> [ClassType] {
+        return try await classTypeAPIService.classTypeByName(name)
     }
     
-    func fetchInstructorsForClassType(_ id: Int) async -> [Int] {
-        do {
-            return try await classTypeAPIService.instructorsForClassType(id)
-        } catch {
-            delegate?.onError(error)
-            return []
-        }
+    func fetchInstructorsForClassType(_ id: Int) async throws -> [Int] {
+        return try await classTypeAPIService.instructorsForClassType(id)
     }
     
-    func fetchRoomsForClassType(_ id: Int) async -> [Int] {
-        do {
-            return try await classTypeAPIService.roomsForClassType(id)
-        } catch {
-            delegate?.onError(error)
-            return []
-        }
+    func fetchRoomsForClassType(_ id: Int) async throws -> [Int] {
+        return try await classTypeAPIService.roomsForClassType(id)
     }
     
-    func fetchFitnessClassesForClassType(_ id: Int) async -> [Int] {
-        do {
-            return try await classTypeAPIService.fitnessClassesForClassType(id)
-        } catch {
-            delegate?.onError(error)
-            return []
-        }
+    func fetchFitnessClassesForClassType(_ id: Int) async throws -> [Int] {
+        return try await classTypeAPIService.fitnessClassesForClassType(id)
     }
 }
