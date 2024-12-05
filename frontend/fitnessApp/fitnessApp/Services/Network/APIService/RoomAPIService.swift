@@ -20,7 +20,7 @@ protocol RoomAPIServicing {
     func findAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int]
 }
 
-final class RoomAPIService: RoomAPIServicing {
+final class RoomAPIService: BaseClass, RoomAPIServicing {
     typealias Dependencies = HasNetwork & HasLoggerService
     
     private let network: Networking

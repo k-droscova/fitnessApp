@@ -22,7 +22,7 @@ protocol FitnessClassAPIServicing {
     func getTraineesForFitnessClass(_ id: Int) async throws -> [Int]
 }
 
-final class FitnessClassAPIService: FitnessClassAPIServicing {
+final class FitnessClassAPIService: BaseClass, FitnessClassAPIServicing {
     typealias Dependencies = HasNetwork & HasLoggerService
     
     private let network: Networking

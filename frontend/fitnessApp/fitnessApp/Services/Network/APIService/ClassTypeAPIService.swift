@@ -15,7 +15,7 @@ protocol ClassTypeAPIServicing {
     func allClassTypes() async throws -> [ClassType]
     func classType(_ id: Int) async throws -> ClassType
     func classTypeByName(_ name: String) async throws -> [ClassType]
-    func postNewClassType(_ classType: ClassType) async throws
+    func postNewClassType(_ classType: ClassType) async throws -> ClassType
     func updateClassType(_ id: Int, _ newClassType: ClassType) async throws
     func deleteClassType(_ id: Int) async throws
     func instructorsForClassType(_ id: Int) async throws -> [Int]
@@ -23,7 +23,7 @@ protocol ClassTypeAPIServicing {
     func fitnessClassesForClassType(_ id: Int) async throws -> [Int]
 }
 
-final class ClassTypeAPIService: ClassTypeAPIServicing {
+final class ClassTypeAPIService: BaseClass, ClassTypeAPIServicing {
     typealias Dependencies = HasNetwork & HasLoggerService
     
     private let network: Networking
@@ -57,14 +57,14 @@ final class ClassTypeAPIService: ClassTypeAPIServicing {
         )
     }
     
-    func postNewClassType(_ classType: ClassType) async throws {
+    func postNewClassType(_ classType: ClassType) async throws -> ClassType {
         let data = try JSONEncoder().encode(classType)
-        _ = try await network.performAuthorizedRequest(
+        return try await network.performAuthorizedRequest(
             endpoint: Endpoint.classType(.create),
             method: .POST,
             body: data,
             errorObject: APIResponseError.self
-        ) as EmptyResponse
+        )
     }
     
     func updateClassType(_ id: Int, _ newClassType: ClassType) async throws {

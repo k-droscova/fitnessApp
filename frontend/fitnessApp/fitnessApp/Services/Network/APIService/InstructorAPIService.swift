@@ -21,7 +21,7 @@ protocol InstructorAPIServicing {
     func searchInstructors(name: String?, surname: String?, input: String?) async throws -> [Instructor]
 }
 
-final class InstructorAPIService: InstructorAPIServicing {
+final class InstructorAPIService: BaseClass, InstructorAPIServicing {
     typealias Dependencies = HasNetwork & HasLoggerService
     
     private let network: Networking

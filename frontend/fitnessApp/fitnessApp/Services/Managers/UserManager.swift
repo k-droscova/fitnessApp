@@ -46,11 +46,24 @@ final class UserManager: BaseClass, UserManaging {
     // MARK: - Public Interface
     
     func login(credentials: LoginCredentials) async throws {
+        try await checkCredentials(credentials: credentials)
         userDefaultsStorage.isLoggedIn = true
     }
     
     func logout() {
         userDefaultsStorage.isLoggedIn = false
         delegate?.onLogout()
+    }
+    
+    // MARK: - Private Helpers
+    
+    func checkCredentials(credentials: LoginCredentials) async throws {
+        guard credentials.username == "admin" && credentials.password == "admin" else {
+            throw BaseError(
+                context: .ui,
+                message: "Invalid credentials",
+                logger: self.logger
+            )
+        }
     }
 }
