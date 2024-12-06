@@ -9,16 +9,13 @@ import Foundation
 
 protocol ClassTypeDetailViewFlowDelegate: NSObject {
     func onLoadError()
-    func dismissPressed()
-    func onEditSuccess()
-    func onEditFailure()
+    func onEditPressed(classType: ClassType)
     func onDeleteSuccess()
     func onDeleteFailure()
     func showDeleteConfirmation(_ confirmAction: @escaping () -> Void)
 }
 
 protocol ClassTypeDetailViewModeling: BaseClass, ObservableObject {
-    var isEditModeOn: Bool { get set }
     var classType: ClassType { get set }
     var classTypeName: String { get set }
     var instructors: [Instructor] { get set }
@@ -26,31 +23,27 @@ protocol ClassTypeDetailViewModeling: BaseClass, ObservableObject {
     var fitnessClasses: [FitnessClass] { get set }
     var isLoading: Bool { get set }
     func onAppear()
-    func dismissButtonPressed()
     func deleteButtonPressed()
-    func saveButtonPressed()
     func editButtonPressed()
 }
 
 final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
     typealias Dependencies = HasLoggerService & HasClassTypeManager & HasInstructorManager & HasRoomManager & HasFitnessClassManager
-    
+
     private let logger: LoggerServicing
     private let classTypeManager: ClassTypeManaging
     private let instructorManager: InstructorManaging
     private let roomManager: RoomManaging
     private let fitnessClassManager: FitnessClassManaging
-    private var transactionalClassType: ClassType
     private weak var delegate: ClassTypeDetailViewFlowDelegate?
-    
-    @Published var isEditModeOn: Bool = false
+
     @Published var isLoading: Bool = true
     @Published var classType: ClassType
     @Published var classTypeName: String = ""
     @Published var instructors: [Instructor] = []
     @Published var rooms: [Room] = []
     @Published var fitnessClasses: [FitnessClass] = []
-    
+
     init(dependencies: Dependencies, classType: ClassType, delegate: ClassTypeDetailViewFlowDelegate?) {
         self.logger = dependencies.logger
         self.instructorManager = dependencies.instructorManager
@@ -58,10 +51,9 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
         self.fitnessClassManager = dependencies.fitnessClassManager
         self.classTypeManager = dependencies.classTypeManager
         self.classType = classType
-        self.transactionalClassType = classType
         self.delegate = delegate
     }
-    
+
     func onAppear() {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
@@ -74,16 +66,13 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             self.classTypeName = self.classType.name
             do {
                 try await self.fetchAllDetails()
+                logger.logMessage("Successfully fetched class type details")
             } catch {
                 delegate?.onLoadError()
             }
         }
     }
-    
-    func dismissButtonPressed() {
-        delegate?.dismissPressed()
-    }
-    
+
     func deleteButtonPressed() {
         delegate?.showDeleteConfirmation { [weak self] in
             guard let self = self else { return }
@@ -102,23 +91,13 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             }
         }
     }
-    
+
     func editButtonPressed() {
-        isEditModeOn.toggle()
+        delegate?.onEditPressed(classType: classType)
     }
-    
-    func saveButtonPressed() {
-        logger.logMessage("Save button pressed")
-    }
-    
-    func cancelButtonPressed() {
-        classType = transactionalClassType
-        classTypeName = transactionalClassType.name
-        isEditModeOn = false
-    }
-    
+
     // MARK: - Private Helpers
-    
+
     private func fetchAllDetails() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
@@ -133,7 +112,7 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             try await group.waitForAll()
         }
     }
-    
+
     private func fetchInstructorsForClassType() async throws {
         let fetchedInstructors = try await withThrowingTaskGroup(of: Instructor.self) { group -> [Instructor] in
             for instructorId in classType.instructors {
@@ -141,16 +120,11 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
                     try await self.instructorManager.fetchInstructorById(instructorId)
                 }
             }
-            
-            var results: [Instructor] = []
-            for try await instructor in group {
-                results.append(instructor)
-            }
-            return results
+            return try await group.reduce(into: [Instructor]()) { $0.append($1) }
         }
-        
         DispatchQueue.main.async { [weak self] in
             self?.instructors = fetchedInstructors
+            self?.logger.logMessage("Fetched instructors")
         }
     }
 
@@ -161,16 +135,11 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
                     try await self.roomManager.fetchRoomById(roomId)
                 }
             }
-            
-            var results: [Room] = []
-            for try await room in group {
-                results.append(room)
-            }
-            return results
+            return try await group.reduce(into: [Room]()) { $0.append($1) }
         }
-        
         DispatchQueue.main.async { [weak self] in
             self?.rooms = fetchedRooms
+            self?.logger.logMessage("Fetched rooms")
         }
     }
 
@@ -181,16 +150,11 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
                     try await self.fitnessClassManager.fetchFitnessClassById(fitnessClassId)
                 }
             }
-            
-            var results: [FitnessClass] = []
-            for try await fitnessClass in group {
-                results.append(fitnessClass)
-            }
-            return results
+            return try await group.reduce(into: [FitnessClass]()) { $0.append($1) }
         }
-        
         DispatchQueue.main.async { [weak self] in
             self?.fitnessClasses = fetchedFitnessClasses
+            self?.logger.logMessage("Fetched classes")
         }
     }
 }

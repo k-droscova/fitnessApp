@@ -9,23 +9,25 @@ import ACKategories
 import Foundation
 import UIKit
 
+
 protocol BaseFlowCoordinator: Base.FlowCoordinatorNoDeepLink {
-    func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
+    func presentSheet(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
     func dismiss()
-    func showAlert(titleKey: String, messageKey: String, completion: (() -> Void)?)
-    func showAlert(titleKey: String, messageKey: String, actions: [UIAlertAction])
+    func showAlert(title: String, message: String, completion: (() -> Void)?)
+    func showAlert(title: String, message: String, actions: [UIAlertAction])
+    func showSuccessAlert(title: String, message: String, completion: (() -> Void)?)
+    func showErrorAlert(title: String, message: String, completion: (() -> Void)?)
     func onError(_ error: any Error)
     func stopChildCoordinators()
 }
 
 extension BaseFlowCoordinator {
-    // MARK: - Presenting and dismissing UIViewController
+    // MARK: - Presenting and Dismissing View Controllers
     
-    func present(_ viewController: UIViewController, animated: Bool = true, completion: (() -> Void)? = nil) {
+    func presentSheet(_ viewController: UIViewController, animated: Bool = true, completion: (() -> Void)? = nil) {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            guard let vc = self.findSuitableController(from: self.rootViewController) else { return }
-            vc.present(viewController, animated: animated, completion: completion)
+            guard let self = self, let rootVC = self.findSuitableController(from: self.rootViewController) else { return }
+            rootVC.present(viewController, animated: animated, completion: completion)
         }
     }
     
@@ -35,55 +37,71 @@ extension BaseFlowCoordinator {
         }
     }
     
-    /// Finds the last view controller in the hierarchy that is not being dismissed. Should be called from rootViewController
+    /// Finds the last view controller in the hierarchy that is not being dismissed. Should be called from `rootViewController`.
     private func findSuitableController(from controller: UIViewController) -> UIViewController? {
-        // If the controller is being dismissed, return nil.
         if controller.isBeingDismissed {
             return nil
         }
-
-        // Recursively check the presented view controller.
+        
         if let presented = controller.presentedViewController {
-            if let suitableController = findSuitableController(from: presented) {
-                return suitableController
-            }
+            return findSuitableController(from: presented) ?? controller
         }
-
-        // If no presented view controller or all presented view controllers are being dismissed,
-        // return the current controller as it is the most suitable.
+        
         return controller
     }
     
     // MARK: - Presenting Alerts
     
-    func showAlert(titleKey: String, messageKey: String, completion: (() -> Void)? = nil) {
+    func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         showAlert(
-            titleKey: titleKey,
-            messageKey: messageKey,
-            actions: [Alert.okAction(completion: completion)]
+            title: title,
+            message: message,
+            actions: [UIAlertAction(title: "OK", style: .default, handler: { _ in completion?() })]
         )
     }
     
-    func showAlert(titleKey: String, messageKey: String, actions: [UIAlertAction]) {
+    func showAlert(title: String, message: String, actions: [UIAlertAction]) {
         DispatchQueue.main.async { [weak self] in
             let alertController = UIAlertController(
-                title: NSLocalizedString(titleKey, comment: ""),
-                message: NSLocalizedString(messageKey, comment: ""),
+                title: title,
+                message: message,
                 preferredStyle: .alert
             )
             
             actions.forEach { alertController.addAction($0) }
             
-            self?.present(alertController, animated: true, completion: nil)
+            self?.presentSheet(alertController, animated: true)
         }
     }
     
-    func onError(_ error: any Error) {
+    // MARK: - Success and Error Alerts
+    
+    func showSuccessAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         showAlert(
-            titleKey: "alert.general_error.title",
-            messageKey: "alert.general_error.message"
+            title: "✅ \(title)",
+            message: message,
+            completion: completion
         )
     }
+    
+    func showErrorAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+        showAlert(
+            title: "❌ \(title)",
+            message: message,
+            completion: completion
+        )
+    }
+    
+    // MARK: - Error Handling
+    
+    func onError(_ error: any Error) {
+        showErrorAlert(
+            title: "Error",
+            message: error.localizedDescription
+        )
+    }
+    
+    // MARK: - Stopping Child Coordinators
     
     func stopChildCoordinators() {
         childCoordinators.forEach { $0.stop(animated: false) }

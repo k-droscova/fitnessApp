@@ -48,7 +48,7 @@ extension ClassTypeFlowCoordinator: ClassTypeListFlowDelegate {
         )
         self.detailViewModel = vm
         let vc = ClassTypeDetailView(viewModel: vm).hosting()
-        present(vc, animated: true)
+        presentSheet(vc, animated: true)
     }
     
     func onAddTapped() {
@@ -58,63 +58,49 @@ extension ClassTypeFlowCoordinator: ClassTypeListFlowDelegate {
 
 extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
     func onLoadError() {
-        showAlert(
-            titleKey: "alert.load_error.title",
-            messageKey: "alert.load_error.message"
+        showErrorAlert(
+            title: "Error",
+            message: "Error occurred when loading class type details"
         )
     }
     
-    func dismissPressed() {
-        dismiss()
-    }
-    
-    func onEditSuccess() {
-        dismiss()
-        showAlert(
-            titleKey: "alert.edit_success.title",
-            messageKey: "alert.edit_success.message"
-        )
-    }
-    
-    func onEditFailure() {
-        showAlert(
-            titleKey: "alert.edit_failure.title",
-            messageKey: "alert.edit_failure.message"
-        )
+    func onEditPressed(classType: ClassType) {
+        appDependencies.logger.logMessage("Edit tapped for class type \(classType.name)")
     }
     
     func onDeleteSuccess() {
         dismiss()
-        showAlert(
-            titleKey: "alert.delete_success.title",
-            messageKey: "alert.delete_success.message"
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Class type deleted successfully"
         )
     }
     
     func onDeleteFailure() {
-        showAlert(
-            titleKey: "alert.delete_failure.title",
-            messageKey: "alert.delete_failure.message"
+        showErrorAlert(
+            title: "Delete error",
+            message: "Error occured while deleting class type, please try again"
         )
     }
     
     func showDeleteConfirmation(_ confirmAction: @escaping () -> Void) {
         let confirmAlertAction = UIAlertAction(
-            title: NSLocalizedString("alert.delete_confirm.ok", comment: ""),
+            title: "Confirm",
             style: .destructive
         ) { _ in
             confirmAction()
         }
         
         let cancelAlertAction = UIAlertAction(
-            title: NSLocalizedString("alert.delete_confirm.cancel", comment: ""),
+            title: "Cancel",
             style: .cancel,
             handler: nil
         )
         
         showAlert(
-            titleKey: "alert.delete_confirm.title",
-            messageKey: "alert.delete_confirm.message",
+            title: "Are you sure?",
+            message: "This action cannot be undone.",
             actions: [confirmAlertAction, cancelAlertAction]
         )
     }

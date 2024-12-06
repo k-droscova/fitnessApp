@@ -42,95 +42,16 @@ struct ClassTypeDetailView: View {
 
             Spacer()
 
-            // Dismiss Button
-            DismissButton(action: {
-                viewModel.dismissButtonPressed()
-            })
+            EditAndDeleteButton(
+                editAction: viewModel.editButtonPressed,
+                deleteAction: viewModel.deleteButtonPressed
+            )
+            .padding(.bottom, 16)
+
         }
         .onAppear {
             viewModel.onAppear()
         }
         .navigationTitle("Class Type Details")
-    }
-}
-
-struct SectionHeaderView: View {
-    let title: String
-
-    var body: some View {
-        Text(title)
-            .font(.subheadline)
-            .fontWeight(.bold)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16)
-    }
-}
-
-struct RoomSectionView: View {
-    let rooms: [Room]
-
-    var body: some View {
-        ForEach(rooms) { room in
-            HStack {
-                Text("Room \(room.roomId ?? 0)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text("Capacity: \(room.maxCapacity)")
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.horizontal, 16)
-        }
-    }
-}
-
-struct InstructorSectionView: View {
-    let instructors: [Instructor]
-
-    var body: some View {
-        ForEach(instructors) { instructor in
-            HStack {
-                Text("\(instructor.name)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text("\(instructor.surname)")
-                    .frame(maxWidth: .infinity, alignment: .center)
-                Text("\(instructor.email)")
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.horizontal, 16)
-        }
-    }
-}
-
-struct FitnessClassSectionView: View {
-    let fitnessClasses: [FitnessClass]
-
-    var body: some View {
-        ForEach(fitnessClasses) { fitnessClass in
-            HStack {
-                Text(Date.UI.formatDate(fitnessClass.dateTime))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text(Date.UI.formatTime(fitnessClass.dateTime))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                Text("Trainees: \(fitnessClass.trainees.count)")
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.horizontal, 16)
-        }
-    }
-}
-
-struct DismissButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text("Dismiss")
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-        }
-        .padding(.horizontal, 16)
     }
 }

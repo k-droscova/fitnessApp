@@ -15,7 +15,7 @@ struct Trainee: Codable {
     let classes: [Int]
     
     enum CodingKeys: String, CodingKey {
-        case traineeId
+        case traineeId = "id"
         case email
         case name
         case surname

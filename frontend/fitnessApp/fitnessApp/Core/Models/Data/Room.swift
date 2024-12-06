@@ -14,7 +14,7 @@ struct Room: Codable {
     let classTypes: [Int]
     
     enum CodingKeys: String, CodingKey {
-        case roomId
+        case roomId = "id"
         case maxCapacity
         case classes = "fitnessClassIds"
         case classTypes = "classTypeIds"
