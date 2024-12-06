@@ -9,9 +9,10 @@ import ACKategories
 import Foundation
 import UIKit
 
-
 protocol BaseFlowCoordinator: Base.FlowCoordinatorNoDeepLink {
     func presentSheet(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
+    func presentNewScreen(_ viewController: UIViewController, animated: Bool)
+    func popTopScreen(animated: Bool)
     func dismiss()
     func showAlert(title: String, message: String, completion: (() -> Void)?)
     func showAlert(title: String, message: String, actions: [UIAlertAction])
@@ -28,6 +29,22 @@ extension BaseFlowCoordinator {
         DispatchQueue.main.async { [weak self] in
             guard let self = self, let rootVC = self.findSuitableController(from: self.rootViewController) else { return }
             rootVC.present(viewController, animated: animated, completion: completion)
+        }
+    }
+    
+    func presentNewScreen(_ viewController: UIViewController, animated: Bool = true) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self,
+                  let navVC = self.navigationController else { return }
+            navVC.pushViewController(viewController, animated: animated)
+        }
+    }
+    
+    func popTopScreen(animated: Bool = true) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self,
+                  let navVC = self.navigationController else { return }
+            navVC.popViewController(animated: animated)
         }
     }
     

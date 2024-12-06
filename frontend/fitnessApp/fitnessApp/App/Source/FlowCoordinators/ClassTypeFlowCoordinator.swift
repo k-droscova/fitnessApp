@@ -15,7 +15,7 @@ final class ClassTypeFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCo
     private weak var delegate: ClassTypeFlowCoordinatorDelegate?
     private var listViewModel: ClassTypeListViewModel?
     private var detailViewModel: ClassTypeDetailViewModel?
-    //private var addViewModel: ClassTypeAddViewModel?
+    private var addViewModel: ClassTypeAddViewModel?
     
     init(delegate: ClassTypeFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -41,6 +41,9 @@ final class ClassTypeFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCo
 
 extension ClassTypeFlowCoordinator: ClassTypeListFlowDelegate {
     func onDetailTapped(with classType: ClassType) {
+        if self.detailViewModel != nil {
+            self.detailViewModel = nil // prevents mem leaks
+        }
         let vm = ClassTypeDetailViewModel(
             dependencies: appDependencies,
             classType: classType,
@@ -52,7 +55,13 @@ extension ClassTypeFlowCoordinator: ClassTypeListFlowDelegate {
     }
     
     func onAddTapped() {
-        appDependencies.logger.logMessage("Add tapped")
+        let vm = ClassTypeAddViewModel(
+            dependencies: appDependencies,
+            delegate: self
+        )
+        self.addViewModel = vm
+        let vc = ClassTypeAddView(viewModel: vm).hosting()
+        presentNewScreen(vc, animated: true)
     }
 }
 
@@ -102,6 +111,30 @@ extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
             title: "Are you sure?",
             message: "This action cannot be undone.",
             actions: [confirmAlertAction, cancelAlertAction]
+        )
+    }
+}
+
+extension ClassTypeFlowCoordinator: ClassTypeAddViewFlowDelegate {
+    func onBackPressed() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+    }
+    
+    func onSaveSuccess() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Class type saved successfully"
+        )
+    }
+    
+    func onSaveFailure(message: String) {
+        showErrorAlert(
+            title: "Save error",
+            message: message
         )
     }
 }

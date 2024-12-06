@@ -112,18 +112,3 @@ struct EditAndDeleteButton: View {
         .padding(.horizontal, 16)
     }
 }
-
-
-struct EditAndDeleteButton_Previews: PreviewProvider {
-    static var previews: some View {
-        EditAndDeleteButton(
-            editAction: {
-                print("Edit action triggered")
-            },
-            deleteAction: {
-                print("Delete action triggered")
-            }
-        )
-        .previewLayout(.sizeThatFits)
-    }
-}

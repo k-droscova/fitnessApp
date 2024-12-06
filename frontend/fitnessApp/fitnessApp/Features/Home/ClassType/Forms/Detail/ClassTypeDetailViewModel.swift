@@ -44,7 +44,7 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
     @Published var rooms: [Room] = []
     @Published var fitnessClasses: [FitnessClass] = []
 
-    init(dependencies: Dependencies, classType: ClassType, delegate: ClassTypeDetailViewFlowDelegate?) {
+    init(dependencies: Dependencies, classType: ClassType, delegate: ClassTypeDetailViewFlowDelegate? = nil) {
         self.logger = dependencies.logger
         self.instructorManager = dependencies.instructorManager
         self.roomManager = dependencies.roomManager
@@ -66,7 +66,6 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             self.classTypeName = self.classType.name
             do {
                 try await self.fetchAllDetails()
-                logger.logMessage("Successfully fetched class type details")
             } catch {
                 delegate?.onLoadError()
             }
@@ -124,7 +123,6 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
         }
         DispatchQueue.main.async { [weak self] in
             self?.instructors = fetchedInstructors
-            self?.logger.logMessage("Fetched instructors")
         }
     }
 
@@ -139,7 +137,6 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
         }
         DispatchQueue.main.async { [weak self] in
             self?.rooms = fetchedRooms
-            self?.logger.logMessage("Fetched rooms")
         }
     }
 
@@ -154,7 +151,6 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
         }
         DispatchQueue.main.async { [weak self] in
             self?.fitnessClasses = fetchedFitnessClasses
-            self?.logger.logMessage("Fetched classes")
         }
     }
 }
