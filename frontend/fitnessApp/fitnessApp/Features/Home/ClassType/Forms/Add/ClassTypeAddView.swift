@@ -24,9 +24,9 @@ struct ClassTypeAddView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
             
-            // Selectable Instructors List
             ScrollView {
                 VStack(spacing: 16) {
+                    // Selectable Instructors List
                     SelectableInstructorList(instructors: $viewModel.instructors)
                     
                     // Selectable Rooms List
@@ -43,11 +43,7 @@ struct ClassTypeAddView: View {
         }
         .overlay {
             if viewModel.isLoading {
-                ProgressView("Loading...")
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.5))
-                    .ignoresSafeArea()
+                CustomProgressView()
             }
         }
     }

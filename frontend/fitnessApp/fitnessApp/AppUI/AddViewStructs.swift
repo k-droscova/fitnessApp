@@ -11,7 +11,7 @@ import SwiftUI
 struct SelectableRow: View {
     let title: String
     @Binding var isSelected: Bool
-
+    
     var body: some View {
         HStack {
             Text(title)
@@ -30,7 +30,7 @@ struct SelectableRow: View {
 struct SelectableList<Item: Identifiable>: View {
     let title: String
     @Binding var items: [SelectableItem<Item>]
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             SectionHeaderView(title: title)
@@ -60,7 +60,7 @@ struct SelectableItem<Item: Identifiable>: Identifiable {
 
 struct SelectableInstructorList: View {
     @Binding var instructors: [SelectableItem<Instructor>]
-
+    
     var body: some View {
         SelectableList(
             title: "Instructors",
@@ -71,7 +71,7 @@ struct SelectableInstructorList: View {
 
 struct SelectableRoomList: View {
     @Binding var rooms: [SelectableItem<Room>]
-
+    
     var body: some View {
         SelectableList(
             title: "Rooms",
@@ -83,7 +83,7 @@ struct SelectableRoomList: View {
 struct InputField: View {
     let label: String
     @Binding var text: String
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
@@ -97,26 +97,31 @@ struct InputField: View {
 
 struct BackButton: View {
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
-            Text("Back")
-                .font(.headline)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(8)
+            HStack {
+                Image(systemName: "arrow.left") // Left arrow icon
+                    .font(.headline)
+                Text("Back")
+                    .font(.headline)
+            }
+            .padding(12)
+            .background(Color.gray.opacity(0.2))
+            .cornerRadius(8)
         }
     }
 }
 
 struct SaveButton: View {
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             Text("Save")
                 .font(.headline)
-                .padding()
+                .padding(12)
+                .padding(.horizontal, 12)
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(8)
