@@ -85,16 +85,19 @@ public class ClassTypeServiceImpl extends CrudServiceImpl<ClassType, Long> imple
             savedClassType.getRooms().add(room);
         });
 
-        // Update fitness classes
-        savedClassType.getClasses().forEach(fitnessClass -> fitnessClass.setClassType(null));
-        savedClassType.getClasses().clear();
-        updatedClassType.getClasses().forEach(fitnessClass -> {
-            fitnessClass.setClassType(savedClassType);
-            savedClassType.getClasses().add(fitnessClass);
-        });
+        // Replace the association with FitnessClass
+        for (FitnessClass fitnessClass : savedClassType.getClasses()) {
+            fitnessClass.setClassType(null); // Clear the existing association
+        }
+        savedClassType.getClasses().clear(); // Clear current references
 
-        // Save changes and return the updated entity
-        return savedClassType;
+        for (FitnessClass fitnessClass : updatedClassType.getClasses()) {
+            fitnessClass.setClassType(savedClassType); // Set the new association
+            savedClassType.getClasses().add(fitnessClass);
+        }
+
+        // Save the updated ClassType
+        return getRepository().save(savedClassType);
     }
 
     @Override

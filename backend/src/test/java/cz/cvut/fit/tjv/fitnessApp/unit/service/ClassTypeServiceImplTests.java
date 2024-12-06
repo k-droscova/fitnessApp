@@ -108,7 +108,7 @@ class ClassTypeServiceImplTest {
 
         classTypeService.update(1L, mockClassType);
 
-        verify(classTypeRepository).save(mockClassType);
+        verify(classTypeRepository, atLeastOnce()).save(mockClassType);
     }
 
     @Test
