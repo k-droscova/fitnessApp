@@ -39,16 +39,27 @@ final class MainFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
         let classTypeVC = classTypeFC.start()
         classTypeVC.tabBarItem = UITabBarItem(
             title: "Class Types",
-            image: UIImage(systemName: "list.bullet"), // Replace with a valid SF Symbol name
-            selectedImage: UIImage(systemName: "list.bullet.circle.fill") // Optional selected image
+            image: UIImage(systemName: "figure.yoga"),
+            selectedImage: UIImage(systemName: "figure.yoga.circle.fill")
+        )
+        
+        // MARK: - Fitness Classes
+        let fitnessClassesFC = FitnessClassFlowCoordinator(delegate: self)
+        addChild(fitnessClassesFC)
+        let fitnessClassesVC = fitnessClassesFC.start()
+        fitnessClassesVC.tabBarItem = UITabBarItem(
+            title: "Fitness Classes",
+            image: UIImage(systemName: "list.bullet"),
+            selectedImage: UIImage(systemName: "list.bullet.circle.fill")
         )
         
         // MARK: - SETUP TabBar
         let tabVC = UITabBarController()
         tabVC.viewControllers = [
-            classTypeVC
+            classTypeVC,
+            fitnessClassesVC
         ]
-        tabVC.selectedViewController = classTypeVC
+        tabVC.selectedViewController = fitnessClassesVC
         //customizeTabBarAppearance(tabBar: tabVC.tabBar)
         return tabVC
     }
@@ -76,6 +87,6 @@ final class MainFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
      */
 }
 
-extension MainFlowCoordinator: ClassTypeFlowCoordinatorDelegate {
-    
-}
+extension MainFlowCoordinator: ClassTypeFlowCoordinatorDelegate {}
+
+extension MainFlowCoordinator: FitnessClassFlowCoordinatorDelegate {}

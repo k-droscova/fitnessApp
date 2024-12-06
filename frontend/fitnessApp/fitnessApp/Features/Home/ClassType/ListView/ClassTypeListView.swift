@@ -16,17 +16,7 @@ struct ClassTypeListView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Spacer()
-                Button(action: {
-                    viewModel.onAddButtonTapped()
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title)
-                        .foregroundColor(.blue)
-                }
-                .padding(.trailing, 16)
-            }
+            AddFormButton(action: viewModel.onAddButtonTapped)
             
             HStack {
                 Text("name")
