@@ -57,7 +57,7 @@ class FitnessClassControllerIT {
     void create_ShouldPersistFitnessClassAndVerifyAssociations() throws Exception {
         // Arrange
         CreateFitnessClassDto createDto = new CreateFitnessClassDto();
-        createDto.setDate(LocalDate.of(2024, 12, 5));
+        createDto.setDate(LocalDate.now().plusDays(4));
         createDto.setTime(LocalTime.of(10, 0));
         createDto.setCapacity(15);
         createDto.setInstructorId(1L); // Preloaded instructor
@@ -70,7 +70,7 @@ class FitnessClassControllerIT {
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.date").value("2024-12-05"))
+                .andExpect(jsonPath("$.date").value(createDto.getDate().toString()))
                 .andExpect(jsonPath("$.time").value("10:00:00"))
                 .andExpect(jsonPath("$.capacity").value(15))
                 .andReturn();
@@ -84,7 +84,7 @@ class FitnessClassControllerIT {
         // Verify the persisted data
         FitnessClass persistedClass = fitnessClassRepository.findById(createdId)
                 .orElseThrow(() -> new AssertionError("FitnessClass not found in the database"));
-        assertEquals(LocalDate.of(2024, 12, 5), persistedClass.getDate());
+        assertEquals(createDto.getDate(), persistedClass.getDate());
         assertEquals(LocalTime.of(10, 0), persistedClass.getTime());
         assertEquals(15, persistedClass.getCapacity());
         assertEquals(1L, persistedClass.getInstructor().getId());

@@ -23,6 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,12 +58,16 @@ class ClassTypeControllerIT {
     private FitnessClassRepository fitnessClassRepository;
 
     @Test
-    void create_ShouldPersistClassType() throws Exception {
+    void create_ShouldPersistClassTypeWithAssociations() throws Exception {
         // Arrange
+        // Prepare the DTO with associations
         CreateClassTypeDto createDto = new CreateClassTypeDto();
         createDto.setName("Pilates Advanced");
+        createDto.setInstructorIds(List.of(1L, 2L));
+        createDto.setRoomIds(List.of(1L, 3L));
+        createDto.setFitnessClassIds(List.of(1L, 2L));
 
-        // Act & Assert
+        // Act
         mockMvc.perform(post("/classtype")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
@@ -69,10 +75,39 @@ class ClassTypeControllerIT {
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.name").value("Pilates Advanced"));
 
-        // Verify persistence in the database
+        // Assert
+        // Verify the ClassType was persisted in the database
         List<ClassType> classTypes = classTypeRepository.findByNameContainingIgnoreCase("Pilates Advanced");
         assertEquals(1, classTypes.size());
-        assertEquals("Pilates Advanced", classTypes.get(0).getName());
+        ClassType savedClassType = classTypes.get(0);
+        assertEquals("Pilates Advanced", savedClassType.getName());
+
+        // Verify the associations in the database by checking the IDs
+        List<Long> instructorIds = savedClassType.getInstructors().stream()
+                .map(Instructor::getId)
+                .toList();
+        assertEquals(2, instructorIds.size());
+        assertTrue(instructorIds.contains(1L));
+        assertTrue(instructorIds.contains(2L));
+
+        List<Long> roomIds = savedClassType.getRooms().stream()
+                .map(Room::getId)
+                .toList();
+        assertEquals(2, roomIds.size());
+        assertTrue(roomIds.contains(1L));
+        assertTrue(roomIds.contains(3L));
+
+        List<Long> fitnessClassIds = savedClassType.getClasses().stream()
+                .map(FitnessClass::getId)
+                .toList();
+        assertEquals(2, fitnessClassIds.size());
+        assertTrue(fitnessClassIds.contains(1L));
+        assertTrue(fitnessClassIds.contains(2L));
+
+        // Verify reverse associations
+        assertTrue(instructorRepository.findById(1L).orElseThrow().getSpecializations().contains(savedClassType));
+        assertTrue(roomRepository.findById(1L).orElseThrow().getClassTypes().contains(savedClassType));
+        assertEquals(savedClassType, fitnessClassRepository.findById(1L).orElseThrow().getClassType());
     }
 
     @Test
@@ -87,7 +122,6 @@ class ClassTypeControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(ErrorMatcher.containsErrorMessage("Data integrity violation"));
     }
-
 
     @Test
     void createAndUpdateClassType_ShouldReflectChangesInAssociations() throws Exception {
