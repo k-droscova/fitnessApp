@@ -70,6 +70,7 @@ struct FitnessClassSectionView: View {
 
 struct DeleteButton: View {
     let action: () -> Void
+    var isDisabled: Bool = false
 
     var body: some View {
         Button(action: action) {
@@ -77,37 +78,59 @@ struct DeleteButton: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.red)
+                .background(isDisabled ? Color.gray : Color.red)
                 .foregroundColor(.white)
                 .cornerRadius(8)
         }
+        .disabled(isDisabled)
     }
 }
 
 struct EditButton: View {
     let action: () -> Void
-    
+    var isDisabled: Bool = false
+
     var body: some View {
         Button(action: action) {
             Text("Edit")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.blue)
+                .background(isDisabled ? Color.gray : Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(8)
         }
+        .disabled(isDisabled)
     }
 }
 
 struct EditAndDeleteButton: View {
     let editAction: () -> Void
     let deleteAction: () -> Void
-    
+    var isEditDisabled: Bool = false
+    var isDeleteDisabled: Bool = false
+
     var body: some View {
         HStack(spacing: 16) {
-            EditButton(action: editAction)
-            DeleteButton(action: deleteAction)
+            EditButton(action: editAction, isDisabled: isEditDisabled)
+            DeleteButton(action: deleteAction, isDisabled: isDeleteDisabled)
+        }
+        .padding(.horizontal, 16)
+    }
+}
+
+struct DetailRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+            Spacer()
+            Text(value)
+                .font(.body)
+                .foregroundColor(.secondary)
         }
         .padding(.horizontal, 16)
     }

@@ -109,6 +109,29 @@ extension BaseFlowCoordinator {
         )
     }
     
+    // MARK: - Confirm Deletion Alert
+    
+    func showDeleteConfirmation(_ confirmAction: @escaping () -> Void) {
+        let confirmAlertAction = UIAlertAction(
+            title: "Confirm",
+            style: .destructive
+        ) { _ in
+            confirmAction()
+        }
+        
+        let cancelAlertAction = UIAlertAction(
+            title: "Cancel",
+            style: .cancel,
+            handler: nil
+        )
+        
+        showAlert(
+            title: "Are you sure?",
+            message: "This action cannot be undone.",
+            actions: [confirmAlertAction, cancelAlertAction]
+        )
+    }
+    
     // MARK: - Error Handling
     
     func onError(_ error: any Error) {

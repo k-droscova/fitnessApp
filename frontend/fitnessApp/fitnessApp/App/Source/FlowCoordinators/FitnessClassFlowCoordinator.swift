@@ -14,6 +14,7 @@ protocol FitnessClassFlowCoordinatorDelegate: NSObject {}
 final class FitnessClassFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordinator {
     private weak var delegate: FitnessClassFlowCoordinatorDelegate?
     private var listViewModel: FitnessClassListViewModel?
+    private var detailViewModel: FitnessClassDetailViewModel?
 
     init(delegate: FitnessClassFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -39,8 +40,17 @@ final class FitnessClassFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlo
 
 extension FitnessClassFlowCoordinator: FitnessClassListFlowDelegate {
     func onDetailTapped(with fitnessClass: FitnessClass) {
-        appDependencies.logger.logMessage("Fitness class \(fitnessClass.fitnessClassId ?? -1) tapped")
-        // Additional navigation logic can be added here in the future
+        if self.detailViewModel != nil {
+            self.detailViewModel = nil // prevents mem leaks
+        }
+        let vm = FitnessClassDetailViewModel(
+            dependencies: appDependencies,
+            fitnessClass: fitnessClass,
+            delegate: self
+        )
+        self.detailViewModel = vm
+        let vc = FitnessClassDetailView(viewModel: vm).hosting()
+        presentSheet(vc, animated: true)
     }
     
     func onAddTapped() {
@@ -52,6 +62,29 @@ extension FitnessClassFlowCoordinator: FitnessClassListFlowDelegate {
         showErrorAlert(
             title: "Error",
             message: "Error occurred while loading fitness classes."
+        )
+    }
+}
+
+extension FitnessClassFlowCoordinator: FitnessClassDetailFlowDelegate {
+    func onEditPressed(fitnessClass: FitnessClass) {
+        dismiss()
+        appDependencies.logger.logMessage("Edit fitness class tapped")
+    }
+    
+    func onDeleteSuccess() {
+        dismiss()
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Fitness class deleted successfully"
+        )
+    }
+    
+    func onDeleteFailure() {
+        showErrorAlert(
+            title: "Delete error",
+            message: "Error occured while deleting fitness class, please try again"
         )
     }
 }

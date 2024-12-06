@@ -101,27 +101,6 @@ extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
             message: "Error occured while deleting class type, please try again"
         )
     }
-    
-    func showDeleteConfirmation(_ confirmAction: @escaping () -> Void) {
-        let confirmAlertAction = UIAlertAction(
-            title: "Confirm",
-            style: .destructive
-        ) { _ in
-            confirmAction()
-        }
-        
-        let cancelAlertAction = UIAlertAction(
-            title: "Cancel",
-            style: .cancel,
-            handler: nil
-        )
-        
-        showAlert(
-            title: "Are you sure?",
-            message: "This action cannot be undone.",
-            actions: [confirmAlertAction, cancelAlertAction]
-        )
-    }
 }
 
 extension ClassTypeFlowCoordinator: ClassTypeAddViewFlowDelegate {
