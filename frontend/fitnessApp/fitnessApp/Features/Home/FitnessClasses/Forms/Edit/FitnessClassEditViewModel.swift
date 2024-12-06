@@ -46,14 +46,14 @@ protocol FitnessClassEditViewModeling: BaseClass, ObservableObject {
 
 final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     typealias Dependencies = HasFitnessClassManager & HasRoomManager & HasInstructorManager & HasClassTypeManager
-
+    
     private let fitnessClassManager: FitnessClassManaging
     private let roomManager: RoomManaging
     private let instructorManager: InstructorManaging
     private let classTypeManager: ClassTypeManaging
     private weak var delegate: FitnessClassEditViewFlowDelegate?
     private let fitnessClass: FitnessClass
-
+    
     // MARK: - Published Properties
     @Published var date: Date? {
         didSet {
@@ -62,10 +62,10 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     }
     @Published var selectedClassType: ClassType? {
         didSet {
-            selectedRoom = nil
-            selectedInstructor = nil
-            selectedCapacity = nil
             if selectedClassType == nil {
+                selectedRoom = nil
+                selectedInstructor = nil
+                selectedCapacity = nil
                 roomOptions = []
                 instructorOptions = []
             } else {
@@ -91,13 +91,13 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     @Published var selectedCapacity: Int? = nil
     @Published var maxCapacity: Int = 0
     @Published var isLoading: Bool = false
-
+    
     // MARK: - Computed Properties
     var isClassTypeSelectionEnabled: Bool { date != nil }
     var isRoomSelectionEnabled: Bool { selectedClassType != nil && date != nil }
     var isInstructorSelectionEnabled: Bool { selectedClassType != nil && date != nil }
     var isCapacitySelectionEnabled: Bool { selectedRoom != nil }
-
+    
     // MARK: - Initializer
     init(
         dependencies: Dependencies,
@@ -110,25 +110,25 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
         self.classTypeManager = dependencies.classTypeManager
         self.delegate = delegate
         self.fitnessClass = fitnessClass
-
-        self.date = fitnessClass.dateTime
-        self.selectedCapacity = fitnessClass.capacity
-
-        super.init()
     }
-
+    
     // MARK: - Actions
     
     func onAppear() {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
             self.isLoading = true
+            self.date = fitnessClass.dateTime
+            self.selectedCapacity = fitnessClass.capacity
             defer { self.isLoading = false }
             do {
                 async let classTypes: () = self.fetchClassTypeOptions()
                 async let roomsAndInstructors: () = self.fetchRoomsAndInstructors()
-
+                
                 try await (classTypes, roomsAndInstructors)
+                self.selectedClassType = self.classTypeOptions.first(where: { $0.classTypeId == self.fitnessClass.classType })
+                self.selectedRoom = self.roomOptions.first(where: { $0.roomId == self.fitnessClass.room })
+                self.selectedInstructor = self.instructorOptions.first(where: { $0.instructorId == self.fitnessClass.instructor })
             } catch {
                 self.delegate?.onLoadError()
             }
@@ -138,7 +138,7 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     func onCancelPressed() {
         delegate?.onCancelPressed()
     }
-
+    
     func onSavePressed() {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
@@ -153,7 +153,7 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
                 self.delegate?.onUpdateFailure(message: "Please complete all fields.")
                 return
             }
-
+            
             let updatedFitnessClass = FitnessClass(
                 fitnessClassId: fitnessClass.fitnessClassId,
                 capacity: capacity,
@@ -163,7 +163,7 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
                 classType: classType,
                 trainees: fitnessClass.trainees
             )
-
+            
             do {
                 try await self.fitnessClassManager.updateFitnessClass(id, updatedFitnessClass)
                 self.delegate?.onUpdateSuccess()
@@ -172,15 +172,14 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
             }
         }
     }
-
+    
     // MARK: - Helpers
     private func validateDateAndRefreshOptions() {
         guard let date = date, Calendar.current.isDateInFuture(date) else {
-            delegate?.onUpdateFailure(message: "Date and time must be in the future.")
             clearSelections()
             return
         }
-
+        
         // Clear dependent selections
         selectedClassType = nil
         roomOptions = []
@@ -189,7 +188,7 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
         selectedInstructor = nil
         selectedCapacity = nil
     }
-
+    
     private func clearSelections() {
         selectedClassType = nil
         selectedRoom = nil
@@ -199,12 +198,11 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
         roomOptions = []
         instructorOptions = []
     }
-
+    
     private func fetchClassTypeOptions() async throws {
         try await classTypeManager.fetchClassTypes()
         DispatchQueue.main.async { [weak self] in
             self?.classTypeOptions = self?.classTypeManager.allClassTypes ?? []
-            self?.selectedClassType = self?.classTypeManager.allClassTypes.first(where: { $0.classTypeId == self?.fitnessClass.classType })
         }
     }
     
@@ -217,22 +215,39 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
             }
         }
     }
-
+    
     private func fetchRoomsAndInstructors() async throws {
         guard let classType = selectedClassType, let date = date else { return }
 
+        // Ensure the room and instructor assigned to the fitness class are included in the options
         let (dateString, timeString) = Date.Backend.split(dateTime: date)
-
         async let fetchRoomsTask = fetchAvailableRooms(classType: classType, dateString: dateString, timeString: timeString)
         async let fetchInstructorsTask = fetchAvailableInstructors(classType: classType, dateString: dateString, timeString: timeString)
-        let (rooms, instructors) = try await (fetchRoomsTask, fetchInstructorsTask)
+        
+        var rooms: [Room] = []
+        var instructors: [Instructor] = []
+
+        rooms = try await fetchRoomsTask
+        instructors = try await fetchInstructorsTask
+        
+        // Include currently selected room and instructor if valid
+        if classType.classTypeId == fitnessClass.classType && Calendar.current.isDate(fitnessClass.dateTime, equalTo: date, toGranularity: .minute) {
+            let currentRoomId = fitnessClass.room
+            if let currentRoom = try? await roomManager.fetchRoomById(currentRoomId), !rooms.contains(where: { $0.roomId == currentRoomId }) {
+                rooms.append(currentRoom)
+            }
+            let currentInstructorId = fitnessClass.instructor
+            if let currentInstructor = try? await instructorManager.fetchInstructorById(currentInstructorId), !instructors.contains(where: { $0.instructorId == currentInstructorId }) {
+                instructors.append(currentInstructor)
+            }
+        }
 
         DispatchQueue.main.async { [weak self] in
             self?.roomOptions = rooms
             self?.instructorOptions = instructors
         }
     }
-
+    
     private func fetchAvailableRooms(classType: ClassType, dateString: String, timeString: String) async throws -> [Room] {
         let roomIds = try await roomManager.findAvailableRooms(
             classTypeId: classType.classTypeId,
@@ -247,7 +262,7 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
         }
         return fetchedRooms
     }
-
+    
     private func fetchAvailableInstructors(classType: ClassType, dateString: String, timeString: String) async throws -> [Instructor] {
         let instructorIds = try await instructorManager.findAvailableInstructors(
             classTypeId: classType.classTypeId,
