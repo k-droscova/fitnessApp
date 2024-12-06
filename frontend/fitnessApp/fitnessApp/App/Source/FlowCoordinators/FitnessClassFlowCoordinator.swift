@@ -16,7 +16,8 @@ final class FitnessClassFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlo
     private var listViewModel: FitnessClassListViewModel?
     private var detailViewModel: FitnessClassDetailViewModel?
     private var addViewModel: FitnessClassAddViewModel?
-
+    private var editViewModel: FitnessClassEditViewModel?
+    
     init(delegate: FitnessClassFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
         super.init()
@@ -75,7 +76,14 @@ extension FitnessClassFlowCoordinator: FitnessClassListFlowDelegate {
 extension FitnessClassFlowCoordinator: FitnessClassDetailFlowDelegate {
     func onEditPressed(fitnessClass: FitnessClass) {
         dismiss()
-        appDependencies.logger.logMessage("Edit fitness class tapped")
+        let vm = FitnessClassEditViewModel(
+            dependencies: appDependencies,
+            fitnessClass: fitnessClass,
+            delegate: self
+        )
+        self.editViewModel = vm
+        let vc = FitnessClassEditView(viewModel: vm).hosting()
+        presentNewScreen(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -114,6 +122,30 @@ extension FitnessClassFlowCoordinator: FitnessClassAddViewFlowDelegate {
     func onSaveFailure(message: String) {
         showErrorAlert(
             title: "Save error",
+            message: message
+        )
+    }
+}
+
+extension FitnessClassFlowCoordinator: FitnessClassEditViewFlowDelegate {
+    func onCancelPressed() {
+        popTopScreen(animated: true)
+        self.editViewModel = nil
+    }
+    
+    func onUpdateSuccess() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Fitness class updated successfully"
+        )
+    }
+    
+    func onUpdateFailure(message: String) {
+        showErrorAlert(
+            title: "Update error",
             message: message
         )
     }
