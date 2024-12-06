@@ -34,7 +34,10 @@ struct FitnessClassRow: View {
                     .foregroundColor(.secondary)
             }
         }
-        .padding(.vertical, 8)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8) // Add some vertical padding for better readability
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(8)
     }
 }
 
@@ -44,7 +47,6 @@ struct FitnessClassRowPreview: View {
         
         return VStack(spacing: 16) {
             FitnessClassRow(fitnessClass: fitnessClass, classTypeName: "Yoga")
-            Divider()
             FitnessClassRow(fitnessClass: FitnessClass.mock2, classTypeName: "Pilates")
         }
         .padding()

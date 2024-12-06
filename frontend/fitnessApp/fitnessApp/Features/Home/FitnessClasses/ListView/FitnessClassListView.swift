@@ -39,7 +39,7 @@ struct FitnessClassListView: View {
                                     fitnessClass: fitnessClass,
                                     classTypeName: viewModel.classTypeNameForFitnessClass(fitnessClass)
                                 )
-                                .padding(.horizontal, 16)
+                                .padding(.horizontal, 8)
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
