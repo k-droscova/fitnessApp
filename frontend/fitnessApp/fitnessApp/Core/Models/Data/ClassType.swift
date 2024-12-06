@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ClassType: Codable {
+struct ClassType: Codable, Hashable {
     let classTypeId: Int?
     let name: String
     let instructors: [Int]
@@ -66,4 +66,8 @@ extension ClassType {
         rooms: [101, 102, 000, 7363],
         fitnessClasses: [201, 202]
     )
+}
+
+extension ClassType: CustomStringConvertible {
+    var description: String { "\(name)" }
 }

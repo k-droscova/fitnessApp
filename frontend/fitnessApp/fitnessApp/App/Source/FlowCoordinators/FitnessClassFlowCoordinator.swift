@@ -15,6 +15,7 @@ final class FitnessClassFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlo
     private weak var delegate: FitnessClassFlowCoordinatorDelegate?
     private var listViewModel: FitnessClassListViewModel?
     private var detailViewModel: FitnessClassDetailViewModel?
+    private var addViewModel: FitnessClassAddViewModel?
 
     init(delegate: FitnessClassFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -54,8 +55,13 @@ extension FitnessClassFlowCoordinator: FitnessClassListFlowDelegate {
     }
     
     func onAddTapped() {
-        appDependencies.logger.logMessage("Add fitness class tapped")
-        // Additional navigation logic can be added here in the future
+        let vm = FitnessClassAddViewModel(
+            dependencies: appDependencies,
+            delegate: self
+        )
+        self.addViewModel = vm
+        let vc = FitnessClassAddView(viewModel: vm).hosting()
+        presentNewScreen(vc, animated: true)
     }
     
     func onLoadError() {
@@ -85,6 +91,30 @@ extension FitnessClassFlowCoordinator: FitnessClassDetailFlowDelegate {
         showErrorAlert(
             title: "Delete error",
             message: "Error occured while deleting fitness class, please try again"
+        )
+    }
+}
+
+extension FitnessClassFlowCoordinator: FitnessClassAddViewFlowDelegate {
+    func onBackPressed() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+    }
+    
+    func onSaveSuccess() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Fitness class type saved successfully"
+        )
+    }
+    
+    func onSaveFailure(message: String) {
+        showErrorAlert(
+            title: "Save error",
+            message: message
         )
     }
 }

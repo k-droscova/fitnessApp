@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Room: Codable {
+struct Room: Codable, Hashable {
     let roomId: Int?
     let maxCapacity: Int
     let classes: [Int]
@@ -67,4 +67,11 @@ extension Room {
         classes: [303, 304],
         classTypes: [403, 404]
     )
+}
+
+extension Room: CustomStringConvertible {
+    var description: String {
+        guard let roomId else { return "Room: \(id)" }
+        return "Room: \(roomId)"
+    }
 }
