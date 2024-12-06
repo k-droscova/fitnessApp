@@ -129,6 +129,22 @@ struct SaveButton: View {
     }
 }
 
+struct CancelButton: View {
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text("Cancel")
+                .font(.headline)
+                .padding(12)
+                .padding(.horizontal, 8)
+                .background(Color.gray.opacity(0.2))
+                .foregroundColor(.red)
+                .cornerRadius(8)
+        }
+    }
+}
+
 struct BackAndSaveButtons: View {
     let backAction: () -> Void
     let saveAction: () -> Void
@@ -140,5 +156,29 @@ struct BackAndSaveButtons: View {
             SaveButton(action: saveAction)
         }
         .padding(.horizontal, 16)
+    }
+}
+
+struct CancelAndSaveButtons: View {
+    let cancelAction: () -> Void
+    let saveAction: () -> Void
+    
+    var body: some View {
+        HStack {
+            CancelButton(action: cancelAction)
+            Spacer()
+            SaveButton(action: saveAction)
+        }
+        .padding(.horizontal, 16)
+    }
+}
+
+struct CancelAndSaveButtons_Previews: PreviewProvider {
+    static var previews: some View {
+        CancelAndSaveButtons(
+            cancelAction: { print("Cancel button tapped") },
+            saveAction: { print("Save button tapped") }
+        )
+        .previewLayout(.sizeThatFits)
     }
 }

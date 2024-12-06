@@ -16,6 +16,7 @@ final class ClassTypeFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCo
     private var listViewModel: ClassTypeListViewModel?
     private var detailViewModel: ClassTypeDetailViewModel?
     private var addViewModel: ClassTypeAddViewModel?
+    private var editViewModel: ClassTypeEditViewModel?
     
     init(delegate: ClassTypeFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -74,7 +75,15 @@ extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
     }
     
     func onEditPressed(classType: ClassType) {
-        appDependencies.logger.logMessage("Edit tapped for class type \(classType.name)")
+        dismiss()
+        let vm = ClassTypeEditViewModel(
+            dependencies: appDependencies,
+            classType: classType,
+            delegate: self
+        )
+        self.editViewModel = vm
+        let vc = ClassTypeEditView(viewModel: vm).hosting()
+        presentNewScreen(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -134,6 +143,30 @@ extension ClassTypeFlowCoordinator: ClassTypeAddViewFlowDelegate {
     func onSaveFailure(message: String) {
         showErrorAlert(
             title: "Save error",
+            message: message
+        )
+    }
+}
+
+extension ClassTypeFlowCoordinator: ClassTypeEditViewFlowDelegate {
+    func onCancelPressed() {
+        popTopScreen(animated: true)
+        self.editViewModel = nil
+    }
+    
+    func onUpdateSuccess() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Class type updated successfully"
+        )
+    }
+    
+    func onUpdateFailure(message: String) {
+        showErrorAlert(
+            title: "Update error",
             message: message
         )
     }
