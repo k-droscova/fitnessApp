@@ -59,4 +59,36 @@ public class TraineeRepositoryIT {
         assertTrue(results.stream().anyMatch(t -> "Bob".equals(t.getName())));
         assertTrue(results.stream().anyMatch(t -> "Dave".equals(t.getName())));
     }
+
+    @Test
+    void findByNameOrSurnameStartingWithIgnoreCase_ShouldReturnTraineesByPartialMatch() {
+        List<Trainee> results = traineeRepository.findByNameOrSurnameStartingWithIgnoreCase("b");
+
+        assertNotNull(results);
+        assertEquals(2, results.size(), "Expected 2 trainees with names or surnames starting with 'b'");
+        assertTrue(results.stream().anyMatch(t -> "Alice".equals(t.getName()) && "Brown".equals(t.getSurname())),
+                "Expected trainee Alice Brown to be in the results");
+        assertTrue(results.stream().anyMatch(t -> "Bob".equals(t.getName()) && "White".equals(t.getSurname())),
+                "Expected trainee Bob White to be in the results");
+    }
+
+    @Test
+    void findByNameOrSurnameStartingWithIgnoreCase_ShouldReturnEmptyForNonMatchingInput() {
+        List<Trainee> results = traineeRepository.findByNameOrSurnameStartingWithIgnoreCase("z");
+
+        assertNotNull(results);
+        assertTrue(results.isEmpty(), "Expected no trainees with names or surnames starting with 'z'");
+    }
+
+    @Test
+    void findByNameOrSurnameStartingWithIgnoreCase_ShouldHandleCaseInsensitiveSearch() {
+        List<Trainee> results = traineeRepository.findByNameOrSurnameStartingWithIgnoreCase("B");
+
+        assertNotNull(results);
+        assertEquals(2, results.size(), "Expected 2 trainees with names or surnames starting with 'B' (case insensitive)");
+        assertTrue(results.stream().anyMatch(t -> "Alice".equals(t.getName()) && "Brown".equals(t.getSurname())),
+                "Expected trainee Alice Brown to be in the results");
+        assertTrue(results.stream().anyMatch(t -> "Bob".equals(t.getName()) && "White".equals(t.getSurname())),
+                "Expected trainee Bob White to be in the results");
+    }
 }
