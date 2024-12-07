@@ -146,4 +146,24 @@ public class TraineeController {
         List<Trainee> trainees = traineeService.findTraineesByFitnessClassId(fitnessClassId);
         return traineeMapper.convertManyToDto(trainees);
     }
+
+    @Operation(summary = "Search Trainees by Name or Surname")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Trainees retrieved successfully"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
+    })
+    @GetMapping("/search")
+    public List<TraineeDto> searchTraineesByName(@RequestParam("input") String input) {
+        List<Trainee> trainees = traineeService.findTraineesByName(input);
+        return traineeMapper.convertManyToDto(trainees);
+    }
 }

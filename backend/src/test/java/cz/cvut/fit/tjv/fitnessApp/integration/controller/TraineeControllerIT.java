@@ -7,6 +7,7 @@ import cz.cvut.fit.tjv.fitnessApp.domain.FitnessClass;
 import cz.cvut.fit.tjv.fitnessApp.domain.Trainee;
 import cz.cvut.fit.tjv.fitnessApp.repository.FitnessClassRepository;
 import cz.cvut.fit.tjv.fitnessApp.repository.TraineeRepository;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -162,5 +163,31 @@ public class TraineeControllerIT {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[0].id").isNotEmpty());
+    }
+
+    @Test
+    void searchTraineesByName_ShouldReturnMatchingTrainees() throws Exception {
+        mockMvc.perform(get("/trainee/search")
+                        .param("input", "B"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[*].name", Matchers.containsInAnyOrder("Alice", "Bob")))
+                .andExpect(jsonPath("$[*].surname", Matchers.containsInAnyOrder("Brown", "White")));
+    }
+
+    @Test
+    void searchTraineesByName_ShouldReturnEmptyList_WhenNoMatchesFound() throws Exception {
+        mockMvc.perform(get("/trainee/search")
+                        .param("input", "Z"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void searchTraineesByName_ShouldReturnBadRequest_WhenInputIsMissing() throws Exception {
+        mockMvc.perform(get("/trainee/search"))
+                .andExpect(status().isBadRequest());
     }
 }

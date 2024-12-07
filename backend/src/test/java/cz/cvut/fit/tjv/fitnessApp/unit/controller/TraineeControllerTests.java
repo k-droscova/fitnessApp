@@ -190,4 +190,37 @@ class TraineeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
+
+    @Test
+    void searchTraineesByName_ShouldReturnMatchingTrainees() throws Exception {
+        Mockito.when(traineeService.findTraineesByName("J"))
+                .thenReturn(mockTraineeList);
+        Mockito.when(traineeMapper.convertManyToDto(mockTraineeList))
+                .thenReturn(mockTraineeDtoList);
+
+        mockMvc.perform(get("/trainee/search")
+                        .param("input", "J"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Jane"))
+                .andExpect(jsonPath("$[0].surname").value("Doe"));
+    }
+
+    @Test
+    void searchTraineesByName_ShouldReturnEmptyList_WhenNoMatchesFound() throws Exception {
+        Mockito.when(traineeService.findTraineesByName("NonExistent"))
+                .thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/trainee/search")
+                        .param("input", "NonExistent"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void searchTraineesByName_ShouldReturnBadRequest_WhenInputIsMissing() throws Exception {
+        mockMvc.perform(get("/trainee/search"))
+                .andExpect(status().isBadRequest())
+                .andExpect(ErrorMatcher.containsErrorMessage("input"));
+    }
 }
