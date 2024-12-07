@@ -136,8 +136,12 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
         }
 
         DispatchQueue.main.async { [weak self] in
-            self?.pastClasses = fetchedClasses.filter { !Calendar.current.isDateTimeInFuture($0.dateTime) }
-            self?.futureClasses = fetchedClasses.filter { Calendar.current.isDateTimeInFuture($0.dateTime) }
+            self?.pastClasses = fetchedClasses
+                .filter { !Calendar.current.isDateTimeInFuture($0.dateTime) }
+                .sorted(by: { $0.dateTime > $1.dateTime })
+            self?.futureClasses = fetchedClasses
+                .filter { Calendar.current.isDateTimeInFuture($0.dateTime) }
+                .sorted(by: { $0.dateTime < $1.dateTime })
         }
     }
 }
