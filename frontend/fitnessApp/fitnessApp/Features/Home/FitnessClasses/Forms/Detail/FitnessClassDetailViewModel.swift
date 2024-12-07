@@ -151,7 +151,7 @@ final class FitnessClassDetailViewModel: BaseClass, FitnessClassDetailViewModeli
     }
     
     private func fetchTrainees() async throws {
-        guard let fitnessClassId = fitnessClass.fitnessClassId else {
+        guard fitnessClass.fitnessClassId != nil else {
             delegate?.onLoadError()
             return
         }

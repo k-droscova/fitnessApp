@@ -32,7 +32,7 @@ enum Endpoint: Endpointing {
             case .getById(let id), .delete(let id), .update(let id):
                 return "/classtype/\(id)"
             case .getByName(name: let name):
-                var basePath = "/classtype"
+                let basePath = "/classtype"
                 return basePath.appendQueryItem(name: "name", value: name)
             case .get, .create:
                 return "/classtype"
@@ -55,7 +55,7 @@ enum Endpoint: Endpointing {
             case .delete(let id):
                 return "/room/\(id)"
             case .getAvailable(let classTypeId, let date, let time):
-                var basePath = "/room/available"
+                let basePath = "/room/available"
                 let queryItems: [String: String?] = [
                     "classTypeId": classTypeId.map { "\($0)" },
                     "date": date,
@@ -129,7 +129,7 @@ enum Endpoint: Endpointing {
                     "time": time
                 ])
             case .search(let name, let surname, let input):
-                var queryItems: [String: String?] = [
+                let queryItems: [String: String?] = [
                     "name": name,
                     "surname": surname,
                     "input": input
