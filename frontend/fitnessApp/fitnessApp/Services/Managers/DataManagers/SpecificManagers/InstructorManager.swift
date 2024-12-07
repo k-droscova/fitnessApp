@@ -21,8 +21,8 @@ protocol InstructorManaging {
     func createInstructor(_ instructor: Instructor) async throws
     func updateInstructor(_ id: Int, _ newInstructor: Instructor) async throws
     func deleteInstructor(_ id: Int) async throws
-    func findAvailableInstructors(classTypeId: Int?, date: String, time: String) async throws -> [Int]
-    func searchInstructors(name: String?, surname: String?, input: String?) async throws -> [Instructor]
+    func fetchAvailableInstructors(classTypeId: Int?, date: String, time: String) async throws -> [Int]
+    func fetchInstructorsByName(name: String?, surname: String?, input: String?) async throws -> [Instructor]
 }
 
 final class InstructorManager: BaseClass, InstructorManaging {
@@ -69,11 +69,11 @@ final class InstructorManager: BaseClass, InstructorManaging {
         allInstructors.removeAll { $0.instructorId == id }
     }
     
-    func findAvailableInstructors(classTypeId: Int?, date: String, time: String) async throws -> [Int] {
+    func fetchAvailableInstructors(classTypeId: Int?, date: String, time: String) async throws -> [Int] {
         return try await instructorAPIService.findAvailableInstructors(classTypeId: classTypeId, date: date, time: time)
     }
     
-    func searchInstructors(name: String?, surname: String?, input: String?) async throws -> [Instructor] {
+    func fetchInstructorsByName(name: String?, surname: String?, input: String?) async throws -> [Instructor] {
         return try await instructorAPIService.searchInstructors(name: name, surname: surname, input: input)
     }
 }

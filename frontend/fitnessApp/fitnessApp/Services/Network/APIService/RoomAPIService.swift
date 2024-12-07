@@ -18,6 +18,7 @@ protocol RoomAPIServicing {
     func updateRoom(_ id: Int, _ newRoom: Room) async throws
     func deleteRoom(_ id: Int) async throws
     func findAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int]
+    func searchByClassTypeName(classTypeName: String) async throws -> [Room]
 }
 
 final class RoomAPIService: BaseClass, RoomAPIServicing {
@@ -76,6 +77,13 @@ final class RoomAPIService: BaseClass, RoomAPIServicing {
     func findAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int] {
         return try await network.performAuthorizedRequest(
             endpoint: Endpoint.room(.getAvailable(classTypeId: classTypeId, date: date, time: time)),
+            errorObject: APIResponseError.self
+        )
+    }
+    
+    func searchByClassTypeName(classTypeName: String) async throws -> [Room] {
+        return try await network.performAuthorizedRequest(
+            endpoint: Endpoint.room(.search(input: classTypeName)),
             errorObject: APIResponseError.self
         )
     }

@@ -18,6 +18,7 @@ protocol TraineeAPIServicing {
     func updateTrainee(_ id: Int, with newTrainee: Trainee) async throws
     func deleteTrainee(_ id: Int) async throws
     func getTraineesByFitnessClassId(_ fitnessClassId: Int) async throws -> [Trainee]
+    func searchByName(_ name: String) async throws -> [Trainee]
 }
 
 final class TraineeAPIService: BaseClass, TraineeAPIServicing {
@@ -78,6 +79,13 @@ final class TraineeAPIService: BaseClass, TraineeAPIServicing {
     func getTraineesByFitnessClassId(_ fitnessClassId: Int) async throws -> [Trainee] {
         return try await network.performAuthorizedRequest(
             endpoint: Endpoint.trainee(.getByFitnessClassId(fitnessClassId: fitnessClassId)),
+            errorObject: APIResponseError.self
+        )
+    }
+    
+    func searchByName(_ name: String) async throws -> [Trainee] {
+        return try await network.performAuthorizedRequest(
+            endpoint: Endpoint.trainee(.search(input: name)),
             errorObject: APIResponseError.self
         )
     }

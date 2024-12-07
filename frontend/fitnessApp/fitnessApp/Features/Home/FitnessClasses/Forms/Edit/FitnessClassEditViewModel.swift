@@ -295,7 +295,7 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     }
     
     private func fetchAvailableRooms(classTypeId: Int, dateString: String, timeString: String) async throws -> [Room] {
-        let roomIds = try await roomManager.findAvailableRooms(
+        let roomIds = try await roomManager.fetchAvailableRooms(
             classTypeId: classTypeId,
             date: dateString,
             time: timeString
@@ -322,7 +322,7 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     }
     
     private func fetchAvailableInstructors(classTypeId: Int, dateString: String, timeString: String) async throws -> [Instructor] {
-        let instructorIds = try await instructorManager.findAvailableInstructors(
+        let instructorIds = try await instructorManager.fetchAvailableInstructors(
             classTypeId: classTypeId,
             date: dateString,
             time: timeString

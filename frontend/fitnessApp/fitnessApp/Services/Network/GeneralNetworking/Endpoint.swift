@@ -62,6 +62,9 @@ enum Endpoint: Endpointing {
                     "time": time
                 ]
                 return basePath.appendQueryItems(queryItems)
+            case .search(let input):
+                var basePath = "/room/search"
+                return basePath.appendQueryItem(name: "input", value: input)
             }
             
         case .fitnessClass(let action):
@@ -102,6 +105,9 @@ enum Endpoint: Endpointing {
                 return "/trainee/\(id)"
             case .getByFitnessClassId(let fitnessClassId):
                 return "/trainee/fitness-class/\(fitnessClassId)"
+            case .search(let input):
+                var basePath = "/trainee/search"
+                return basePath.appendQueryItem(name: "input", value: input)
             }
             
         case .instructor(let action):
@@ -188,6 +194,7 @@ extension Endpoint {
         case update(id: Int)
         case delete(id: Int)
         case getAvailable(classTypeId: Int?, date: String, time: String)
+        case search(input: String)
     }
     
     enum FitnessClassAction {
@@ -208,6 +215,7 @@ extension Endpoint {
         case update(id: Int)
         case delete(id: Int)
         case getByFitnessClassId(fitnessClassId: Int)
+        case search(input: String)
     }
     
     enum InstructorAction {

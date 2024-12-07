@@ -98,7 +98,7 @@ final class InstructorListViewModel: BaseClass, InstructorListViewModeling {
                     }
                 } else {
                     // Perform the search using API
-                    let searchResults = try await self.manager.searchInstructors(name: nil, surname: nil, input: input)
+                    let searchResults = try await self.manager.fetchInstructorsByName(name: nil, surname: nil, input: input)
                     DispatchQueue.main.async {
                         self.instructors = searchResults
                     }

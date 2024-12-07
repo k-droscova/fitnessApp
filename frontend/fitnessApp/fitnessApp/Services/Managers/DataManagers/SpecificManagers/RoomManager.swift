@@ -21,7 +21,8 @@ protocol RoomManaging {
     func createRoom(_ room: Room) async throws
     func updateRoom(_ id: Int, _ newRoom: Room) async throws
     func deleteRoom(_ id: Int) async throws
-    func findAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int]
+    func fetchAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int]
+    func fetchRoomsByClassTypeName(_ classTypeName: String) async throws -> [Room]
 }
 
 final class RoomManager: BaseClass, RoomManaging {
@@ -68,7 +69,11 @@ final class RoomManager: BaseClass, RoomManaging {
         allRooms.removeAll { $0.roomId == id }
     }
     
-    func findAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int] {
+    func fetchAvailableRooms(classTypeId: Int?, date: String, time: String) async throws -> [Int] {
         return try await roomAPIService.findAvailableRooms(classTypeId: classTypeId, date: date, time: time)
+    }
+    
+    func fetchRoomsByClassTypeName(_ classTypeName: String) async throws -> [Room] {
+        return try await roomAPIService.searchByClassTypeName(classTypeName: classTypeName)
     }
 }

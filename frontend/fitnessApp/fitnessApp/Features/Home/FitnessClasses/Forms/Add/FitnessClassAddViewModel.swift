@@ -234,7 +234,7 @@ final class FitnessClassAddViewModel: BaseClass, FitnessClassAddViewModeling {
 
     // Separate async calls for rooms and instructors
     private func fetchAvailableRooms(classType: ClassType, dateString: String, timeString: String) async throws -> [Room] {
-        let roomIds = try await roomManager.findAvailableRooms(
+        let roomIds = try await roomManager.fetchAvailableRooms(
             classTypeId: classType.classTypeId,
             date: dateString,
             time: timeString
@@ -249,7 +249,7 @@ final class FitnessClassAddViewModel: BaseClass, FitnessClassAddViewModeling {
     }
 
     private func fetchAvailableInstructors(classType: ClassType, dateString: String, timeString: String) async throws -> [Instructor] {
-        let instructorIds = try await instructorManager.findAvailableInstructors(
+        let instructorIds = try await instructorManager.fetchAvailableInstructors(
             classTypeId: classType.classTypeId,
             date: dateString,
             time: timeString

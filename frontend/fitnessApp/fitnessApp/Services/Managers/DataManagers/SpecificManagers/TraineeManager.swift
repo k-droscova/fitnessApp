@@ -22,6 +22,7 @@ protocol TraineeManaging {
     func updateTrainee(_ id: Int, with newTrainee: Trainee) async throws
     func deleteTrainee(_ id: Int) async throws
     func fetchTraineesByFitnessClassId(_ fitnessClassId: Int) async throws -> [Trainee]
+    func fetchTraineesByName(_ name: String) async throws -> [Trainee]
 }
 
 final class TraineeManager: BaseClass, TraineeManaging {
@@ -73,5 +74,9 @@ final class TraineeManager: BaseClass, TraineeManaging {
     
     func fetchTraineesByFitnessClassId(_ fitnessClassId: Int) async throws -> [Trainee] {
         return try await traineeAPIService.getTraineesByFitnessClassId(fitnessClassId)
+    }
+    
+    func fetchTraineesByName(_ name: String) async throws -> [Trainee] {
+        return try await traineeAPIService.searchByName(name)
     }
 }
