@@ -87,6 +87,7 @@ struct InputField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
+                .padding(.horizontal, 16)
                 .font(.subheadline)
                 .fontWeight(.semibold)
             TextField("Enter \(label.lowercased())", text: $text)
