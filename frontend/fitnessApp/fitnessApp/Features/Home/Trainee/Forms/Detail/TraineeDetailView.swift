@@ -50,6 +50,9 @@ struct TraineeDetailView: View {
                     ) {
                         FitnessClassSectionView(fitnessClasses: viewModel.pastClasses)
                     }
+                    
+                    RegisterButton(action: viewModel.onRegisterPressed)
+                        .padding(.vertical, 16)
                 }
                 .padding(.vertical, 16)
             }

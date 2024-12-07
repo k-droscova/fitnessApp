@@ -17,6 +17,7 @@ final class TraineeFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoor
     private var detailViewModel: TraineeDetailViewModel?
     private var addViewModel: TraineeAddViewModel?
     private var editViewModel: TraineeEditViewModel?
+    private var registrationViewModel: TraineeRegistrationViewModel?
 
     init(delegate: TraineeFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -73,7 +74,19 @@ extension TraineeFlowCoordinator: TraineeListFlowDelegate {
     }
 }
 
-extension TraineeFlowCoordinator: TraineeDetaulViewFlowDelegate {
+extension TraineeFlowCoordinator: TraineeDetailViewFlowDelegate {
+    func onRegisterPressed(trainee: Trainee) {
+        let vm = TraineeRegistrationViewModel(
+            dependencies: appDependencies,
+            trainee: trainee,
+            delegate: self
+        )
+        self.registrationViewModel = vm
+        let vc = TraineeRegistrationView(viewModel: vm).hosting()
+        presentSheet(vc, animated: true)
+            
+    }
+    
     func onEditPressed(trainee: Trainee) {
         dismiss()
         let vm = TraineeEditViewModel(
@@ -148,5 +161,31 @@ extension TraineeFlowCoordinator: TraineeEditViewFlowDelegate {
             title: "Update error",
             message: message
         )
+    }
+}
+
+extension TraineeFlowCoordinator: TraineeRegistrationViewFlowDelegate {
+    func onTraineeRegistrationSuccess() {
+        dismiss()
+        self.registrationViewModel = nil // mem leaks
+        self.detailViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Registration successful"
+        )
+    }
+    
+    func onTraineeRegistrationFailure(message: String) {
+        dismiss()
+        self.registrationViewModel = nil // mem leaks
+        self.detailViewModel?.onAppear()
+        showErrorAlert(
+            title: "Registration Error",
+            message: message
+        )
+    }
+    
+    func onRegistrationDismiss() {
+        self.registrationViewModel = nil
     }
 }

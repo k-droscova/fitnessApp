@@ -211,31 +211,3 @@ struct ExpandableSection<Content: View>: View {
         .padding(.horizontal, 16)
     }
 }
-
-
-struct ExpandableSection_Previews: PreviewProvider {
-    static var previews: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                ExpandableSection(
-                    title: "Rooms",
-                    placeholder: "No rooms available",
-                    isEmpty: false
-                ) {
-                    RoomSectionView(rooms: [.mock, .mock2])
-                }
-                
-                ExpandableSection(
-                    title: "Empty Section",
-                    placeholder: "No content to show",
-                    isEmpty: true
-                ) {
-                    EmptyView() // No content
-                }
-            }
-            .padding(.top, 16)
-        }
-        .background(Color(.systemBackground))
-        .previewLayout(.sizeThatFits)
-    }
-}

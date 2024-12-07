@@ -20,8 +20,9 @@ struct CustomProgressView: View {
 struct FilterableDatePicker: View {
     @Binding var selectedDate: Date?
     let placeholder: String
+    var dateRange: ClosedRange<Date>? = nil
     @State private var isDatePickerVisible: Bool = false
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -42,8 +43,8 @@ struct FilterableDatePicker: View {
                     }
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(PlainButtonStyle()) // Ensure no default button styles
-                
+                .buttonStyle(PlainButtonStyle())
+
                 if selectedDate != nil {
                     Button(action: {
                         selectedDate = nil
@@ -57,12 +58,12 @@ struct FilterableDatePicker: View {
             }
             .padding()
             .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-            
+
             if isDatePickerVisible {
                 DatePicker(
                     "",
                     selection: Binding(
-                        get: { selectedDate ?? Date() },
+                        get: { selectedDate ?? (dateRange?.lowerBound ?? Date()) },
                         set: {
                             selectedDate = $0
                             withAnimation {
@@ -70,6 +71,7 @@ struct FilterableDatePicker: View {
                             }
                         }
                     ),
+                    in: dateRange ?? Date.distantPast...Date.distantFuture,
                     displayedComponents: [.date]
                 )
                 .datePickerStyle(GraphicalDatePickerStyle())
@@ -83,8 +85,9 @@ struct FilterableDatePicker: View {
 struct FilterableTimePicker: View {
     @Binding var selectedTime: Date?
     let placeholder: String
+    var timeRange: ClosedRange<Date>? = nil
     @State private var isTimePickerVisible: Bool = false
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -105,8 +108,8 @@ struct FilterableTimePicker: View {
                     }
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(PlainButtonStyle()) // Ensure no default button styles
-                
+                .buttonStyle(PlainButtonStyle())
+
                 if selectedTime != nil {
                     Button(action: {
                         selectedTime = nil
@@ -120,12 +123,12 @@ struct FilterableTimePicker: View {
             }
             .padding()
             .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-            
+
             if isTimePickerVisible {
                 DatePicker(
                     "",
                     selection: Binding(
-                        get: { selectedTime ?? Date() },
+                        get: { selectedTime ?? (timeRange?.lowerBound ?? Date()) },
                         set: {
                             selectedTime = $0
                             withAnimation {
@@ -133,6 +136,7 @@ struct FilterableTimePicker: View {
                             }
                         }
                     ),
+                    in: timeRange ?? Date.distantPast...Date.distantFuture,
                     displayedComponents: [.hourAndMinute]
                 )
                 .datePickerStyle(WheelDatePickerStyle())
@@ -149,6 +153,8 @@ struct DateAndTimeFilters: View {
     @Binding var fromTime: Date?
     @Binding var toTime: Date?
     @State private var areFiltersVisible: Bool = false
+    var dateFromRange: ClosedRange<Date>? = nil
+    var dateToRange: ClosedRange<Date>? = nil
     let errorText: String?
     
     var body: some View {
@@ -173,8 +179,8 @@ struct DateAndTimeFilters: View {
             // Date and Time Pickers (conditionally visible)
             if areFiltersVisible {
                 VStack(spacing: 16) {
-                    FilterableDatePicker(selectedDate: $fromDate, placeholder: "Date From")
-                    FilterableDatePicker(selectedDate: $toDate, placeholder: "Date To")
+                    FilterableDatePicker(selectedDate: $fromDate, placeholder: "Date From", dateRange: dateFromRange)
+                    FilterableDatePicker(selectedDate: $toDate, placeholder: "Date To", dateRange: dateToRange)
                     FilterableTimePicker(selectedTime: $fromTime, placeholder: "Time From")
                     FilterableTimePicker(selectedTime: $toTime, placeholder: "Time To")
                 }
@@ -296,5 +302,23 @@ struct SearchBar: View {
                 )
         }
         .padding(.horizontal, 16)
+    }
+}
+
+struct RegisterButton: View {
+    let action: () -> Void
+    var isDisabled: Bool = false
+
+    var body: some View {
+        Button(action: action) {
+            Text("Register for classes")
+                .font(.subheadline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(isDisabled ? Color(.secondarySystemBackground) : Color.clear)
+                .foregroundColor(isDisabled ? Color.secondary : Color.blue)
+                .cornerRadius(8)
+        }
+        .disabled(isDisabled)
     }
 }
