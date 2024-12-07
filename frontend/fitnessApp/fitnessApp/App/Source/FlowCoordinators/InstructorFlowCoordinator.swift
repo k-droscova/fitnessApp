@@ -16,6 +16,7 @@ final class InstructorFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowC
     private var listViewModel: InstructorListViewModel?
     private var detailViewModel: InstructorDetailViewModel?
     private var addViewModel: InstructorAddViewModel?
+    private var editViewModel: InstructorEditViewModel?
 
     init(delegate: InstructorFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -74,7 +75,15 @@ extension InstructorFlowCoordinator: InstructorListFlowDelegate {
 
 extension InstructorFlowCoordinator: InstructorDetailViewFlowDelegate {
     func onEditPressed(instructor: Instructor) {
-        print("Edit instructor tapped")
+        dismiss()
+        let vm = InstructorEditViewModel(
+            dependencies: appDependencies,
+            instructor: instructor,
+            delegate: self
+        )
+        self.editViewModel = vm
+        let vc = InstructorEditView(viewModel: vm).hosting()
+        presentNewScreen(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -113,6 +122,30 @@ extension InstructorFlowCoordinator: InstructorAddViewFlowDelegate {
     func onSaveFailure(message: String) {
         showErrorAlert(
             title: "Save error",
+            message: message
+        )
+    }
+}
+
+extension InstructorFlowCoordinator: InstructorEditViewFlowDelegate {
+    func onCancelPressed() {
+        popTopScreen(animated: true)
+        self.editViewModel = nil
+    }
+    
+    func onUpdateSuccess() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Instructor updated successfully"
+        )
+    }
+    
+    func onUpdateFailure(message: String) {
+        showErrorAlert(
+            title: "Update error",
             message: message
         )
     }

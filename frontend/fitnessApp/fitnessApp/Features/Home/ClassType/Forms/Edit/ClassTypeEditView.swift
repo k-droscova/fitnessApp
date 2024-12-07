@@ -11,7 +11,7 @@ struct ClassTypeEditView: View {
     @StateObject var viewModel: ClassTypeEditViewModel
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             // Header with Back and Save buttons
             CancelAndSaveButtons(
                 cancelAction: viewModel.onCancelPressed,
@@ -22,7 +22,6 @@ struct ClassTypeEditView: View {
             // TextField for Class Type Name
             InputField(label: "Class Type Name", text: $viewModel.classTypeName)
                 .padding(.horizontal, 16)
-                .padding(.top, 16)
 
             ScrollView {
                 VStack(spacing: 16) {
@@ -33,7 +32,6 @@ struct ClassTypeEditView: View {
                     SelectableRoomList(rooms: $viewModel.rooms)
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 16)
             }
 
             Spacer()
