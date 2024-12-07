@@ -29,4 +29,13 @@ extension String {
         guard let value = value else { return self }
         return appendQueryItems([name: value])
     }
+    
+    var isValidEmail: Bool {
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let range = NSRange(location: 0, length: self.utf16.count)
+        let matches = detector?.matches(in: self, options: [], range: range) ?? []
+
+        // Ensure there's exactly one match and that it's an email
+        return matches.count == 1 && matches.first?.url?.scheme == "mailto"
+    }
 }

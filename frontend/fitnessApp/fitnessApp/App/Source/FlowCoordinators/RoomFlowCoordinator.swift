@@ -16,6 +16,7 @@ final class RoomFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
     private var listViewModel: RoomListViewModel?
     private var detailViewModel: RoomDetailViewModel?
     private var addViewModel: RoomAddViewModel?
+    private var editViewModel: RoomEditViewModel?
 
     init(delegate: RoomFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -74,7 +75,15 @@ extension RoomFlowCoordinator: RoomListFlowDelegate {
 
 extension RoomFlowCoordinator: RoomDetailViewFlowDelegate {
     func onEditPressed(room: Room) {
-        print("Edit room tapped")
+        dismiss()
+        let vm = RoomEditViewModel(
+            dependencies: appDependencies,
+            room: room,
+            delegate: self
+        )
+        self.editViewModel = vm
+        let vc = RoomEditView(viewModel: vm).hosting()
+        presentNewScreen(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -113,6 +122,30 @@ extension RoomFlowCoordinator: RoomAddViewFlowDelegate {
     func onSaveFailure(message: String) {
         showErrorAlert(
             title: "Save error",
+            message: message
+        )
+    }
+}
+
+extension RoomFlowCoordinator: RoomEditViewFlowDelegate {
+    func onCancelPressed() {
+        popTopScreen(animated: true)
+        self.editViewModel = nil
+    }
+    
+    func onUpdateSuccess() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Room updated successfully"
+        )
+    }
+    
+    func onUpdateFailure(message: String) {
+        showErrorAlert(
+            title: "Update error",
             message: message
         )
     }

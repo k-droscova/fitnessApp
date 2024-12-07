@@ -1,5 +1,5 @@
 //
-//  InstructorEditView.swift
+//  TraineeEditView.swift
 //  fitnessApp
 //
 //  Created by Karolína Droscová on 07.12.2024.
@@ -7,39 +7,24 @@
 
 import SwiftUI
 
-struct InstructorEditView: View {
-    @StateObject var viewModel: InstructorEditViewModel
-    
+struct TraineeEditView: View {
+    @StateObject var viewModel: TraineeEditViewModel
+
     var body: some View {
         VStack(spacing: 16) {
-            // Header with Cancel and Save buttons
             CancelAndSaveButtons(
                 cancelAction: viewModel.onCancelPressed,
                 saveAction: viewModel.onSavePressed
             )
             .padding(.top, 16)
-            
-            // Input Fields for Name and Surname
+
             VStack(spacing: 16) {
                 InputField(label: "First Name", text: $viewModel.name)
                 InputField(label: "Last Name", text: $viewModel.surname)
+                InputField(label: "Email", text: $viewModel.email)
             }
             .padding(.horizontal, 16)
-            
-            // Expandable Birthday Picker
-            ExpandableBirthdayPicker(
-                selectedDate: $viewModel.birthdate,
-                placeholder: "Select Birthday"
-            )
-            .padding(.vertical, 8)
-            // Scrollable List for Specializations
-            ScrollView {
-                VStack(spacing: 16) {
-                    SelectableClassTypeList(classTypes: $viewModel.specializations)
-                }
-                .padding(.horizontal, 16)
-            }
-            
+
             Spacer()
         }
         .onAppear {

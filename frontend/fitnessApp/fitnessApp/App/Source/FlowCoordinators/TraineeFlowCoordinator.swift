@@ -16,6 +16,7 @@ final class TraineeFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoor
     private var listViewModel: TraineeListViewModel?
     private var detailViewModel: TraineeDetailViewModel?
     private var addViewModel: TraineeAddViewModel?
+    private var editViewModel: TraineeEditViewModel?
 
     init(delegate: TraineeFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -74,7 +75,15 @@ extension TraineeFlowCoordinator: TraineeListFlowDelegate {
 
 extension TraineeFlowCoordinator: TraineeDetaulViewFlowDelegate {
     func onEditPressed(trainee: Trainee) {
-        print("Edit trainee tapped")
+        dismiss()
+        let vm = TraineeEditViewModel(
+            dependencies: appDependencies,
+            trainee: trainee,
+            delegate: self
+        )
+        self.editViewModel = vm
+        let vc = TraineeEditView(viewModel: vm).hosting()
+        presentNewScreen(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -113,6 +122,30 @@ extension TraineeFlowCoordinator: TraineeAddViewFlowDelegate {
     func onSaveFailure(message: String) {
         showErrorAlert(
             title: "Save error",
+            message: message
+        )
+    }
+}
+
+extension TraineeFlowCoordinator: TraineeEditViewFlowDelegate {
+    func onCancelPressed() {
+        popTopScreen(animated: true)
+        self.editViewModel = nil
+    }
+    
+    func onUpdateSuccess() {
+        popTopScreen(animated: true)
+        self.addViewModel = nil
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Trainee updated successfully"
+        )
+    }
+    
+    func onUpdateFailure(message: String) {
+        showErrorAlert(
+            title: "Update error",
             message: message
         )
     }

@@ -56,7 +56,7 @@ final class TraineeAddViewModel: BaseClass, TraineeAddViewModeling {
                 return
             }
             
-            guard self.isValidEmail(self.email) else {
+            guard self.email.isValidEmail else {
                 self.delegate?.onSaveFailure(message: "Invalid email format")
                 return
             }
@@ -78,16 +78,5 @@ final class TraineeAddViewModel: BaseClass, TraineeAddViewModeling {
                 delegate?.onSaveFailure(message: error.localizedDescription)
             }
         }
-    }
-    
-    // MARK: - Private Helpers
-    
-    private func isValidEmail(_ email: String) -> Bool {
-        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-        let range = NSRange(location: 0, length: email.utf16.count)
-        let matches = detector?.matches(in: email, options: [], range: range) ?? []
-        
-        // Ensure there's exactly one match and that it's an email
-        return matches.count == 1 && matches.first?.url?.scheme == "mailto"
     }
 }
