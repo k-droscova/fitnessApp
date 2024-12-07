@@ -443,7 +443,7 @@ struct ExpandableBirthdayPicker: View {
 
 struct CapacityPicker: View {
     @Binding var selectedCapacity: Int
-    let maxCapacity: Int
+    let maxCapacity: Int?
     let placeholder: String
 
     var body: some View {
@@ -451,10 +451,18 @@ struct CapacityPicker: View {
             Text("Capacity")
                 .font(.headline)
                 .foregroundColor(.primary)
-            
+
             Picker(placeholder, selection: $selectedCapacity) {
-                ForEach(1...maxCapacity, id: \.self) { capacity in
-                    Text("\(capacity)").tag(capacity)
+                if let maxCapacity = maxCapacity {
+                    // Use the provided max capacity
+                    ForEach(1...maxCapacity, id: \.self) { capacity in
+                        Text("\(capacity)").tag(capacity)
+                    }
+                } else {
+                    // Infinite picker (arbitrary large range)
+                    ForEach(1..<1000, id: \.self) { capacity in
+                        Text("\(capacity)").tag(capacity)
+                    }
                 }
             }
             .pickerStyle(WheelPickerStyle())
