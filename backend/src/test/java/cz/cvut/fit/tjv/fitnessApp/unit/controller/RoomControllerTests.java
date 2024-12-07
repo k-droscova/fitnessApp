@@ -199,4 +199,35 @@ class RoomControllerTest {
 
         Mockito.verify(roomService).deleteById(1L);
     }
+
+    @Test
+    void findByClassTypeName_ShouldReturnRooms() throws Exception {
+        String classTypeName = "Yoga";
+        Mockito.when(roomService.findByClassTypeName(classTypeName)).thenReturn(mockRoomList);
+        Mockito.when(roomMapper.convertManyToDto(mockRoomList)).thenReturn(mockRoomDtoList);
+
+        mockMvc.perform(get("/room/search")
+                        .param("classTypeName", classTypeName))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].maxCapacity").value(50));
+    }
+
+    @Test
+    void findByClassTypeName_ShouldReturnEmptyList_WhenNoRoomsFound() throws Exception {
+        String classTypeName = "NonExistent";
+        Mockito.when(roomService.findByClassTypeName(classTypeName)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/room/search")
+                        .param("classTypeName", classTypeName))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void findByClassTypeName_ShouldReturnBadRequest_WhenClassTypeNameIsMissing() throws Exception {
+        mockMvc.perform(get("/room/search"))
+                .andExpect(status().isBadRequest())
+                .andExpect(ErrorMatcher.containsErrorMessage("classTypeName"));
+    }
 }

@@ -155,4 +155,24 @@ public class RoomController {
                 .map(Room::getId)
                 .collect(Collectors.toList());
     }
+
+    @Operation(summary = "Search Rooms by ClassType name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Rooms retrieved successfully"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
+    })
+    @GetMapping("/search")
+    public List<RoomDto> findByClassTypeName(@RequestParam String classTypeName) {
+        List<Room> rooms = roomService.findByClassTypeName(classTypeName);
+        return roomMapper.convertManyToDto(rooms);
+    }
 }

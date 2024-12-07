@@ -195,4 +195,35 @@ class RoomControllerIT {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(3)); // Assuming 2 rooms are available for ClassType ID 1 at the given time
     }
+
+    @Test
+    void searchRoomsByClassTypeName_ShouldReturnMatchingRooms() throws Exception {
+        // Act
+        mockMvc.perform(get("/room/search")
+                        .param("classTypeName", "yog")) // Searching for "yog" to match "Yoga" and "Power Yoga"
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(4)) // Should return 4 rooms: IDs 1, 3, 4, and 5
+                .andExpect(jsonPath("$[?(@.id == 1)]").exists()) // Room 1
+                .andExpect(jsonPath("$[?(@.id == 3)]").exists()) // Room 3
+                .andExpect(jsonPath("$[?(@.id == 4)]").exists()) // Room 4
+                .andExpect(jsonPath("$[?(@.id == 5)]").exists()); // Room 5
+    }
+
+    @Test
+    void searchRoomsByClassTypeName_ShouldReturnEmptyList_WhenNoMatch() throws Exception {
+        // Act
+        mockMvc.perform(get("/room/search")
+                        .param("classTypeName", "nonexistent")) // Searching for a non-matching class type
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0)); // Should return an empty list
+    }
+
+    @Test
+    void searchRoomsByClassTypeName_ShouldReturnBadRequest_WhenClassTypeNameIsMissing() throws Exception {
+        // Act
+        mockMvc.perform(get("/room/search"))
+                .andExpect(status().isBadRequest());
+    }
 }
