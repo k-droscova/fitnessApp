@@ -18,6 +18,9 @@ struct ClassTypeListView: View {
         VStack {
             AddFormButton(action: viewModel.onAddButtonTapped)
             
+            SearchBar(searchText: $viewModel.searchClassTypeName)
+                .padding(.top, 16)
+            
             ListHeaderSection(headers: ["name", "instructors", "rooms", "classes"])
             
             ListSection {
@@ -34,6 +37,9 @@ struct ClassTypeListView: View {
         }
         .onAppear {
             viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
         }
         .navigationTitle("Class Types")
     }

@@ -264,3 +264,58 @@ struct ListSection<Content: View>: View {
         }
     }
 }
+
+struct SearchBar: View {
+    @Binding var searchText: String
+    var placeholder: String = "Search by name..."
+    
+    var body: some View {
+        HStack {
+            TextField(placeholder, text: $searchText)
+                .padding(8)
+                .padding(.horizontal, 24)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(8)
+                .overlay(
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 8)
+                        
+                        if !searchText.isEmpty {
+                            Button(action: {
+                                searchText = ""
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.gray)
+                                    .padding(.trailing, 8)
+                            }
+                        }
+                    }
+                )
+        }
+        .padding(.horizontal, 16)
+    }
+}
+
+struct ContentView: View {
+    @State private var searchText: String = ""
+    
+    var body: some View {
+        VStack {
+            SearchBar(searchText: $searchText, placeholder: "Search instructors...")
+            
+            Text("Search Text: \(searchText)")
+                .padding()
+            
+            Spacer()
+        }
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
