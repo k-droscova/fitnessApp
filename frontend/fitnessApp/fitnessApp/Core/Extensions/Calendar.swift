@@ -14,4 +14,8 @@ extension Calendar {
         }
         return date >= tomorrow
     }
+    
+    func isDateEqualToMinute(_ date1: Date, _ date2: Date) -> Bool {
+        isDate(date1, equalTo: date2, toGranularity: .minute)
+    }
 }

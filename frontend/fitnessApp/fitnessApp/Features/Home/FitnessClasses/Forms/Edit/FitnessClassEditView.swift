@@ -15,7 +15,8 @@ struct FitnessClassEditView: View {
             // Header with Cancel and Save buttons
             CancelAndSaveButtons(
                 cancelAction: viewModel.onCancelPressed,
-                saveAction: viewModel.onSavePressed
+                saveAction: viewModel.onSavePressed,
+                isSaveDisabled: viewModel.isSaveDisabled
             )
             .padding(.vertical, 16)
             .padding(.horizontal, 16)

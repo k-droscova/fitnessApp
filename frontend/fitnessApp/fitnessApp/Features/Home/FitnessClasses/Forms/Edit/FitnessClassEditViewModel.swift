@@ -39,6 +39,7 @@ protocol FitnessClassEditViewModeling: BaseClass, ObservableObject {
     var selectedCapacity: Int? { get set }
     
     var isLoading: Bool { get }
+    var isSaveDisabled: Bool { get }
     func onAppear()
     func onCancelPressed()
     func onSavePressed()
@@ -53,29 +54,35 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     private let classTypeManager: ClassTypeManaging
     private weak var delegate: FitnessClassEditViewFlowDelegate?
     private let fitnessClass: FitnessClass
+    private var isInitializingData: Bool = true
     
     // MARK: - Published Properties
     @Published var date: Date? {
         didSet {
+            guard !isInitializingData else { return }
             validateDateAndRefreshOptions()
+            isSaveDisabled = isSaveButtonDisabled()
         }
     }
     @Published var selectedClassType: ClassType? {
         didSet {
+            guard !isInitializingData else { return }
+            selectedRoom = nil
+            selectedInstructor = nil
+            selectedCapacity = nil
             if selectedClassType == nil {
-                selectedRoom = nil
-                selectedInstructor = nil
-                selectedCapacity = nil
                 roomOptions = []
                 instructorOptions = []
             } else {
                 loadRoomsAndInstructors()
             }
+            isSaveDisabled = isSaveButtonDisabled()
         }
     }
     @Published var classTypeOptions: [ClassType] = []
     @Published var selectedRoom: Room? {
         didSet {
+            guard !isInitializingData else { return }
             if let room = selectedRoom {
                 maxCapacity = room.maxCapacity
                 selectedCapacity = min(maxCapacity, selectedCapacity ?? 0)
@@ -83,14 +90,21 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
                 maxCapacity = 0
                 selectedCapacity = nil
             }
+            isSaveDisabled = isSaveButtonDisabled()
         }
     }
     @Published var roomOptions: [Room] = []
-    @Published var selectedInstructor: Instructor? = nil
+    @Published var selectedInstructor: Instructor? = nil {
+        didSet {
+            guard !isInitializingData else { return }
+            isSaveDisabled = isSaveButtonDisabled()
+        }
+    }
     @Published var instructorOptions: [Instructor] = []
     @Published var selectedCapacity: Int? = nil
     @Published var maxCapacity: Int = 0
     @Published var isLoading: Bool = false
+    @Published var isSaveDisabled: Bool = true
     
     // MARK: - Computed Properties
     var isClassTypeSelectionEnabled: Bool { date != nil }
@@ -118,17 +132,10 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
             self.isLoading = true
-            self.date = fitnessClass.dateTime
-            self.selectedCapacity = fitnessClass.capacity
             defer { self.isLoading = false }
+            defer { self.isInitializingData = false }
             do {
-                async let classTypes: () = self.fetchClassTypeOptions()
-                async let roomsAndInstructors: () = self.fetchRoomsAndInstructors()
-                
-                try await (classTypes, roomsAndInstructors)
-                self.selectedClassType = self.classTypeOptions.first(where: { $0.classTypeId == self.fitnessClass.classType })
-                self.selectedRoom = self.roomOptions.first(where: { $0.roomId == self.fitnessClass.room })
-                self.selectedInstructor = self.instructorOptions.first(where: { $0.instructorId == self.fitnessClass.instructor })
+                try await self.populateData()
             } catch {
                 self.delegate?.onLoadError()
             }
@@ -174,6 +181,75 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     }
     
     // MARK: - Helpers
+    @MainActor
+    private func populateData() async throws {
+        // Populate date and capacity
+        self.date = fitnessClass.dateTime
+        self.selectedCapacity = fitnessClass.capacity
+        
+        // Fetch class type options
+        try await fetchClassTypesForInitialData()
+        
+        // Fetch rooms and instructors based on the fitness class's initial data
+        try await fetchRoomsAndInstructorsForInitialData()
+    }
+    
+    @MainActor
+    private func fetchClassTypesForInitialData() async throws {
+        try await fetchClassTypeOptions()
+        self.selectedClassType = self.classTypeOptions.first(where: { $0.classTypeId == fitnessClass.classType })
+    }
+    
+    @MainActor
+    private func fetchRoomsAndInstructorsForInitialData() async throws {
+        let (dateString, timeString) = Date.Backend.split(dateTime: fitnessClass.dateTime)
+        
+        async let roomsTask = fetchAvailableRooms(
+            classTypeId: fitnessClass.classType,
+            dateString: dateString,
+            timeString: timeString
+        )
+        async let instructorsTask = fetchAvailableInstructors(
+            classTypeId: fitnessClass.classType,
+            dateString: dateString,
+            timeString: timeString
+        )
+        
+        let rooms = try await roomsTask
+        let instructors = try await instructorsTask
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.roomOptions = rooms
+            self?.instructorOptions = instructors
+            self?.selectedRoom = rooms.first(where: { $0.roomId == self?.fitnessClass.room })
+            self?.selectedInstructor = instructors.first(where: { $0.instructorId == self?.fitnessClass.instructor })
+        }
+    }
+    
+    private func fetchRoomsAndInstructors() async throws -> (rooms: [Room], instructors: [Instructor]) {
+        guard let classTypeId = selectedClassType?.classTypeId, let date = date else {
+            return ([], [])
+        }
+        
+        let (dateString, timeString) = Date.Backend.split(dateTime: date)
+        
+        async let roomsTask = fetchAvailableRooms(
+            classTypeId: classTypeId,
+            dateString: dateString,
+            timeString: timeString
+        )
+        async let instructorsTask = fetchAvailableInstructors(
+            classTypeId: classTypeId,
+            dateString: dateString,
+            timeString: timeString
+        )
+        
+        let rooms = try await roomsTask
+        let instructors = try await instructorsTask
+        
+        return (rooms, instructors)
+    }
+    
     private func validateDateAndRefreshOptions() {
         guard let date = date, Calendar.current.isDateInFuture(date) else {
             clearSelections()
@@ -209,72 +285,76 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     private func loadRoomsAndInstructors() {
         Task { @MainActor [weak self] in
             do {
-                try await self?.fetchRoomsAndInstructors()
+                guard let (rooms, instructors) = try await self?.fetchRoomsAndInstructors() else { self?.delegate?.onLoadError(); return }
+                self?.roomOptions = rooms
+                self?.instructorOptions = instructors
             } catch {
                 self?.delegate?.onLoadError()
             }
         }
     }
     
-    private func fetchRoomsAndInstructors() async throws {
-        guard let classType = selectedClassType, let date = date else { return }
-
-        // Ensure the room and instructor assigned to the fitness class are included in the options
-        let (dateString, timeString) = Date.Backend.split(dateTime: date)
-        async let fetchRoomsTask = fetchAvailableRooms(classType: classType, dateString: dateString, timeString: timeString)
-        async let fetchInstructorsTask = fetchAvailableInstructors(classType: classType, dateString: dateString, timeString: timeString)
-        
-        var rooms: [Room] = []
-        var instructors: [Instructor] = []
-
-        rooms = try await fetchRoomsTask
-        instructors = try await fetchInstructorsTask
-        
-        // Include currently selected room and instructor if valid
-        if classType.classTypeId == fitnessClass.classType && Calendar.current.isDate(fitnessClass.dateTime, equalTo: date, toGranularity: .minute) {
-            let currentRoomId = fitnessClass.room
-            if let currentRoom = try? await roomManager.fetchRoomById(currentRoomId), !rooms.contains(where: { $0.roomId == currentRoomId }) {
-                rooms.append(currentRoom)
-            }
-            let currentInstructorId = fitnessClass.instructor
-            if let currentInstructor = try? await instructorManager.fetchInstructorById(currentInstructorId), !instructors.contains(where: { $0.instructorId == currentInstructorId }) {
-                instructors.append(currentInstructor)
-            }
-        }
-
-        DispatchQueue.main.async { [weak self] in
-            self?.roomOptions = rooms
-            self?.instructorOptions = instructors
-        }
-    }
-    
-    private func fetchAvailableRooms(classType: ClassType, dateString: String, timeString: String) async throws -> [Room] {
+    private func fetchAvailableRooms(classTypeId: Int, dateString: String, timeString: String) async throws -> [Room] {
         let roomIds = try await roomManager.findAvailableRooms(
-            classTypeId: classType.classTypeId,
+            classTypeId: classTypeId,
             date: dateString,
             time: timeString
         )
-        let fetchedRooms = try await withThrowingTaskGroup(of: Room.self) { group -> [Room] in
+        var fetchedRooms = try await withThrowingTaskGroup(of: Room.self) { group -> [Room] in
             for roomId in roomIds {
                 group.addTask { try await self.roomManager.fetchRoomById(roomId) }
             }
             return try await group.reduce(into: [Room]()) { $0.append($1) }
         }
+        
+        guard let date = date else { return fetchedRooms }
+        
+        if classTypeId == fitnessClass.classType &&
+            Calendar.current.isDateEqualToMinute(date, fitnessClass.dateTime) {
+            let currentRoomId = fitnessClass.room
+            if let currentRoom = try? await roomManager.fetchRoomById(currentRoomId),
+               !fetchedRooms.contains(where: { $0.roomId == currentRoomId }) {
+                fetchedRooms.append(currentRoom)
+            }
+        }
+        
         return fetchedRooms
     }
     
-    private func fetchAvailableInstructors(classType: ClassType, dateString: String, timeString: String) async throws -> [Instructor] {
+    private func fetchAvailableInstructors(classTypeId: Int, dateString: String, timeString: String) async throws -> [Instructor] {
         let instructorIds = try await instructorManager.findAvailableInstructors(
-            classTypeId: classType.classTypeId,
+            classTypeId: classTypeId,
             date: dateString,
             time: timeString
         )
-        let fetchedInstructors = try await withThrowingTaskGroup(of: Instructor.self) { group -> [Instructor] in
+        var fetchedInstructors = try await withThrowingTaskGroup(of: Instructor.self) { group -> [Instructor] in
             for instructorId in instructorIds {
                 group.addTask { try await self.instructorManager.fetchInstructorById(instructorId) }
             }
             return try await group.reduce(into: [Instructor]()) { $0.append($1) }
         }
+        
+        guard let date = date else { return fetchedInstructors }
+        
+        if classTypeId == fitnessClass.classType &&
+            Calendar.current.isDateEqualToMinute(date, fitnessClass.dateTime) {
+            let currentInstructorId = fitnessClass.instructor
+            if let currentInstructor = try? await instructorManager.fetchInstructorById(currentInstructorId),
+               !fetchedInstructors.contains(where: { $0.instructorId == currentInstructorId }) {
+                fetchedInstructors.append(currentInstructor)
+            }
+        }
+        
         return fetchedInstructors
+    }
+    
+    private func isSaveButtonDisabled() -> Bool {
+        guard let date = date else { return true }
+        
+        return Calendar.current.isDateEqualToMinute(date, fitnessClass.dateTime) &&
+        selectedClassType?.classTypeId == fitnessClass.classType &&
+        selectedRoom?.roomId == fitnessClass.room &&
+        selectedInstructor?.instructorId == fitnessClass.instructor &&
+        selectedCapacity == fitnessClass.capacity
     }
 }

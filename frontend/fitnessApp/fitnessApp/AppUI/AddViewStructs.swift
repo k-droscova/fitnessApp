@@ -115,6 +115,7 @@ struct BackButton: View {
 
 struct SaveButton: View {
     let action: () -> Void
+    var isDisabled: Bool = false
     
     var body: some View {
         Button(action: action) {
@@ -122,10 +123,11 @@ struct SaveButton: View {
                 .font(.headline)
                 .padding(12)
                 .padding(.horizontal, 12)
-                .background(Color.blue)
+                .background(isDisabled ? Color.gray : Color.blue) // Add visual feedback
                 .foregroundColor(.white)
                 .cornerRadius(8)
         }
+        .disabled(isDisabled)
     }
 }
 
@@ -162,12 +164,13 @@ struct BackAndSaveButtons: View {
 struct CancelAndSaveButtons: View {
     let cancelAction: () -> Void
     let saveAction: () -> Void
+    var isSaveDisabled: Bool = false
     
     var body: some View {
         HStack {
             CancelButton(action: cancelAction)
             Spacer()
-            SaveButton(action: saveAction)
+            SaveButton(action: saveAction, isDisabled: isSaveDisabled)
         }
         .padding(.horizontal, 16)
     }
