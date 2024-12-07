@@ -39,18 +39,18 @@ final class MainFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
         let classTypeVC = classTypeFC.start()
         classTypeVC.tabBarItem = UITabBarItem(
             title: "Class Types",
-            image: UIImage(systemName: "figure.yoga"),
-            selectedImage: UIImage(systemName: "figure.yoga.circle.fill")
+            image: UIImage(systemName: "figure.cooldown"),
+            selectedImage: UIImage(systemName: "figure.cooldown.circle.fill")
         )
         
-        // MARK: - Fitness Classes
-        let fitnessClassesFC = FitnessClassFlowCoordinator(delegate: self)
-        addChild(fitnessClassesFC)
-        let fitnessClassesVC = fitnessClassesFC.start()
-        fitnessClassesVC.tabBarItem = UITabBarItem(
-            title: "Fitness Classes",
-            image: UIImage(systemName: "list.bullet"),
-            selectedImage: UIImage(systemName: "list.bullet.circle.fill")
+        // MARK: - Rooms
+        let roomsFC = RoomFlowCoordinator(delegate: self)
+        addChild(roomsFC)
+        let roomsVC = roomsFC.start()
+        roomsVC.tabBarItem = UITabBarItem(
+            title: "Rooms",
+            image: UIImage(systemName: "house"),
+            selectedImage: UIImage(systemName: "house.circle.fill")
         )
         
         // MARK: - Instructors
@@ -63,11 +63,33 @@ final class MainFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
             selectedImage: UIImage(systemName: "person.circle.fill")
         )
         
+        // MARK: - Trainees
+        let traineesFC = TraineeFlowCoordinator(delegate: self)
+        addChild(traineesFC)
+        let traineesVC = traineesFC.start()
+        traineesVC.tabBarItem = UITabBarItem(
+            title: "Trainees",
+            image: UIImage(systemName: "figure.strengthtraining.traditional"),
+            selectedImage: UIImage(systemName: "figure.strengthtraining.traditional.circle.fill")
+        )
+        
+        // MARK: - Fitness Classes
+        let fitnessClassesFC = FitnessClassFlowCoordinator(delegate: self)
+        addChild(fitnessClassesFC)
+        let fitnessClassesVC = fitnessClassesFC.start()
+        fitnessClassesVC.tabBarItem = UITabBarItem(
+            title: "Classes",
+            image: UIImage(systemName: "list.bullet"),
+            selectedImage: UIImage(systemName: "list.bullet.circle.fill")
+        )
+        
         // MARK: - SETUP TabBar
         let tabVC = UITabBarController()
         tabVC.viewControllers = [
             classTypeVC,
+            roomsVC,
             instructorsVC,
+            traineesVC,
             fitnessClassesVC
         ]
         tabVC.selectedViewController = instructorsVC
@@ -102,3 +124,7 @@ extension MainFlowCoordinator: ClassTypeFlowCoordinatorDelegate {}
 extension MainFlowCoordinator: FitnessClassFlowCoordinatorDelegate {}
 
 extension MainFlowCoordinator: InstructorFlowCoordinatorDelegate {}
+
+extension MainFlowCoordinator: RoomFlowCoordinatorDelegate {}
+
+extension MainFlowCoordinator: TraineeFlowCoordinatorDelegate {}

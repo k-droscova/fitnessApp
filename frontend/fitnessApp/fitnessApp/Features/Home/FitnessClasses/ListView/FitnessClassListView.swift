@@ -22,7 +22,7 @@ struct FitnessClassListView: View {
                 toTime: $viewModel.timeToFilter,
                 errorText: viewModel.errorMessage
             )
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 16)
             
             ScrollView {
                 LazyVStack(spacing: 10) {
@@ -39,7 +39,7 @@ struct FitnessClassListView: View {
                                     fitnessClass: fitnessClass,
                                     classTypeName: viewModel.classTypeNameForFitnessClass(fitnessClass)
                                 )
-                                .padding(.horizontal, 8)
+                                .padding(.horizontal, 16)
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
@@ -48,7 +48,6 @@ struct FitnessClassListView: View {
                 .padding(.vertical, 10)
             }
         }
-        .padding()
         .onAppear {
             viewModel.onAppear()
         }
