@@ -207,3 +207,60 @@ struct AddFormButton: View {
         }
     }
 }
+
+struct ListRowHeadlineStyleView: View {
+    let text: String
+    var alignment: Alignment = .leading
+    
+    var body: some View {
+        Text(text)
+            .font(.headline)
+            .frame(maxWidth: .infinity, alignment: alignment)
+    }
+}
+
+
+struct ListRowSubheadlineStyleView: View {
+    let text: String
+    var alignment: Alignment = .center
+    
+    var body: some View {
+        Text(text)
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity, alignment: alignment)
+    }
+}
+
+struct ListHeaderSection: View {
+    let headers: [String]
+    
+    var body: some View {
+        HStack {
+            ForEach(headers, id: \.self) { header in
+                Text(header)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+        }
+        .modifier(ListHeaderStyle())
+    }
+}
+
+struct ListSection<Content: View>: View {
+    let content: Content
+    
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(spacing: 10) {
+                content
+            }
+            .padding(.vertical, 10)
+        }
+    }
+}

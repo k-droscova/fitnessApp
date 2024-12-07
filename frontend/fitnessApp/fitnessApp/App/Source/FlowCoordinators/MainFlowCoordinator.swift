@@ -53,40 +53,52 @@ final class MainFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
             selectedImage: UIImage(systemName: "list.bullet.circle.fill")
         )
         
+        // MARK: - Instructors
+        let instructorsFC = InstructorFlowCoordinator(delegate: self)
+        addChild(instructorsFC)
+        let instructorsVC = instructorsFC.start()
+        instructorsVC.tabBarItem = UITabBarItem(
+            title: "Instructors",
+            image: UIImage(systemName: "person"),
+            selectedImage: UIImage(systemName: "person.circle.fill")
+        )
+        
         // MARK: - SETUP TabBar
         let tabVC = UITabBarController()
         tabVC.viewControllers = [
             classTypeVC,
+            instructorsVC,
             fitnessClassesVC
         ]
-        tabVC.selectedViewController = fitnessClassesVC
-        //customizeTabBarAppearance(tabBar: tabVC.tabBar)
+        tabVC.selectedViewController = instructorsVC
+        customizeTabBarAppearance(tabBar: tabVC.tabBar)
         return tabVC
     }
     
-    /*private func customizeTabBarAppearance(tabBar: UITabBar) {
-     if #available(iOS 15.0, *) {
-     let appearance = UITabBarAppearance()
-     appearance.configureWithOpaqueBackground()
-     appearance.backgroundColor = CustomColors.TabBar.background.color
-     
-     appearance.stackedLayoutAppearance.selected.iconColor = CustomColors.TabBar.selectedItem.color
-     appearance.stackedLayoutAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: CustomColors.TabBar.selectedItem.color]
-     
-     appearance.stackedLayoutAppearance.normal.iconColor = CustomColors.TabBar.unselectedItem.color
-     appearance.stackedLayoutAppearance.normal.titleTextAttributes = [NSAttributedString.Key.foregroundColor: CustomColors.TabBar.unselectedItem.color]
-     
-     tabBar.standardAppearance = appearance
-     tabBar.scrollEdgeAppearance = appearance
-     } else {
-     tabBar.barTintColor = CustomColors.TabBar.background.color
-     tabBar.tintColor = CustomColors.TabBar.selectedItem.color
-     tabBar.unselectedItemTintColor = CustomColors.TabBar.unselectedItem.color
-     }
-     }
-     */
+    private func customizeTabBarAppearance(tabBar: UITabBar) {
+        if #available(iOS 15.0, *) {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor.systemBackground
+            
+            appearance.stackedLayoutAppearance.selected.iconColor = UIColor.systemBlue
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemBlue]
+            
+            appearance.stackedLayoutAppearance.normal.iconColor = UIColor.systemGray
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemGray]
+            
+            tabBar.standardAppearance = appearance
+            tabBar.scrollEdgeAppearance = appearance
+        } else {
+            tabBar.barTintColor = UIColor.systemBackground
+            tabBar.tintColor = UIColor.systemBlue
+            tabBar.unselectedItemTintColor = UIColor.systemGray
+        }
+    }
 }
 
 extension MainFlowCoordinator: ClassTypeFlowCoordinatorDelegate {}
 
 extension MainFlowCoordinator: FitnessClassFlowCoordinatorDelegate {}
+
+extension MainFlowCoordinator: InstructorFlowCoordinatorDelegate {}

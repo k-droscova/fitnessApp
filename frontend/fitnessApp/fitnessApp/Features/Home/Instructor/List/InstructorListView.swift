@@ -1,16 +1,16 @@
 //
-//  ClassTypeListView.swift
+//  InstructorListView.swift
 //  fitnessApp
 //
-//  Created by Karolína Droscová on 05.12.2024.
+//  Created by Karolína Droscová on 07.12.2024.
 //
 
 import SwiftUI
 
-struct ClassTypeListView: View {
-    @StateObject private var viewModel: ClassTypeListViewModel
+struct InstructorListView: View {
+    @StateObject private var viewModel: InstructorListViewModel
     
-    init(viewModel: ClassTypeListViewModel) {
+    init(viewModel: InstructorListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     
@@ -18,14 +18,14 @@ struct ClassTypeListView: View {
         VStack {
             AddFormButton(action: viewModel.onAddButtonTapped)
             
-            ListHeaderSection(headers: ["name", "instructors", "rooms", "classes"])
+            ListHeaderSection(headers: ["name", "specializations", "classes"])
             
             ListSection {
-                ForEach(viewModel.classTypes) { classType in
+                ForEach(viewModel.instructors) { instructor in
                     Button(action: {
-                        viewModel.onClassTypeTapped(classType)
+                        viewModel.onInstructorTapped(instructor)
                     }) {
-                        ClassTypeRowView(classType: classType)
+                        InstructorRowView(instructor: instructor)
                             .padding(.horizontal, 16)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -35,6 +35,6 @@ struct ClassTypeListView: View {
         .onAppear {
             viewModel.onAppear()
         }
-        .navigationTitle("Class Types")
+        .navigationTitle("Instructors")
     }
 }

@@ -17,28 +17,14 @@ struct ClassTypeRowView: View {
     
     var body: some View {
         HStack {
-            Text(classType.name)
-                .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading) // Align name to the left
+            ListRowHeadlineStyleView(text: classType.name, alignment: .leading)
             
-            Text("\(classType.instructors.count)")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center) // Center instructors count
+            ListRowSubheadlineStyleView(text: "\(classType.instructors.count)")
             
-            Text("\(classType.rooms.count)")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center) // Center rooms count
+            ListRowSubheadlineStyleView(text: "\(classType.rooms.count)")
             
-            Text("\(classType.fitnessClasses.count)")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center) // Align fitness classes count to the right
+            ListRowSubheadlineStyleView(text: "\(classType.fitnessClasses.count)")
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8) // Add some vertical padding for better readability
-        .background(Color.gray.opacity(0.2))
-        .cornerRadius(8)
+        .listRowStyle()
     }
 }
