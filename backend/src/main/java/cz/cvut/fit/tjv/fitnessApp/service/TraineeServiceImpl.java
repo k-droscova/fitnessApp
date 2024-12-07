@@ -82,4 +82,12 @@ public class TraineeServiceImpl extends CrudServiceImpl<Trainee, Long> implement
         }
         return traineeRepository.findByFitnessClassId(fitnessClassId);
     }
+
+    @Override
+    public List<Trainee> findTraineesByName(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Trainee name must not be null");
+        }
+        return traineeRepository.findByNameOrSurnameStartingWithIgnoreCase(name);
+    }
 }

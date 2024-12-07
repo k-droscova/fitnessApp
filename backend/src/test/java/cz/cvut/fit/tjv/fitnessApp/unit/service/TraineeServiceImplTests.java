@@ -205,4 +205,49 @@ class TraineeServiceImplTest {
 
         verify(traineeRepository, never()).findByFitnessClassId(any());
     }
+
+    @Test
+    void findTraineesByName_ShouldReturnTrainees_WhenMatching() {
+        // Arrange
+        Trainee trainee2 = new Trainee();
+        trainee2.setId(2L);
+        trainee2.setName("John");
+        trainee2.setSurname("Doe");
+
+        when(traineeRepository.findByNameOrSurnameStartingWithIgnoreCase("doe"))
+                .thenReturn(List.of(mockTrainee, trainee2));
+
+        // Act
+        List<Trainee> result = traineeService.findTraineesByName("doe");
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size(), "Expected 2 trainees with matching name or surname");
+        assertTrue(result.stream().anyMatch(t -> "Jane".equals(t.getName()) && "Doe".equals(t.getSurname())),
+                "Expected trainee Jane Doe in the results");
+        assertTrue(result.stream().anyMatch(t -> "John".equals(t.getName()) && "Doe".equals(t.getSurname())),
+                "Expected trainee John Doe in the results");
+    }
+
+    @Test
+    void findTraineesByName_ShouldReturnEmptyList_WhenNoMatchingTrainees() {
+        // Arrange
+        when(traineeRepository.findByNameOrSurnameStartingWithIgnoreCase("xyz"))
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<Trainee> result = traineeService.findTraineesByName("xyz");
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "Expected no trainees to match the input 'xyz'");
+    }
+
+    @Test
+    void findTraineesByName_ShouldThrowException_WhenInputIsNull() {
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> traineeService.findTraineesByName(null),
+                "Expected IllegalArgumentException for null input");
+        verify(traineeRepository, never()).findByNameOrSurnameStartingWithIgnoreCase(any());
+    }
 }

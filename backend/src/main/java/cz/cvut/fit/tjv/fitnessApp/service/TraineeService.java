@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface TraineeService extends CrudService<Trainee, Long> {
     List<Trainee> findTraineesByFitnessClassId(Long fitnessClassId);
+    List<Trainee> findTraineesByName(String name);
 }
