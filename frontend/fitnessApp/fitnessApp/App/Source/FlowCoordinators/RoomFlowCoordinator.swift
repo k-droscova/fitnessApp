@@ -14,6 +14,7 @@ protocol RoomFlowCoordinatorDelegate: NSObject {}
 final class RoomFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordinator {
     private weak var delegate: RoomFlowCoordinatorDelegate?
     private var listViewModel: RoomListViewModel?
+    private var detailViewModel: RoomDetailViewModel?
 
     init(delegate: RoomFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -39,8 +40,17 @@ final class RoomFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordin
 
 extension RoomFlowCoordinator: RoomListFlowDelegate {
     func onDetailTapped(with room: Room) {
-        print("Room detail tapped: \(room.id), Capacity: \(room.maxCapacity)")
-        // Placeholder for future detail screen implementation
+        if self.detailViewModel != nil {
+            self.detailViewModel = nil // prevents mem leaks
+        }
+        let vm = RoomDetailViewModel(
+            dependencies: appDependencies,
+            room: room,
+            delegate: self
+        )
+        self.detailViewModel = vm
+        let vc = RoomDetailView(viewModel: vm).hosting()
+        presentSheet(vc, animated: true)
     }
 
     func onAddTapped() {
@@ -52,6 +62,28 @@ extension RoomFlowCoordinator: RoomListFlowDelegate {
         showErrorAlert(
             title: "Error",
             message: "Error occurred when loading rooms"
+        )
+    }
+}
+
+extension RoomFlowCoordinator: RoomDetailViewFlowDelegate {
+    func onEditPressed(room: Room) {
+        print("Edit room tapped")
+    }
+    
+    func onDeleteSuccess() {
+        dismiss()
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Room deleted successfully"
+        )
+    }
+    
+    func onDeleteFailure() {
+        showErrorAlert(
+            title: "Delete error",
+            message: "Error occured while deleting room, please try again"
         )
     }
 }
