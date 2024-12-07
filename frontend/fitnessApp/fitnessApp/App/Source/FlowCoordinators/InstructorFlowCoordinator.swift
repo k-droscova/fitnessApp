@@ -14,6 +14,7 @@ protocol InstructorFlowCoordinatorDelegate: NSObject {}
 final class InstructorFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoordinator {
     private weak var delegate: InstructorFlowCoordinatorDelegate?
     private var listViewModel: InstructorListViewModel?
+    private var detailViewModel: InstructorDetailViewModel?
 
     init(delegate: InstructorFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -39,8 +40,17 @@ final class InstructorFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowC
 
 extension InstructorFlowCoordinator: InstructorListFlowDelegate {
     func onDetailTapped(with instructor: Instructor) {
-        print("Instructor detail tapped: \(instructor.name) \(instructor.surname)")
-        // Placeholder for future detail screen implementation
+        if self.detailViewModel != nil {
+            self.detailViewModel = nil // prevents mem leaks
+        }
+        let vm = InstructorDetailViewModel(
+            dependencies: appDependencies,
+            instructor: instructor,
+            delegate: self
+        )
+        self.detailViewModel = vm
+        let vc = InstructorDetailView(viewModel: vm).hosting()
+        presentSheet(vc, animated: true)
     }
 
     func onAddTapped() {
@@ -52,6 +62,28 @@ extension InstructorFlowCoordinator: InstructorListFlowDelegate {
         showErrorAlert(
             title: "Error",
             message: "Error occurred when loading instructors"
+        )
+    }
+}
+
+extension InstructorFlowCoordinator: InstructorDetailViewFlowDelegate {
+    func onEditPressed(instructor: Instructor) {
+        print("Edit instructor tapped")
+    }
+    
+    func onDeleteSuccess() {
+        dismiss()
+        listViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Instructor deleted successfully"
+        )
+    }
+    
+    func onDeleteFailure() {
+        showErrorAlert(
+            title: "Delete error",
+            message: "Error occured while deleting instructor, please try again"
         )
     }
 }

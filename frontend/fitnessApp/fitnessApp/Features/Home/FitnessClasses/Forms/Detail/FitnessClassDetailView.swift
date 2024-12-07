@@ -14,44 +14,41 @@ struct FitnessClassDetailView: View {
         VStack {
             // Title
             Text(viewModel.dateTimeString)
-                .font(.title)
+                .font(.headline)
                 .padding(.top, 16)
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Class Type Section
-                    DetailRow(title: "Class Type", value: viewModel.classTypeName)
                     
-                    // Instructor Section
-                    if let instructor = viewModel.instructor {
-                        DetailRow(title: "Instructor", value: "\(instructor.name) \(instructor.surname)")
+                    ExpandableSection(
+                        title: "Class details",
+                        placeholder: "No details available",
+                        isEmpty: false
+                    ) {
+                        // Class Type Section
+                        DetailRow(title: "Class Type", value: viewModel.classTypeName)
+                        
+                        // Instructor Section
+                        if let instructor = viewModel.instructor {
+                            DetailRow(title: "Instructor", value: "\(instructor.name) \(instructor.surname)")
+                        }
+                        
+                        // Room Section
+                        DetailRow(title: "Room number", value: String(viewModel.roomId))
+                        
+                        // Capacity Section
+                        DetailRow(title: "Class Capacity", value: String(viewModel.capacity))
+                        
+                        // Occupancy Section
+                        DetailRow(title: "Registrations", value: "\(viewModel.occupancy)/\(viewModel.capacity)")
                     }
                     
-                    // Room Section
-                    DetailRow(title: "Room number", value: String(viewModel.roomId))
-                    
-                    // Capacity Section
-                    DetailRow(title: "Class Capacity", value: String(viewModel.capacity))
-                    
-                    // Occupancy Section
-                    DetailRow(title: "Registrations", value: "\(viewModel.occupancy)/\(viewModel.capacity)")
-                    
-                    // Trainees Section
-                    if !viewModel.trainees.isEmpty {
-                        Divider()
-                        SectionHeaderView(title: "Trainees")
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(viewModel.trainees) { trainee in
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("\(trainee.name) \(trainee.surname)")
-                                        .font(.body)
-                                    Text(trainee.email)
-                                        .font(.footnote)
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
+                    ExpandableSection(
+                        title: "Registered trainees",
+                        placeholder: "No trainees registered",
+                        isEmpty: viewModel.trainees.isEmpty
+                    ) {
+                        TraineeSectionView(trainees: viewModel.trainees)
                     }
                 }
                 .padding(.vertical, 16)
@@ -86,6 +83,5 @@ struct FitnessClassDetailView: View {
                 CustomProgressView()
             }
         }
-        .padding()
     }
 }

@@ -36,6 +36,37 @@ struct RoomSectionView: View {
     }
 }
 
+struct SpecializationSectionView: View {
+    let classTypes: [ClassType]
+    
+    var body: some View {
+        ForEach(classTypes) { classType in
+            HStack {
+                Text(classType.name)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+}
+
+struct TraineeSectionView: View {
+    let trainees: [Trainee]
+    
+    var body: some View {
+        ForEach(trainees) { trainee in
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(trainee.name) \(trainee.surname)")
+                    .font(.subheadline)
+                Text(trainee.email)
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+}
+
 struct InstructorSectionView: View {
     let instructors: [Instructor]
 
@@ -126,12 +157,85 @@ struct DetailRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.headline)
+                .font(.subheadline)
             Spacer()
             Text(value)
-                .font(.body)
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         }
         .padding(.horizontal, 16)
+    }
+}
+
+struct ExpandableSection<Content: View>: View {
+    let title: String
+    let placeholder: String
+    let isEmpty: Bool
+    @ViewBuilder var content: Content
+    
+    @State private var isExpanded: Bool = true
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Button(action: {
+                    isExpanded.toggle()
+                }) {
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            
+            if isExpanded {
+                if isEmpty {
+                    Text(placeholder)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
+                } else {
+                    content
+                        .padding(.bottom, 8)
+                        .font(.subheadline)
+                }
+            }
+        }
+        .background(Color(.systemGroupedBackground))
+        .cornerRadius(8)
+        .padding(.horizontal, 16)
+    }
+}
+
+
+struct ExpandableSection_Previews: PreviewProvider {
+    static var previews: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                ExpandableSection(
+                    title: "Rooms",
+                    placeholder: "No rooms available",
+                    isEmpty: false
+                ) {
+                    RoomSectionView(rooms: [.mock, .mock2])
+                }
+                
+                ExpandableSection(
+                    title: "Empty Section",
+                    placeholder: "No content to show",
+                    isEmpty: true
+                ) {
+                    EmptyView() // No content
+                }
+            }
+            .padding(.top, 16)
+        }
+        .background(Color(.systemBackground))
+        .previewLayout(.sizeThatFits)
     }
 }

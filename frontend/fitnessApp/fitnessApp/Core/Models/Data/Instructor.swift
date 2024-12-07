@@ -15,6 +15,8 @@ struct Instructor: Codable, Hashable {
     let specializations: [Int]
     let classes: [Int]
     
+    var age: Int { Calendar.current.calculateAge(from: birthDate) ?? 0 }
+    
     enum CodingKeys: String, CodingKey {
         case instructorId = "id"
         case name

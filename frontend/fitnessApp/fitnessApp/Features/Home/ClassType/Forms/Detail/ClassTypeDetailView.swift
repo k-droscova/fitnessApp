@@ -20,20 +20,29 @@ struct ClassTypeDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // Rooms Section
-                    if !viewModel.rooms.isEmpty {
-                        SectionHeaderView(title: "Rooms")
+                    ExpandableSection(
+                        title: "Rooms",
+                        placeholder: "No dedicated rooms for this class type",
+                        isEmpty: viewModel.rooms.isEmpty
+                    ) {
                         RoomSectionView(rooms: viewModel.rooms)
                     }
-
-                    // Instructors Section
-                    if !viewModel.instructors.isEmpty {
-                        SectionHeaderView(title: "Instructors")
+                    
+                    // Instructors
+                    ExpandableSection(
+                        title: "Instructors",
+                        placeholder: "No specialized instructors for this class type",
+                        isEmpty: viewModel.instructors.isEmpty
+                    ) {
                         InstructorSectionView(instructors: viewModel.instructors)
                     }
-
-                    // Fitness Classes Section
-                    if !viewModel.fitnessClasses.isEmpty {
-                        SectionHeaderView(title: "Fitness Classes")
+                    
+                    // Classes
+                    ExpandableSection(
+                        title: "Fitness Classes",
+                        placeholder: "No scheduled classes for this class type",
+                        isEmpty: viewModel.fitnessClasses.isEmpty
+                    ) {
                         FitnessClassSectionView(fitnessClasses: viewModel.fitnessClasses)
                     }
                 }

@@ -298,24 +298,3 @@ struct SearchBar: View {
         .padding(.horizontal, 16)
     }
 }
-
-struct ContentView: View {
-    @State private var searchText: String = ""
-    
-    var body: some View {
-        VStack {
-            SearchBar(searchText: $searchText, placeholder: "Search instructors...")
-            
-            Text("Search Text: \(searchText)")
-                .padding()
-            
-            Spacer()
-        }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
