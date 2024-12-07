@@ -30,4 +30,12 @@ public interface RoomRepository extends CrudRepository<Room, Long> {
             @Param("date") LocalDate date,
             @Param("time") LocalTime time
     );
+
+    @Query("""
+        SELECT r
+        FROM Room r
+        JOIN r.classTypes ct
+        WHERE ct.id IN :classTypeIds
+    """)
+    List<Room> findAllByClassTypeIds(@Param("classTypeIds") List<Long> classTypeIds);
 }

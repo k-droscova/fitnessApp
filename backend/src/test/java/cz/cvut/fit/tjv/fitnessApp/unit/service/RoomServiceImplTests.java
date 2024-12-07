@@ -214,4 +214,36 @@ class RoomServiceImplTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void findByClassTypeName_ShouldReturnRoomsForMatchingClassTypeName() {
+        // Arrange
+        String classTypeName = "Yoga";
+        ClassType yogaClassType = new ClassType();
+        yogaClassType.setId(1L);
+        yogaClassType.setName(classTypeName);
+
+        Room yogaRoom1 = new Room();
+        yogaRoom1.setId(1L);
+        Room yogaRoom2 = new Room();
+        yogaRoom2.setId(3L);
+
+        when(classTypeRepository.findByNameContainingIgnoreCase(classTypeName))
+                .thenReturn(List.of(yogaClassType));
+        when(roomRepository.findAllByClassTypeIds(List.of(1L)))
+                .thenReturn(List.of(yogaRoom1, yogaRoom2));
+
+        // Act
+        List<Room> result = roomService.findByClassTypeName(classTypeName);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(yogaRoom1));
+        assertTrue(result.contains(yogaRoom2));
+
+        // Verify interactions
+        verify(classTypeRepository).findByNameContainingIgnoreCase(classTypeName);
+        verify(roomRepository).findAllByClassTypeIds(List.of(1L));
+    }
 }

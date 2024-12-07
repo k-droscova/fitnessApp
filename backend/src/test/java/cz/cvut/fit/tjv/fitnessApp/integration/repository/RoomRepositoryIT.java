@@ -89,4 +89,18 @@ public class RoomRepositoryIT {
         assertTrue(results.stream().anyMatch(r -> r.getId() == 3L));
         assertTrue(results.stream().anyMatch(r -> r.getId() == 5L));
     }
+
+    @Test
+    void findAllByClassTypeIds_ShouldReturnRoomsForMatchingClassTypeIds() {
+        // Test for Yoga (id = 1) and Pilates (id = 2)
+        List<Long> classTypeIds = List.of(1L, 2L);
+
+        List<Room> results = roomRepository.findAllByClassTypeIds(classTypeIds);
+
+        assertNotNull(results);
+        assertEquals(3, results.size(), "Expected 3 rooms that can host Yoga or Pilates");
+        assertTrue(results.stream().anyMatch(r -> r.getId() == 1L), "Room 1 should be included for Yoga and Pilates");
+        assertTrue(results.stream().anyMatch(r -> r.getId() == 3L), "Room 3 should be included for Yoga");
+        assertTrue(results.stream().anyMatch(r -> r.getId() == 5L), "Room 5 should be included for Yoga");
+    }
 }

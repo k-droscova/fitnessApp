@@ -107,4 +107,13 @@ public class RoomServiceImpl extends CrudServiceImpl<Room, Long> implements Room
                 time
         );
     }
+
+    @Override
+    public List<Room> findByClassTypeName(String classTypeName) {
+        List<ClassType> classTypes = classTypeRepository.findByNameContainingIgnoreCase(classTypeName);
+        List<Long> classTypeIds = classTypes.stream()
+                .map(ClassType::getId)
+                .toList();
+        return roomRepository.findAllByClassTypeIds(classTypeIds);
+    }
 }

@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface RoomService extends CrudService<Room, Long> {
     List<Room> findAvailableRooms(Optional<Long> classTypeId, LocalDate date, LocalTime time);
+    List<Room> findByClassTypeName(String classTypeName);
 }
