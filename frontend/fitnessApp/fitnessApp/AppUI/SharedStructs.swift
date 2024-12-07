@@ -313,12 +313,53 @@ struct RegisterButton: View {
         Button(action: action) {
             Text("Register for classes")
                 .font(.subheadline)
-                .frame(maxWidth: .infinity)
                 .padding()
                 .background(isDisabled ? Color(.secondarySystemBackground) : Color.clear)
                 .foregroundColor(isDisabled ? Color.secondary : Color.blue)
                 .cornerRadius(8)
         }
         .disabled(isDisabled)
+    }
+}
+
+struct UnregisterButton: View {
+    let action: () -> Void
+    var isDisabled: Bool = false
+
+    var body: some View {
+        Button(action: action) {
+            Text("Unregister from classes")
+                .font(.subheadline)
+                .padding()
+                .background(isDisabled ? Color(.secondarySystemBackground) : Color.clear)
+                .foregroundColor(isDisabled ? Color.secondary : Color.red)
+                .cornerRadius(8)
+        }
+        .disabled(isDisabled)
+    }
+}
+
+import SwiftUI
+
+struct ButtonsPreviewProvider: PreviewProvider {
+    static var previews: some View {
+        VStack(spacing: 16) {
+            RegisterButton(action: {
+                print("Register button tapped")
+            }, isDisabled: false)
+
+            RegisterButton(action: {
+                print("Register button tapped (disabled)")
+            }, isDisabled: true)
+
+            UnregisterButton(action: {
+                print("Unregister button tapped")
+            }, isDisabled: false)
+
+            UnregisterButton(action: {
+                print("Unregister button tapped (disabled)")
+            }, isDisabled: true)
+        }
+        .previewLayout(.sizeThatFits)
     }
 }

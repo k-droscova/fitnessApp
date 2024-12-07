@@ -22,7 +22,7 @@ struct TraineeDetailView: View {
                 .padding(.bottom, 8)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .center, spacing: 16) {
 
                     ExpandableSection(
                         title: "Personal Details",
@@ -36,14 +36,6 @@ struct TraineeDetailView: View {
                     }
                     
                     ExpandableSection(
-                        title: "Upcoming Classes",
-                        placeholder: "No upcoming classes",
-                        isEmpty: viewModel.futureClasses.isEmpty
-                    ) {
-                        FitnessClassSectionView(fitnessClasses: viewModel.futureClasses)
-                    }
-                    
-                    ExpandableSection(
                         title: "Past Classes",
                         placeholder: "No past classes",
                         isEmpty: viewModel.pastClasses.isEmpty
@@ -51,8 +43,22 @@ struct TraineeDetailView: View {
                         FitnessClassSectionView(fitnessClasses: viewModel.pastClasses)
                     }
                     
-                    RegisterButton(action: viewModel.onRegisterPressed)
-                        .padding(.vertical, 16)
+                    ExpandableSection(
+                        title: "Upcoming Classes",
+                        placeholder: "No upcoming classes",
+                        isEmpty: viewModel.futureClasses.isEmpty
+                    ) {
+                        FitnessClassSectionView(fitnessClasses: viewModel.futureClasses)
+                    }
+                    
+                    VStack(alignment: .center) {
+                        RegisterButton(action: viewModel.onRegisterPressed)
+                        
+                        UnregisterButton(
+                            action: viewModel.onUnregisterPressed,
+                            isDisabled: viewModel.isUnregisteredButtonDisabled
+                        )
+                    }
                 }
                 .padding(.vertical, 16)
             }

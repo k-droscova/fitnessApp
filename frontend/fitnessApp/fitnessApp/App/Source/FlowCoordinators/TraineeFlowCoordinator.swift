@@ -188,4 +188,8 @@ extension TraineeFlowCoordinator: TraineeRegistrationViewFlowDelegate {
     func onRegistrationDismiss() {
         self.registrationViewModel = nil
     }
+    
+    func onUnregisterPressed(trainee: Trainee) {
+        print("Unregister pressed")
+    }
 }

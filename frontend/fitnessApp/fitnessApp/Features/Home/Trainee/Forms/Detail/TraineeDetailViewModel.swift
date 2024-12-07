@@ -14,16 +14,19 @@ protocol TraineeDetailViewFlowDelegate: NSObject {
     func onDeleteFailure()
     func showDeleteConfirmation(_ confirmAction: @escaping () -> Void)
     func onRegisterPressed(trainee: Trainee)
+    func onUnregisterPressed(trainee: Trainee)
 }
 
 protocol TraineeDetailViewModeling: BaseClass, ObservableObject {
     var trainee: Trainee { get }
     var pastClasses: [FitnessClass] { get }
     var futureClasses: [FitnessClass] { get }
+    var isUnregisteredButtonDisabled: Bool { get }
     func onAppear()
     func onEditPressed()
     func onDeletePressed()
     func onRegisterPressed()
+    func onUnregisterPressed()
 }
 
 final class TraineeDetailViewModel: BaseClass, TraineeDetailViewModeling {
@@ -38,6 +41,7 @@ final class TraineeDetailViewModel: BaseClass, TraineeDetailViewModeling {
     @Published var pastClasses: [FitnessClass] = []
     @Published var futureClasses: [FitnessClass] = []
     @Published var isLoading: Bool = true
+    var isUnregisteredButtonDisabled: Bool { futureClasses.isEmpty }
     
     init(
         dependencies: Dependencies,
@@ -94,6 +98,10 @@ final class TraineeDetailViewModel: BaseClass, TraineeDetailViewModeling {
     
     func onRegisterPressed() {
         delegate?.onRegisterPressed(trainee: trainee)
+    }
+    
+    func onUnregisterPressed() {
+        delegate?.onUnregisterPressed(trainee: trainee)
     }
     
     // MARK: - Private Helpers
