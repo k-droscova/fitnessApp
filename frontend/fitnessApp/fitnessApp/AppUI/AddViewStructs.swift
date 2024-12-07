@@ -27,6 +27,20 @@ struct SelectableRow: View {
     }
 }
 
+struct SelectableItem<Item: Identifiable>: Identifiable {
+    let id: Item.ID
+    let item: Item
+    var isSelected: Bool
+    let itemDescription: String
+    
+    init(item: Item, isSelected: Bool = false, itemDescription: String) {
+        self.id = item.id
+        self.item = item
+        self.isSelected = isSelected
+        self.itemDescription = itemDescription
+    }
+}
+
 struct SelectableList<Item: Identifiable>: View {
     let title: String
     @Binding var items: [SelectableItem<Item>]
@@ -44,17 +58,24 @@ struct SelectableList<Item: Identifiable>: View {
     }
 }
 
-struct SelectableItem<Item: Identifiable>: Identifiable {
-    let id: Item.ID
-    let item: Item
-    var isSelected: Bool
-    let itemDescription: String
-    
-    init(item: Item, isSelected: Bool = false, itemDescription: String) {
-        self.id = item.id
-        self.item = item
-        self.isSelected = isSelected
-        self.itemDescription = itemDescription
+struct SingleSelectableList<Item: Identifiable>: View {
+    let title: String
+    @Binding var items: [SelectableItem<Item>]
+    @Binding var selectedID: Item.ID?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeaderView(title: title)
+            ForEach(items) { selectableItem in
+                SelectableRow(
+                    title: selectableItem.itemDescription,
+                    isSelected: .constant(selectableItem.id == selectedID)
+                )
+                .onTapGesture {
+                    selectedID = (selectedID == selectableItem.id) ? nil : selectableItem.id
+                }
+            }
+        }
     }
 }
 
@@ -76,6 +97,17 @@ struct SelectableRoomList: View {
         SelectableList(
             title: "Rooms",
             items: $rooms
+        )
+    }
+}
+
+struct SelectableClassTypeList: View {
+    @Binding var classTypes: [SelectableItem<ClassType>]
+    
+    var body: some View {
+        SelectableList(
+            title: "Specializations",
+            items: $classTypes
         )
     }
 }
@@ -191,6 +223,29 @@ struct FutureDatePicker: View {
                 selection: $selectedDate,
                 in: Date()...,
                 displayedComponents: [.date, .hourAndMinute]
+            )
+            .labelsHidden()
+            .datePickerStyle(GraphicalDatePickerStyle())
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.5)))
+    }
+}
+
+struct BirthdaDatePicker: View {
+    @Binding var selectedDate: Date
+    let title: String
+    
+    var body: some View {
+        VStack(alignment: .center, spacing: 8) {
+            Text(title)
+                .font(.headline)
+            
+            DatePicker(
+                "",
+                selection: $selectedDate,
+                in: ...Date(),
+                displayedComponents: [.date]
             )
             .labelsHidden()
             .datePickerStyle(GraphicalDatePickerStyle())
@@ -320,6 +375,68 @@ struct ExpandableDatePicker: View {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = .short
+        return formatter
+    }
+}
+
+struct ExpandableBirthdayPicker: View {
+    @Binding var selectedDate: Date?
+    var placeholder: String = "Select birthday"
+    @State private var isExpanded: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Button to toggle the date picker
+            Button(action: {
+                withAnimation {
+                    isExpanded.toggle()
+                }
+            }) {
+                HStack {
+                    if let date = selectedDate {
+                        Text(date, formatter: dateFormatter)
+                            .foregroundColor(.primary)
+                    } else {
+                        Text(placeholder)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .foregroundColor(.gray)
+                }
+                .contentShape(Rectangle())
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            // DatePicker (conditionally visible)
+            if isExpanded {
+                DatePicker(
+                    "",
+                    selection: Binding(
+                        get: { selectedDate ?? Date()},
+                        set: { newValue in
+                            selectedDate = newValue
+                        }
+                    ),
+                    in: ...Date(),
+                    displayedComponents: [.date]
+                )
+                .datePickerStyle(GraphicalDatePickerStyle())
+                .labelsHidden()
+                .padding(.top, 8)
+                .transition(.opacity)
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    // Date Formatter
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .none
         return formatter
     }
 }
