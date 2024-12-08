@@ -101,7 +101,12 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
         }
     }
     @Published var instructorOptions: [Instructor] = []
-    @Published var selectedCapacity: Int? = nil
+    @Published var selectedCapacity: Int? = nil {
+        didSet {
+            guard !isInitializingData else { return }
+            isSaveDisabled = isSaveButtonDisabled()
+        }
+    }
     @Published var maxCapacity: Int = 0
     @Published var isLoading: Bool = false
     @Published var isSaveDisabled: Bool = true
@@ -349,12 +354,19 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
     }
     
     private func isSaveButtonDisabled() -> Bool {
-        guard let date = date else { return true }
+        guard let date = date,
+              let selectedClassType = selectedClassType,
+              let selectedRoom = selectedRoom,
+              let selectedInstructor = selectedInstructor,
+              let selectedCapacity = selectedCapacity else {
+            return true // Disable the button if any field is incomplete
+        }
         
-        return Calendar.current.isDateEqualToMinute(date, fitnessClass.dateTime) &&
-        selectedClassType?.classTypeId == fitnessClass.classType &&
-        selectedRoom?.roomId == fitnessClass.room &&
-        selectedInstructor?.instructorId == fitnessClass.instructor &&
-        selectedCapacity == fitnessClass.capacity
+        // Enable the button only if any value has changed
+        return Calendar.current.isDateEqualToMinute(date, fitnessClass.dateTime)
+                    && selectedClassType.classTypeId == fitnessClass.classType
+                    && selectedRoom.roomId == fitnessClass.room
+                    && selectedInstructor.instructorId == fitnessClass.instructor
+                    && selectedCapacity == fitnessClass.capacity
     }
 }
