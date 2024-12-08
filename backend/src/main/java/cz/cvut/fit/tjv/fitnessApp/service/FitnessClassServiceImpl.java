@@ -157,6 +157,33 @@ public class FitnessClassServiceImpl extends CrudServiceImpl<FitnessClass, Long>
         fitnessClassRepository.save(fitnessClass);
     }
 
+    @Override
+    public void deleteTraineeFromClass(Long fitnessClassId, Long traineeId) {
+        // Fetch the fitness class
+        FitnessClass fitnessClass = fitnessClassRepository.findById(fitnessClassId)
+                .orElseThrow(() -> new IllegalArgumentException("FitnessClass not found"));
+
+        // Fetch the trainee
+        Trainee trainee = traineeRepository.findById(traineeId)
+                .orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
+
+        // Validate that the trainee is enrolled in the class
+        if (!fitnessClass.getTrainees().contains(trainee)) {
+            throw new IllegalArgumentException("Trainee is not enrolled in this class.");
+        }
+
+        // Validate future date
+        validateFutureDateTime(fitnessClass.getDate(), fitnessClass.getTime(), "Cannot deregister from a class in the past.");
+
+        // Remove the trainee from the fitness class
+        fitnessClass.getTrainees().remove(trainee);
+        trainee.getClasses().remove(fitnessClass);
+
+        // Save the updates
+        fitnessClassRepository.save(fitnessClass);
+        traineeRepository.save(trainee);
+    }
+
     // PRIVATE HELPERS
 
     private boolean isRoomAvailable(FitnessClass fitnessClass, Long excludeId) {

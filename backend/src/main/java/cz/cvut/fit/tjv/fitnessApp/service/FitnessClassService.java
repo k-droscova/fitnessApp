@@ -15,4 +15,5 @@ public interface FitnessClassService extends CrudService<FitnessClass, Long> {
     void scheduleClass(FitnessClass fitnessClass);
     void validateAndUpdate(Long id, FitnessClass updatedClass);
     void addTraineeToClass(Long fitnessClassId, Long traineeId);
+    void deleteTraineeFromClass(Long fitnessClassId, Long traineeId);
 }

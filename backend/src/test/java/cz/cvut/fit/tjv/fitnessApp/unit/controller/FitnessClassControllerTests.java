@@ -190,4 +190,22 @@ class FitnessClassControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: FitnessClass not found"));
     }
+
+    @Test
+    void removeTraineeFromClass_ShouldReturnNoContent() throws Exception {
+        Mockito.doNothing().when(fitnessClassService).deleteTraineeFromClass(1L, 2L);
+
+        mockMvc.perform(delete("/fitness-class/1/remove-trainee/2"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void removeTraineeFromClass_ShouldReturnBadRequest_WhenServiceFails() throws Exception {
+        Mockito.doThrow(new IllegalArgumentException("Invalid Trainee or FitnessClass"))
+                .when(fitnessClassService).deleteTraineeFromClass(1L, 2L);
+
+        mockMvc.perform(delete("/fitness-class/1/remove-trainee/2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid Trainee or FitnessClass"));
+    }
 }

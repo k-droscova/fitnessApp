@@ -277,4 +277,43 @@ class FitnessClassControllerIT {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(3)); // Assuming 3 attendees for fitness class 1
     }
+
+    @Test
+    void removeTraineeFromClass_ShouldRemoveTraineeFromFutureClass() throws Exception {
+        // Arrange: Create a FitnessClass in the future
+        LocalDate futureDate = LocalDate.now().plusDays(10); // 10 days from now
+        LocalTime futureTime = LocalTime.of(10, 0); // 10:00 AM
+        FitnessClass futureClass = new FitnessClass();
+        futureClass.setDate(futureDate);
+        futureClass.setTime(futureTime);
+        futureClass.setCapacity(10);
+        futureClass.setInstructor(instructorRepository.findById(1L)
+                .orElseThrow(() -> new AssertionError("Instructor not found")));
+        futureClass.setRoom(roomRepository.findById(1L)
+                .orElseThrow(() -> new AssertionError("Room not found")));
+        futureClass.setClassType(classTypeRepository.findById(1L)
+                .orElseThrow(() -> new AssertionError("ClassType not found")));
+        FitnessClass savedClass = fitnessClassRepository.save(futureClass);
+
+        // Arrange: Add a trainee to the future FitnessClass
+        mockMvc.perform(post("/fitness-class/" + savedClass.getId() + "/add-trainee/1"))
+                .andExpect(status().isNoContent());
+
+        // Act: Remove the trainee from the FitnessClass
+        mockMvc.perform(delete("/fitness-class/" + savedClass.getId() + "/remove-trainee/1"))
+                .andExpect(status().isNoContent());
+
+        // Assert: Verify the trainee is removed from the FitnessClass
+        FitnessClass updatedClass = fitnessClassRepository.findById(savedClass.getId())
+                .orElseThrow(() -> new AssertionError("FitnessClass not found in the database"));
+        assertTrue(updatedClass.getTrainees().stream()
+                .noneMatch(trainee -> trainee.getId().equals(1L)), "Trainee should no longer be enrolled in the FitnessClass");
+
+        // Assert: Verify the FitnessClass is removed from the trainee's list of classes
+        Trainee trainee = traineeRepository.findById(1L)
+                .orElseThrow(() -> new AssertionError("Trainee not found in the database"));
+        assertTrue(trainee.getClasses().stream()
+                        .noneMatch(fitnessClass -> fitnessClass.getId().equals(savedClass.getId())),
+                "FitnessClass should no longer be associated with the trainee");
+    }
 }

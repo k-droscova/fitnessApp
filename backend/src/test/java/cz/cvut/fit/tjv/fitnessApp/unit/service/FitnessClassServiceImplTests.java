@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -328,5 +329,88 @@ class FitnessClassServiceImplTest {
                 () -> fitnessClassService.addTraineeToClass(1L, 1L));
 
         verify(fitnessClassRepository, never()).save(any());
+    }
+
+    @Test
+    void deleteTraineeFromClass_ShouldRemoveTraineeSuccessfully() {
+        // Setup
+        Trainee mockTrainee = new Trainee();
+        mockTrainee.setId(1L);
+
+        mockFitnessClass.getTrainees().add(mockTrainee);
+        mockTrainee.setClasses(new ArrayList<>(List.of(mockFitnessClass)));
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(mockTrainee));
+
+        // Act
+        fitnessClassService.deleteTraineeFromClass(1L, 1L);
+
+        // Assert
+        assertFalse(mockFitnessClass.getTrainees().contains(mockTrainee), "Trainee should have been removed from the class.");
+        assertFalse(mockTrainee.getClasses().contains(mockFitnessClass), "Fitness class should have been removed from the trainee.");
+        verify(fitnessClassRepository).save(mockFitnessClass);
+        verify(traineeRepository).save(mockTrainee);
+    }
+
+    @Test
+    void deleteTraineeFromClass_ShouldThrowException_WhenFitnessClassNotFound() {
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.deleteTraineeFromClass(1L, 1L),
+                "Expected exception when fitness class is not found.");
+
+        verify(fitnessClassRepository, never()).save(any());
+        verify(traineeRepository, never()).save(any());
+    }
+
+    @Test
+    void deleteTraineeFromClass_ShouldThrowException_WhenTraineeNotFound() {
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.deleteTraineeFromClass(1L, 1L),
+                "Expected exception when trainee is not found.");
+
+        verify(fitnessClassRepository, never()).save(any());
+        verify(traineeRepository, never()).save(any());
+    }
+
+    @Test
+    void deleteTraineeFromClass_ShouldThrowException_WhenTraineeNotEnrolled() {
+        Trainee mockTrainee = new Trainee();
+        mockTrainee.setId(1L);
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(mockTrainee));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.deleteTraineeFromClass(1L, 1L),
+                "Expected exception when trainee is not enrolled in the class.");
+
+        verify(fitnessClassRepository, never()).save(any());
+        verify(traineeRepository, never()).save(any());
+    }
+
+    @Test
+    void deleteTraineeFromClass_ShouldThrowException_WhenClassIsInPast() {
+        Trainee mockTrainee = new Trainee();
+        mockTrainee.setId(1L);
+
+        mockFitnessClass.getTrainees().add(mockTrainee);
+        mockFitnessClass.setDate(LocalDate.now().minusDays(1)); // Past date
+        mockFitnessClass.setTime(LocalTime.now().minusHours(1)); // Past time
+
+        when(fitnessClassRepository.findById(1L)).thenReturn(Optional.of(mockFitnessClass));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(mockTrainee));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> fitnessClassService.deleteTraineeFromClass(1L, 1L),
+                "Expected exception when deregistration is attempted for a class in the past.");
+
+        verify(fitnessClassRepository, never()).save(any());
+        verify(traineeRepository, never()).save(any());
     }
 }

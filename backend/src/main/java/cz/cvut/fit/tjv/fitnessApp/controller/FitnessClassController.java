@@ -177,6 +177,26 @@ public class FitnessClassController {
         fitnessClassService.addTraineeToClass(id, traineeId);
     }
 
+    @Operation(summary = "Remove a Trainee from a FitnessClass")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Trainee removed from FitnessClass successfully"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
+            )
+    })
+    @DeleteMapping("/{id}/remove-trainee/{traineeId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeTraineeFromClass(@PathVariable Long id, @PathVariable Long traineeId) {
+        fitnessClassService.deleteTraineeFromClass(id, traineeId);
+    }
+
     @Operation(summary = "Retrieve all trainees enrolled in a FitnessClass")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of trainees retrieved successfully"),
