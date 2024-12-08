@@ -68,6 +68,9 @@ struct InstructorDetailView: View {
         .onAppear {
             viewModel.onAppear()
         }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
         .navigationTitle("Instructor Details")
     }
 }

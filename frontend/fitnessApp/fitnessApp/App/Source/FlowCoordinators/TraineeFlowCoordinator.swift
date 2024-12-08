@@ -89,7 +89,6 @@ extension TraineeFlowCoordinator: TraineeDetailViewFlowDelegate {
     }
     
     func onEditPressed(trainee: Trainee) {
-        dismiss()
         let vm = TraineeEditViewModel(
             dependencies: appDependencies,
             trainee: trainee,
@@ -97,7 +96,7 @@ extension TraineeFlowCoordinator: TraineeDetailViewFlowDelegate {
         )
         self.editViewModel = vm
         let vc = TraineeEditView(viewModel: vm).hosting()
-        presentNewScreen(vc, animated: true)
+        presentSheet(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -114,6 +113,11 @@ extension TraineeFlowCoordinator: TraineeDetailViewFlowDelegate {
             title: "Delete error",
             message: "Error occured while deleting trainee, please try again"
         )
+    }
+    
+    func onDetailDismissed() {
+        self.detailViewModel = nil
+        self.listViewModel?.onAppear()
     }
 }
 
@@ -142,15 +146,14 @@ extension TraineeFlowCoordinator: TraineeAddViewFlowDelegate {
 }
 
 extension TraineeFlowCoordinator: TraineeEditViewFlowDelegate {
-    func onCancelPressed() {
-        popTopScreen(animated: true)
+    func onEditViewDismissed() {
         self.editViewModel = nil
     }
     
     func onUpdateSuccess() {
-        popTopScreen(animated: true)
-        self.addViewModel = nil
-        listViewModel?.onAppear()
+        dismiss()
+        self.editViewModel = nil
+        detailViewModel?.onAppear()
         showSuccessAlert(
             title: "Success",
             message: "Trainee updated successfully"
@@ -215,7 +218,7 @@ extension TraineeFlowCoordinator: TraineeDeregistrationViewFlowDelegate {
     
     func onDeregistrationFailure(message: String) {
         dismiss()
-        self.registrationViewModel = nil // mem leaks
+        self.deregistrationViewModel = nil // mem leaks
         self.detailViewModel?.onAppear()
         showErrorAlert(
             title: "Deregistration Error",

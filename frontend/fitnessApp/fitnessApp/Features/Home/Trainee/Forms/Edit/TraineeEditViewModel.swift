@@ -9,7 +9,7 @@ import Foundation
 
 protocol TraineeEditViewFlowDelegate: NSObject {
     func onLoadError()
-    func onCancelPressed()
+    func onEditViewDismissed()
     func onUpdateSuccess()
     func onUpdateFailure(message: String)
 }
@@ -20,7 +20,7 @@ protocol TraineeEditViewModeling: BaseClass, ObservableObject {
     var email: String { get set }
     var isLoading: Bool { get }
     func onAppear()
-    func onCancelPressed()
+    func onDisappear()
     func onSavePressed()
 }
 
@@ -51,8 +51,8 @@ final class TraineeEditViewModel: BaseClass, TraineeEditViewModeling {
         return
     }
 
-    func onCancelPressed() {
-        delegate?.onCancelPressed()
+    func onDisappear() {
+        delegate?.onEditViewDismissed()
     }
 
     func onSavePressed() {

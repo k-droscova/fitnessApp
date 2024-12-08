@@ -12,23 +12,26 @@ struct TraineeEditView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            CancelAndSaveButtons(
-                cancelAction: viewModel.onCancelPressed,
-                saveAction: viewModel.onSavePressed
-            )
-            .padding(.top, 16)
-
             VStack(spacing: 16) {
                 InputField(label: "First Name", text: $viewModel.name)
                 InputField(label: "Last Name", text: $viewModel.surname)
                 InputField(label: "Email", text: $viewModel.email)
             }
             .padding(.horizontal, 16)
+            .padding(.top, 16)
 
             Spacer()
+            
+            SaveButton(
+                action: viewModel.onSavePressed
+            )
+            .padding(.vertical, 8)
         }
         .onAppear {
             viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
         }
         .overlay {
             if viewModel.isLoading {
