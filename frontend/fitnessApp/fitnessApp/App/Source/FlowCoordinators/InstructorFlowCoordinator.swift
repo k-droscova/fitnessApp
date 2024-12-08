@@ -73,6 +73,7 @@ extension InstructorFlowCoordinator: InstructorListFlowDelegate {
 extension InstructorFlowCoordinator: InstructorDetailViewFlowDelegate {
     func onDetailDismissed() {
         self.detailViewModel = nil
+        self.listViewModel?.onAppear()
     }
     
     func onEditPressed(instructor: Instructor) {

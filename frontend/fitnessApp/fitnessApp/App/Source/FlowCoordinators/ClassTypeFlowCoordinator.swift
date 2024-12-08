@@ -66,6 +66,7 @@ extension ClassTypeFlowCoordinator: ClassTypeListFlowDelegate {
 extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
     func onDetailDismissed() {
         self.detailViewModel = nil
+        self.listViewModel?.onAppear()
     }
     
     func onLoadError() {
