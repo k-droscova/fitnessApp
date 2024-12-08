@@ -40,7 +40,7 @@ final class FitnessClassDetailViewModel: BaseClass, FitnessClassDetailViewModeli
     private let classTypeManager: ClassTypeManaging
     private let instructorManager: InstructorManaging
     private let traineeManager: TraineeManaging
-    private let fitnessClass: FitnessClass
+    private var fitnessClass: FitnessClass
     private weak var delegate: FitnessClassDetailFlowDelegate?
     
     @Published var isLoading: Bool = true
@@ -90,13 +90,19 @@ final class FitnessClassDetailViewModel: BaseClass, FitnessClassDetailViewModeli
             guard let self = self else { return }
             self.isLoading = true
             defer { self.isLoading = false }
+            guard let id = self.fitnessClass.fitnessClassId else {
+                self.delegate?.onLoadError()
+                return
+            }
             do {
+                try await self.refreshFitnessClassDetails(id: id)
                 try await self.fetchDetails()
             } catch {
                 self.delegate?.onLoadError()
             }
         }
     }
+    
     
     func onDisappear() {
         delegate?.onDetailDismissed()
@@ -126,6 +132,16 @@ final class FitnessClassDetailViewModel: BaseClass, FitnessClassDetailViewModeli
     }
     
     // MARK: - Private Helpers
+    
+    private func refreshFitnessClassDetails(id: Int) async throws {
+        // Fetch the updated fitness class details
+        let updatedFitnessClass = try await fitnessClassManager.fetchFitnessClassById(id)
+        
+        // Update the fitnessClass
+        await MainActor.run {
+            self.fitnessClass = updatedFitnessClass
+        }
+    }
     
     private func fetchDetails() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
