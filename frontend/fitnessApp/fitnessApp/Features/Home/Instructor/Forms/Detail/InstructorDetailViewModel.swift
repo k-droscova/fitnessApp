@@ -37,14 +37,14 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
     private let classTypeManager: ClassTypeManaging
     private let fitnessClassManager: FitnessClassManaging
     private weak var delegate: InstructorDetailViewFlowDelegate?
-
+    
     @Published var instructor: Instructor
     @Published var birthday: String = ""
     @Published var specializations: [ClassType] = []
     @Published var pastClasses: [FitnessClass] = []
     @Published var futureClasses: [FitnessClass] = []
     @Published var isLoading: Bool = true
-
+    
     init(
         dependencies: Dependencies,
         instructor: Instructor,
@@ -57,19 +57,20 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
         self.instructor = instructor
         self.delegate = delegate
     }
-
+    
     func onAppear() {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
             self.isLoading = true
             defer { self.isLoading = false }
             
-            guard let _ = self.instructor.instructorId else {
+            guard let id = self.instructor.instructorId else {
                 self.delegate?.onLoadError()
                 return
             }
-            self.birthday = Date.UI.formatDate(self.instructor.birthDate)
+            
             do {
+                try await self.refreshInstructorDetails(id: id)
                 try await self.fetchAllDetails()
             } catch {
                 delegate?.onLoadError()
@@ -80,7 +81,7 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
     func onDisappear() {
         delegate?.onDetailDismissed()
     }
-
+    
     func onDeletePressed() {
         delegate?.showDeleteConfirmation { [weak self] in
             guard let self = self else { return }
@@ -98,13 +99,25 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
             }
         }
     }
-
+    
     func onEditPressed() {
         delegate?.onEditPressed(instructor: instructor)
     }
-
+    
     // MARK: - Private Helpers
-
+    
+    private func refreshInstructorDetails(id: Int) async throws {
+        // Fetch the updated instructor details
+        let updatedInstructor = try await instructorManager.fetchInstructorById(id)
+        
+        // Update the instructor and its birthday
+        await MainActor.run {
+            self.instructor = updatedInstructor
+            self.birthday = Date.UI.formatDate(updatedInstructor.birthDate)
+            self.birthday = Date.UI.formatDate(updatedInstructor.birthDate)
+        }
+    }
+    
     private func fetchAllDetails() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
@@ -116,7 +129,7 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
             try await group.waitForAll()
         }
     }
-
+    
     private func fetchSpecializations() async throws {
         let fetchedSpecializations = try await withThrowingTaskGroup(of: ClassType.self) { group -> [ClassType] in
             for specializationId in instructor.specializations {
@@ -130,7 +143,7 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
             self?.specializations = fetchedSpecializations
         }
     }
-
+    
     private func fetchClasses() async throws {
         let fetchedClasses = try await withThrowingTaskGroup(of: FitnessClass.self) { group -> [FitnessClass] in
             for fitnessClassId in instructor.classes {
@@ -140,7 +153,7 @@ final class InstructorDetailViewModel: BaseClass, InstructorDetailViewModeling {
             }
             return try await group.reduce(into: [FitnessClass]()) { $0.append($1) }
         }
-
+        
         DispatchQueue.main.async { [weak self] in
             self?.pastClasses = fetchedClasses
                 .filter { !Calendar.current.isDateTimeInFuture($0.dateTime) }
