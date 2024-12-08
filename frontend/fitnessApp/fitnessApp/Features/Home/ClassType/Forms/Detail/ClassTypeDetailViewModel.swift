@@ -31,21 +31,21 @@ protocol ClassTypeDetailViewModeling: BaseClass, ObservableObject {
 
 final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
     typealias Dependencies = HasLoggerService & HasClassTypeManager & HasInstructorManager & HasRoomManager & HasFitnessClassManager
-
+    
     private let logger: LoggerServicing
     private let classTypeManager: ClassTypeManaging
     private let instructorManager: InstructorManaging
     private let roomManager: RoomManaging
     private let fitnessClassManager: FitnessClassManaging
     private weak var delegate: ClassTypeDetailViewFlowDelegate?
-
+    
     @Published var isLoading: Bool = true
     @Published var classType: ClassType
     @Published var classTypeName: String = ""
     @Published var instructors: [Instructor] = []
     @Published var rooms: [Room] = []
     @Published var fitnessClasses: [FitnessClass] = []
-
+    
     init(dependencies: Dependencies, classType: ClassType, delegate: ClassTypeDetailViewFlowDelegate? = nil) {
         self.logger = dependencies.logger
         self.instructorManager = dependencies.instructorManager
@@ -55,18 +55,18 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
         self.classType = classType
         self.delegate = delegate
     }
-
+    
     func onAppear() {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
             self.isLoading = true
             defer { self.isLoading = false }
-            guard self.classType.classTypeId != nil else {
+            guard let id = self.classType.classTypeId else {
                 self.delegate?.onLoadError()
                 return
             }
-            self.classTypeName = self.classType.name
             do {
+                try await self.refreshClassTypeDetails(id: id)
                 try await self.fetchAllDetails()
             } catch {
                 delegate?.onLoadError()
@@ -77,7 +77,7 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
     func onDisappear() {
         delegate?.onDetailDismissed()
     }
-
+    
     func deleteButtonPressed() {
         delegate?.showDeleteConfirmation { [weak self] in
             guard let self = self else { return }
@@ -96,13 +96,24 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             }
         }
     }
-
+    
     func editButtonPressed() {
         delegate?.onEditPressed(classType: classType)
     }
-
+    
     // MARK: - Private Helpers
-
+    
+    private func refreshClassTypeDetails(id: Int) async throws {
+        // Fetch the updated class type details
+        let updatedClassType = try await classTypeManager.fetchClassTypeById(id)
+        
+        // Update the classType and its name
+        await MainActor.run {
+            self.classType = updatedClassType
+            self.classTypeName = updatedClassType.name
+        }
+    }
+    
     private func fetchAllDetails() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
@@ -117,7 +128,7 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             try await group.waitForAll()
         }
     }
-
+    
     private func fetchInstructorsForClassType() async throws {
         let fetchedInstructors = try await withThrowingTaskGroup(of: Instructor.self) { group -> [Instructor] in
             for instructorId in classType.instructors {
@@ -131,7 +142,7 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             self?.instructors = fetchedInstructors
         }
     }
-
+    
     private func fetchRoomsForClassType() async throws {
         let fetchedRooms = try await withThrowingTaskGroup(of: Room.self) { group -> [Room] in
             for roomId in classType.rooms {
@@ -145,7 +156,7 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
             self?.rooms = fetchedRooms
         }
     }
-
+    
     private func fetchFitnessClassesForClassType() async throws {
         let fetchedFitnessClasses = try await withThrowingTaskGroup(of: FitnessClass.self) { group -> [FitnessClass] in
             for fitnessClassId in classType.fitnessClasses {
