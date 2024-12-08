@@ -300,7 +300,7 @@ class FitnessClassControllerIT {
                 .andExpect(status().isNoContent());
 
         // Act: Remove the trainee from the FitnessClass
-        mockMvc.perform(delete("/fitness-class/" + savedClass.getId() + "/remove-trainee/1"))
+        mockMvc.perform(post("/fitness-class/" + savedClass.getId() + "/remove-trainee/1"))
                 .andExpect(status().isNoContent());
 
         // Assert: Verify the trainee is removed from the FitnessClass

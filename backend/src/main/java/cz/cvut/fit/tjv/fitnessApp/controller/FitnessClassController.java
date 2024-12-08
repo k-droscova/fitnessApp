@@ -191,7 +191,7 @@ public class FitnessClassController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseImpl.class))
             )
     })
-    @DeleteMapping("/{id}/remove-trainee/{traineeId}")
+    @PostMapping("/{id}/remove-trainee/{traineeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTraineeFromClass(@PathVariable Long id, @PathVariable Long traineeId) {
         fitnessClassService.deleteTraineeFromClass(id, traineeId);

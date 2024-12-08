@@ -195,7 +195,7 @@ class FitnessClassControllerTest {
     void removeTraineeFromClass_ShouldReturnNoContent() throws Exception {
         Mockito.doNothing().when(fitnessClassService).deleteTraineeFromClass(1L, 2L);
 
-        mockMvc.perform(delete("/fitness-class/1/remove-trainee/2"))
+        mockMvc.perform(post("/fitness-class/1/remove-trainee/2"))
                 .andExpect(status().isNoContent());
     }
 
@@ -204,7 +204,7 @@ class FitnessClassControllerTest {
         Mockito.doThrow(new IllegalArgumentException("Invalid Trainee or FitnessClass"))
                 .when(fitnessClassService).deleteTraineeFromClass(1L, 2L);
 
-        mockMvc.perform(delete("/fitness-class/1/remove-trainee/2"))
+        mockMvc.perform(post("/fitness-class/1/remove-trainee/2"))
                 .andExpect(status().isBadRequest())
                 .andExpect(ErrorMatcher.matchesErrorMessage("Invalid argument: Invalid Trainee or FitnessClass"));
     }
