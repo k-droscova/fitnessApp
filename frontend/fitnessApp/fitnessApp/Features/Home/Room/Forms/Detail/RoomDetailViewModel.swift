@@ -30,19 +30,19 @@ protocol RoomDetailViewModeling: BaseClass, ObservableObject {
 
 final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
     typealias Dependencies = HasLoggerService & HasRoomManager & HasClassTypeManager & HasFitnessClassManager
-
+    
     private let logger: LoggerServicing
     private let roomManager: RoomManaging
     private let classTypeManager: ClassTypeManaging
     private let fitnessClassManager: FitnessClassManaging
     private weak var delegate: RoomDetailViewFlowDelegate?
-
+    
     @Published var room: Room
     @Published var classTypes: [ClassType] = []
     @Published var pastClasses: [FitnessClass] = []
     @Published var futureClasses: [FitnessClass] = []
     @Published var isLoading: Bool = true
-
+    
     init(
         dependencies: Dependencies,
         room: Room,
@@ -55,19 +55,20 @@ final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
         self.room = room
         self.delegate = delegate
     }
-
+    
     func onAppear() {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
             self.isLoading = true
             defer { self.isLoading = false }
-
-            guard let _ = self.room.roomId else {
+            
+            guard let id = self.room.roomId else {
                 self.delegate?.onLoadError()
                 return
             }
-
+            
             do {
+                try await self.refreshRoomDetails(id: id)
                 try await self.fetchAllDetails()
             } catch {
                 delegate?.onLoadError()
@@ -78,11 +79,11 @@ final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
     func onDisappear() {
         delegate?.onDetailDismissed()
     }
-
+    
     func onEditPressed() {
         delegate?.onEditPressed(room: room)
     }
-
+    
     func onDeletePressed() {
         delegate?.showDeleteConfirmation { [weak self] in
             guard let self = self else { return }
@@ -100,9 +101,19 @@ final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
             }
         }
     }
-
+    
     // MARK: - Private Helpers
-
+    
+    private func refreshRoomDetails(id: Int) async throws {
+        // Fetch the updated room details
+        let updatedRoom = try await roomManager.fetchRoomById(id)
+        
+        // Update the room details
+        await MainActor.run {
+            self.room = updatedRoom
+        }
+    }
+    
     private func fetchAllDetails() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
@@ -114,7 +125,7 @@ final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
             try await group.waitForAll()
         }
     }
-
+    
     private func fetchClassTypes() async throws {
         let fetchedClassTypes = try await withThrowingTaskGroup(of: ClassType.self) { group -> [ClassType] in
             for classTypeId in room.classTypes {
@@ -128,7 +139,7 @@ final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
             self?.classTypes = fetchedClassTypes
         }
     }
-
+    
     private func fetchClasses() async throws {
         let fetchedClasses = try await withThrowingTaskGroup(of: FitnessClass.self) { group -> [FitnessClass] in
             for fitnessClassId in room.classes {
@@ -138,13 +149,13 @@ final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
             }
             return try await group.reduce(into: [FitnessClass]()) { $0.append($1) }
         }
-
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.pastClasses = fetchedClasses
                 .filter { !Calendar.current.isDateTimeInFuture($0.dateTime) }
                 .sorted(by: { $0.dateTime > $1.dateTime })
-
+            
             self.futureClasses = fetchedClasses
                 .filter { Calendar.current.isDateTimeInFuture($0.dateTime) }
                 .sorted(by: { $0.dateTime < $1.dateTime })

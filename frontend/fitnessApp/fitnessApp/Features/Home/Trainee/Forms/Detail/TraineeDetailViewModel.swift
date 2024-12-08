@@ -63,12 +63,13 @@ final class TraineeDetailViewModel: BaseClass, TraineeDetailViewModeling {
             self.isLoading = true
             defer { self.isLoading = false }
             
-            guard self.trainee.traineeId != nil else {
+            guard let id = self.trainee.traineeId else {
                 self.delegate?.onLoadError()
                 return
             }
             
             do {
+                try await self.refreshTraineeDetails(id: id)
                 try await self.fetchClasses()
             } catch {
                 self.delegate?.onLoadError()
@@ -111,6 +112,16 @@ final class TraineeDetailViewModel: BaseClass, TraineeDetailViewModeling {
     }
     
     // MARK: - Private Helpers
+    
+    private func refreshTraineeDetails(id: Int) async throws {
+        // Fetch the updated trainee details
+        let updatedTrainee = try await traineeManager.fetchTraineeById(id)
+        
+        // Update the trainee details
+        await MainActor.run {
+            self.trainee = updatedTrainee
+        }
+    }
     
     private func fetchClasses() async throws {
         guard let id = self.trainee.traineeId else {
