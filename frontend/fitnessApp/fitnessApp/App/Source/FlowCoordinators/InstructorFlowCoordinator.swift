@@ -42,9 +42,6 @@ final class InstructorFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowC
 
 extension InstructorFlowCoordinator: InstructorListFlowDelegate {
     func onDetailTapped(with instructor: Instructor) {
-        if self.detailViewModel != nil {
-            self.detailViewModel = nil // prevents mem leaks
-        }
         let vm = InstructorDetailViewModel(
             dependencies: appDependencies,
             instructor: instructor,
@@ -74,8 +71,11 @@ extension InstructorFlowCoordinator: InstructorListFlowDelegate {
 }
 
 extension InstructorFlowCoordinator: InstructorDetailViewFlowDelegate {
+    func onDetailDismissed() {
+        self.detailViewModel = nil
+    }
+    
     func onEditPressed(instructor: Instructor) {
-        dismiss()
         let vm = InstructorEditViewModel(
             dependencies: appDependencies,
             instructor: instructor,
@@ -83,7 +83,7 @@ extension InstructorFlowCoordinator: InstructorDetailViewFlowDelegate {
         )
         self.editViewModel = vm
         let vc = InstructorEditView(viewModel: vm).hosting()
-        presentNewScreen(vc, animated: true)
+        presentSheet(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -128,15 +128,14 @@ extension InstructorFlowCoordinator: InstructorAddViewFlowDelegate {
 }
 
 extension InstructorFlowCoordinator: InstructorEditViewFlowDelegate {
-    func onCancelPressed() {
-        popTopScreen(animated: true)
+    func onEditViewDismissed() {
         self.editViewModel = nil
     }
     
     func onUpdateSuccess() {
-        popTopScreen(animated: true)
-        self.addViewModel = nil
-        listViewModel?.onAppear()
+        dismiss()
+        self.editViewModel = nil
+        detailViewModel?.onAppear()
         showSuccessAlert(
             title: "Success",
             message: "Instructor updated successfully"

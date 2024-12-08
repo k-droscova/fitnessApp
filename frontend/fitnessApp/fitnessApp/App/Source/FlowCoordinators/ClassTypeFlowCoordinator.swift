@@ -129,9 +129,9 @@ extension ClassTypeFlowCoordinator: ClassTypeAddViewFlowDelegate {
 
 extension ClassTypeFlowCoordinator: ClassTypeEditViewFlowDelegate {
     func onUpdateSuccess() {
-        popTopScreen(animated: true)
-        self.addViewModel = nil
-        listViewModel?.onAppear()
+        dismiss()
+        self.editViewModel = nil
+        detailViewModel?.onAppear()
         showSuccessAlert(
             title: "Success",
             message: "Class type updated successfully"

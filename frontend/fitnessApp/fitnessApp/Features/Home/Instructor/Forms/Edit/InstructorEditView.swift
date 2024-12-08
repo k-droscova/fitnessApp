@@ -12,19 +12,13 @@ struct InstructorEditView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            // Header with Cancel and Save buttons
-            CancelAndSaveButtons(
-                cancelAction: viewModel.onCancelPressed,
-                saveAction: viewModel.onSavePressed
-            )
-            .padding(.top, 16)
-            
             // Input Fields for Name and Surname
             VStack(spacing: 16) {
                 InputField(label: "First Name", text: $viewModel.name)
                 InputField(label: "Last Name", text: $viewModel.surname)
             }
             .padding(.horizontal, 16)
+            .padding(.top, 16)
             
             // Expandable Birthday Picker
             ExpandableBirthdayPicker(
@@ -41,9 +35,17 @@ struct InstructorEditView: View {
             }
             
             Spacer()
+            
+            SaveButton(
+                action: viewModel.onSavePressed
+            )
+            .padding(.vertical, 8)
         }
         .onAppear {
             viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
         }
         .overlay {
             if viewModel.isLoading {

@@ -9,7 +9,7 @@ import Foundation
 
 protocol InstructorEditViewFlowDelegate: NSObject {
     func onLoadError()
-    func onCancelPressed()
+    func onEditViewDismissed()
     func onUpdateSuccess()
     func onUpdateFailure(message: String)
 }
@@ -21,7 +21,7 @@ protocol InstructorEditViewModeling: BaseClass, ObservableObject {
     var specializations: [SelectableItem<ClassType>] { get set }
     var isLoading: Bool { get set }
     func onAppear()
-    func onCancelPressed()
+    func onDisappear()
     func onSavePressed()
 }
 
@@ -65,8 +65,8 @@ final class InstructorEditViewModel: BaseClass, InstructorEditViewModeling {
         }
     }
 
-    func onCancelPressed() {
-        delegate?.onCancelPressed()
+    func onDisappear() {
+        delegate?.onEditViewDismissed()
     }
 
     func onSavePressed() {
