@@ -24,6 +24,7 @@ protocol FitnessClassManaging {
     func updateFitnessClass(_ id: Int, _ newFitnessClass: FitnessClass) async throws
     func deleteFitnessClass(_ id: Int) async throws
     func addTraineeToFitnessClass(_ id: Int, _ traineeId: Int) async throws
+    func deleteTraineeFromFitnessClass(_ id: Int, _ traineeId: Int) async throws
 }
 
 final class FitnessClassManager: BaseClass, FitnessClassManaging {
@@ -80,5 +81,9 @@ final class FitnessClassManager: BaseClass, FitnessClassManaging {
     
     func addTraineeToFitnessClass(_ id: Int, _ traineeId: Int) async throws {
         try await fitnessClassAPIService.addTraineeToFitnessClass(id, traineeId)
+    }
+    
+    func deleteTraineeFromFitnessClass(_ id: Int, _ traineeId: Int) async throws {
+        try await fitnessClassAPIService.deleteTraineeFromFitnessClass(id, traineeId)
     }
 }

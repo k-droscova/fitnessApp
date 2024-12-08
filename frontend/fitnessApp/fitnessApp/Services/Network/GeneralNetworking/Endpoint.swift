@@ -82,6 +82,8 @@ enum Endpoint: Endpointing {
                 return "/fitness-class/\(id)"
             case .addTrainee(let id, let traineeId):
                 return "/fitness-class/\(id)/add-trainee/\(traineeId)"
+            case .deleteTrainee(let id, let traineeId):
+                return "/fitness-class/\(id)/remove-trainee/\(traineeId)"
             case .getTrainees(let id):
                 return "/fitness-class/\(id)/trainees"
             case .getByFilter(let date, let startTime, let endTime, let roomId):
@@ -206,6 +208,7 @@ extension Endpoint {
         case update(id: Int)
         case delete(id: Int)
         case addTrainee(id: Int, traineeId: Int)
+        case deleteTrainee(id: Int, traineeId: Int)
         case getTrainees(id: Int)
         case getByFilter(date: String?, startTime: String?, endTime: String?, roomId: Int?)
     }

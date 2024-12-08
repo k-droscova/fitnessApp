@@ -18,6 +18,7 @@ final class TraineeFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCoor
     private var addViewModel: TraineeAddViewModel?
     private var editViewModel: TraineeEditViewModel?
     private var registrationViewModel: TraineeRegistrationViewModel?
+    private var deregistrationViewModel: TraineeDeregistrationViewModel?
 
     init(delegate: TraineeFlowCoordinatorDelegate? = nil) {
         self.delegate = delegate
@@ -190,6 +191,39 @@ extension TraineeFlowCoordinator: TraineeRegistrationViewFlowDelegate {
     }
     
     func onUnregisterPressed(trainee: Trainee) {
-        print("Unregister pressed")
+        let vm = TraineeDeregistrationViewModel(
+            dependencies: appDependencies,
+            trainee: trainee,
+            delegate: self
+        )
+        self.deregistrationViewModel = vm
+        let vc = TraineeDeregistrationView(viewModel: vm).hosting()
+        presentSheet(vc, animated: true)
+    }
+}
+
+extension TraineeFlowCoordinator: TraineeDeregistrationViewFlowDelegate {
+    func onDeregistrationSuccess() {
+        dismiss()
+        self.deregistrationViewModel = nil // mem leaks
+        self.detailViewModel?.onAppear()
+        showSuccessAlert(
+            title: "Success",
+            message: "Deregistration successful"
+        )
+    }
+    
+    func onDeregistrationFailure(message: String) {
+        dismiss()
+        self.registrationViewModel = nil // mem leaks
+        self.detailViewModel?.onAppear()
+        showErrorAlert(
+            title: "Deregistration Error",
+            message: message
+        )
+    }
+    
+    func onDeregistrationDismiss() {
+        self.deregistrationViewModel = nil
     }
 }

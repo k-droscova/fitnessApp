@@ -19,6 +19,7 @@ protocol FitnessClassAPIServicing {
     func updateFitnessClass(_ id: Int, _ newFitnessClass: FitnessClass) async throws
     func deleteFitnessClass(_ id: Int) async throws
     func addTraineeToFitnessClass(_ id: Int, _ traineeId: Int) async throws
+    func deleteTraineeFromFitnessClass(_ id: Int, _ traineeId: Int) async throws
     func getTraineesForFitnessClass(_ id: Int) async throws -> [Int]
 }
 
@@ -93,6 +94,14 @@ final class FitnessClassAPIService: BaseClass, FitnessClassAPIServicing {
     func addTraineeToFitnessClass(_ id: Int, _ traineeId: Int) async throws {
         _ = try await network.performAuthorizedRequest(
             endpoint: Endpoint.fitnessClass(.addTrainee(id: id, traineeId: traineeId)),
+            method: .POST,
+            errorObject: APIResponseError.self
+        ) as EmptyResponse
+    }
+    
+    func deleteTraineeFromFitnessClass(_ id: Int, _ traineeId: Int) async throws {
+        _ = try await network.performAuthorizedRequest(
+            endpoint: Endpoint.fitnessClass(.deleteTrainee(id: id, traineeId: traineeId)),
             method: .POST,
             errorObject: APIResponseError.self
         ) as EmptyResponse

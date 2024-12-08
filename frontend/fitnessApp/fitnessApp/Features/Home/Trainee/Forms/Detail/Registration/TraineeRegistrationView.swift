@@ -57,7 +57,6 @@ struct TraineeRegistrationView: View {
             }) {
                 Text("Register")
                     .font(.headline)
-                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(viewModel.isRegisteredButtonDisabled ? Color.gray : Color.blue)
                     .foregroundColor(.white)
@@ -69,6 +68,9 @@ struct TraineeRegistrationView: View {
         }
         .onAppear {
             viewModel.onAppear()
+        }
+        .onDisappear{
+            viewModel.onDisappear()
         }
         .overlay {
             if viewModel.isLoading {
