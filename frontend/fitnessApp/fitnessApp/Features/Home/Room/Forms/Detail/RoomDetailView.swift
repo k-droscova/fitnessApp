@@ -67,6 +67,9 @@ struct RoomDetailView: View {
         .onAppear {
             viewModel.onAppear()
         }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
         .navigationTitle("Room Details")
     }
 }

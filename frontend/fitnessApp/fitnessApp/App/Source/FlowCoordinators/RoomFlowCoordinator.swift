@@ -74,8 +74,12 @@ extension RoomFlowCoordinator: RoomListFlowDelegate {
 }
 
 extension RoomFlowCoordinator: RoomDetailViewFlowDelegate {
+    func onDetailDismissed() {
+        self.detailViewModel = nil
+        self.listViewModel?.onAppear()
+    }
+    
     func onEditPressed(room: Room) {
-        dismiss()
         let vm = RoomEditViewModel(
             dependencies: appDependencies,
             room: room,
@@ -83,7 +87,7 @@ extension RoomFlowCoordinator: RoomDetailViewFlowDelegate {
         )
         self.editViewModel = vm
         let vc = RoomEditView(viewModel: vm).hosting()
-        presentNewScreen(vc, animated: true)
+        presentSheet(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -128,15 +132,14 @@ extension RoomFlowCoordinator: RoomAddViewFlowDelegate {
 }
 
 extension RoomFlowCoordinator: RoomEditViewFlowDelegate {
-    func onCancelPressed() {
-        popTopScreen(animated: true)
+    func onEditViewDismissed() {
         self.editViewModel = nil
     }
     
     func onUpdateSuccess() {
-        popTopScreen(animated: true)
-        self.addViewModel = nil
-        listViewModel?.onAppear()
+        dismiss()
+        self.editViewModel = nil
+        detailViewModel?.onAppear()
         showSuccessAlert(
             title: "Success",
             message: "Room updated successfully"

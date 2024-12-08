@@ -12,13 +12,6 @@ struct RoomEditView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            // Header with Cancel and Save buttons
-            CancelAndSaveButtons(
-                cancelAction: viewModel.onCancelPressed,
-                saveAction: viewModel.onSavePressed
-            )
-            .padding(.top, 16)
-
             // Capacity Picker
             CapacityPicker(
                 selectedCapacity: $viewModel.maxCapacity,
@@ -26,6 +19,7 @@ struct RoomEditView: View {
                 placeholder: "Select Capacity"
             )
             .padding(.horizontal, 16)
+            .padding(.top, 16)
 
             ScrollView {
                 VStack(spacing: 16) {
@@ -36,9 +30,17 @@ struct RoomEditView: View {
             }
 
             Spacer()
+            
+            SaveButton(
+                action: viewModel.onSavePressed
+            )
+            .padding(.vertical, 8)
         }
         .onAppear {
             viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
         }
         .overlay {
             if viewModel.isLoading {

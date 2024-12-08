@@ -13,6 +13,7 @@ protocol RoomDetailViewFlowDelegate: NSObject {
     func onDeleteSuccess()
     func onDeleteFailure()
     func showDeleteConfirmation(_ confirmAction: @escaping () -> Void)
+    func onDetailDismissed()
 }
 
 protocol RoomDetailViewModeling: BaseClass, ObservableObject {
@@ -22,6 +23,7 @@ protocol RoomDetailViewModeling: BaseClass, ObservableObject {
     var futureClasses: [FitnessClass] { get }
     var isLoading: Bool { get }
     func onAppear()
+    func onDisappear()
     func onEditPressed()
     func onDeletePressed()
 }
@@ -71,6 +73,10 @@ final class RoomDetailViewModel: BaseClass, RoomDetailViewModeling {
                 delegate?.onLoadError()
             }
         }
+    }
+    
+    func onDisappear() {
+        delegate?.onDetailDismissed()
     }
 
     func onEditPressed() {

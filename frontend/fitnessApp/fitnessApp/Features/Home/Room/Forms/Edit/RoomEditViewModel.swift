@@ -9,7 +9,7 @@ import Foundation
 
 protocol RoomEditViewFlowDelegate: NSObject {
     func onLoadError()
-    func onCancelPressed()
+    func onEditViewDismissed()
     func onUpdateSuccess()
     func onUpdateFailure(message: String)
 }
@@ -19,7 +19,7 @@ protocol RoomEditViewModeling: BaseClass, ObservableObject {
     var classTypes: [SelectableItem<ClassType>] { get set }
     var isLoading: Bool { get set }
     func onAppear()
-    func onCancelPressed()
+    func onDisappear()
     func onSavePressed()
 }
 
@@ -59,8 +59,8 @@ final class RoomEditViewModel: BaseClass, RoomEditViewModeling {
         }
     }
     
-    func onCancelPressed() {
-        delegate?.onCancelPressed()
+    func onDisappear() {
+        delegate?.onEditViewDismissed()
     }
     
     func onSavePressed() {
