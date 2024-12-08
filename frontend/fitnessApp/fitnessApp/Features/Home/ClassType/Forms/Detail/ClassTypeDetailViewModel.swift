@@ -13,6 +13,7 @@ protocol ClassTypeDetailViewFlowDelegate: NSObject {
     func onDeleteSuccess()
     func onDeleteFailure()
     func showDeleteConfirmation(_ confirmAction: @escaping () -> Void)
+    func onDetailDismissed()
 }
 
 protocol ClassTypeDetailViewModeling: BaseClass, ObservableObject {
@@ -23,6 +24,7 @@ protocol ClassTypeDetailViewModeling: BaseClass, ObservableObject {
     var fitnessClasses: [FitnessClass] { get set }
     var isLoading: Bool { get set }
     func onAppear()
+    func onDisappear()
     func deleteButtonPressed()
     func editButtonPressed()
 }
@@ -70,6 +72,10 @@ final class ClassTypeDetailViewModel: BaseClass, ClassTypeDetailViewModeling {
                 delegate?.onLoadError()
             }
         }
+    }
+    
+    func onDisappear() {
+        delegate?.onDetailDismissed()
     }
 
     func deleteButtonPressed() {

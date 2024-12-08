@@ -42,9 +42,6 @@ final class ClassTypeFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlowCo
 
 extension ClassTypeFlowCoordinator: ClassTypeListFlowDelegate {
     func onDetailTapped(with classType: ClassType) {
-        if self.detailViewModel != nil {
-            self.detailViewModel = nil // prevents mem leaks
-        }
         let vm = ClassTypeDetailViewModel(
             dependencies: appDependencies,
             classType: classType,
@@ -67,6 +64,10 @@ extension ClassTypeFlowCoordinator: ClassTypeListFlowDelegate {
 }
 
 extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
+    func onDetailDismissed() {
+        self.detailViewModel = nil
+    }
+    
     func onLoadError() {
         showErrorAlert(
             title: "Error",
@@ -75,7 +76,6 @@ extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
     }
     
     func onEditPressed(classType: ClassType) {
-        dismiss()
         let vm = ClassTypeEditViewModel(
             dependencies: appDependencies,
             classType: classType,
@@ -83,7 +83,7 @@ extension ClassTypeFlowCoordinator: ClassTypeDetailViewFlowDelegate {
         )
         self.editViewModel = vm
         let vc = ClassTypeEditView(viewModel: vm).hosting()
-        presentNewScreen(vc, animated: true)
+        presentSheet(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -128,11 +128,6 @@ extension ClassTypeFlowCoordinator: ClassTypeAddViewFlowDelegate {
 }
 
 extension ClassTypeFlowCoordinator: ClassTypeEditViewFlowDelegate {
-    func onCancelPressed() {
-        popTopScreen(animated: true)
-        self.editViewModel = nil
-    }
-    
     func onUpdateSuccess() {
         popTopScreen(animated: true)
         self.addViewModel = nil
@@ -148,5 +143,9 @@ extension ClassTypeFlowCoordinator: ClassTypeEditViewFlowDelegate {
             title: "Update error",
             message: message
         )
+    }
+    
+    func onEditViewDismissed() {
+        self.editViewModel = nil
     }
 }

@@ -61,6 +61,9 @@ struct ClassTypeDetailView: View {
         .onAppear {
             viewModel.onAppear()
         }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
         .navigationTitle("Class Type Details")
     }
 }
