@@ -9,7 +9,7 @@ import Foundation
 
 protocol FitnessClassEditViewFlowDelegate: NSObject {
     func onLoadError()
-    func onCancelPressed()
+    func onEditViewDismissed()
     func onUpdateSuccess()
     func onUpdateFailure(message: String)
 }
@@ -41,7 +41,7 @@ protocol FitnessClassEditViewModeling: BaseClass, ObservableObject {
     var isLoading: Bool { get }
     var isSaveDisabled: Bool { get }
     func onAppear()
-    func onCancelPressed()
+    func onDisappear()
     func onSavePressed()
 }
 
@@ -142,8 +142,8 @@ final class FitnessClassEditViewModel: BaseClass, FitnessClassEditViewModeling {
         }
     }
     
-    func onCancelPressed() {
-        delegate?.onCancelPressed()
+    func onDisappear() {
+        delegate?.onEditViewDismissed()
     }
     
     func onSavePressed() {

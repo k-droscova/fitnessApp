@@ -13,6 +13,7 @@ protocol FitnessClassDetailFlowDelegate: NSObject {
     func onDeleteSuccess()
     func onDeleteFailure()
     func showDeleteConfirmation(_ confirmAction: @escaping () -> Void)
+    func onDetailDismissed()
 }
 
 protocol FitnessClassDetailViewModeling: BaseClass, ObservableObject {
@@ -26,6 +27,7 @@ protocol FitnessClassDetailViewModeling: BaseClass, ObservableObject {
     var trainees: [Trainee] { get }
     var isLoading: Bool { get set }
     func onAppear()
+    func onDisappear()
     func onEditPressed()
     func onDeletePressed()
 }
@@ -94,6 +96,10 @@ final class FitnessClassDetailViewModel: BaseClass, FitnessClassDetailViewModeli
                 self.delegate?.onLoadError()
             }
         }
+    }
+    
+    func onDisappear() {
+        delegate?.onDetailDismissed()
     }
     
     func onEditPressed() {

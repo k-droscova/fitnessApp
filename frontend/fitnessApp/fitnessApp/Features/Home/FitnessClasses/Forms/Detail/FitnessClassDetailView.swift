@@ -78,6 +78,9 @@ struct FitnessClassDetailView: View {
         .onAppear {
             viewModel.onAppear()
         }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
         .overlay {
             if viewModel.isLoading {
                 CustomProgressView()

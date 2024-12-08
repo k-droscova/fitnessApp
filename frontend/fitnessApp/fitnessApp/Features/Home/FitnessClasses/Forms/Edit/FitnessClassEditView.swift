@@ -12,15 +12,6 @@ struct FitnessClassEditView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            // Header with Cancel and Save buttons
-            CancelAndSaveButtons(
-                cancelAction: viewModel.onCancelPressed,
-                saveAction: viewModel.onSavePressed,
-                isSaveDisabled: viewModel.isSaveDisabled
-            )
-            .padding(.vertical, 16)
-            .padding(.horizontal, 16)
-            
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // Date and Time Picker
@@ -70,13 +61,23 @@ struct FitnessClassEditView: View {
                     
                     Spacer()
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
             }
             
             Spacer()
+            
+            SaveButton(
+                action: viewModel.onSavePressed,
+                isDisabled: viewModel.isSaveDisabled
+            )
+            .padding(.vertical, 8)
         }
         .onAppear {
             viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
         }
         .overlay {
             if viewModel.isLoading {

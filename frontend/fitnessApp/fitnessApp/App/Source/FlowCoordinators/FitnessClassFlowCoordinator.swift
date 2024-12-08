@@ -42,9 +42,6 @@ final class FitnessClassFlowCoordinator: Base.FlowCoordinatorNoDeepLink, BaseFlo
 
 extension FitnessClassFlowCoordinator: FitnessClassListFlowDelegate {
     func onDetailTapped(with fitnessClass: FitnessClass) {
-        if self.detailViewModel != nil {
-            self.detailViewModel = nil // prevents mem leaks
-        }
         let vm = FitnessClassDetailViewModel(
             dependencies: appDependencies,
             fitnessClass: fitnessClass,
@@ -74,8 +71,12 @@ extension FitnessClassFlowCoordinator: FitnessClassListFlowDelegate {
 }
 
 extension FitnessClassFlowCoordinator: FitnessClassDetailFlowDelegate {
+    func onDetailDismissed() {
+        self.detailViewModel = nil
+        self.listViewModel?.onAppear()
+    }
+    
     func onEditPressed(fitnessClass: FitnessClass) {
-        dismiss()
         let vm = FitnessClassEditViewModel(
             dependencies: appDependencies,
             fitnessClass: fitnessClass,
@@ -83,7 +84,7 @@ extension FitnessClassFlowCoordinator: FitnessClassDetailFlowDelegate {
         )
         self.editViewModel = vm
         let vc = FitnessClassEditView(viewModel: vm).hosting()
-        presentNewScreen(vc, animated: true)
+        presentSheet(vc, animated: true)
     }
     
     func onDeleteSuccess() {
@@ -128,15 +129,14 @@ extension FitnessClassFlowCoordinator: FitnessClassAddViewFlowDelegate {
 }
 
 extension FitnessClassFlowCoordinator: FitnessClassEditViewFlowDelegate {
-    func onCancelPressed() {
-        popTopScreen(animated: true)
+    func onEditViewDismissed() {
         self.editViewModel = nil
     }
     
     func onUpdateSuccess() {
-        popTopScreen(animated: true)
-        self.addViewModel = nil
-        listViewModel?.onAppear()
+        dismiss()
+        self.editViewModel = nil
+        detailViewModel?.onAppear()
         showSuccessAlert(
             title: "Success",
             message: "Fitness class updated successfully"
