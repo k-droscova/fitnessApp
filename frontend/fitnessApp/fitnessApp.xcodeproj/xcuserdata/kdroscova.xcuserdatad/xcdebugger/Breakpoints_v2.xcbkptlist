@@ -18,6 +18,64 @@
             endingLineNumber = "85"
             landmarkName = "searchByClassTypeName(classTypeName:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "CAE92B0C-E4D7-4E13-B4C8-5053F2C5D3F0 - 86993b67f6ebe8cc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for fitnessApp.RoomAPIService.searchByClassTypeName(classTypeName: Swift.String) async throws -&gt; Swift.Array&lt;fitnessApp.Room&gt;"
+                  moduleName = "fitnessApp.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kdroscova/Dev/School/TJV/semestralka/tjv/frontend/fitnessApp/fitnessApp/Services/Network/APIService/RoomAPIService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "85"
+                  endingLineNumber = "85">
+               </Location>
+               <Location
+                  uuid = "CAE92B0C-E4D7-4E13-B4C8-5053F2C5D3F0 - a32696f3b502f2a7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for fitnessApp.RoomAPIService.searchByClassTypeName(classTypeName: Swift.String) async throws -&gt; Swift.Array&lt;fitnessApp.Room&gt;"
+                  moduleName = "fitnessApp.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kdroscova/Dev/School/TJV/semestralka/tjv/frontend/fitnessApp/fitnessApp/Services/Network/APIService/RoomAPIService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "85"
+                  endingLineNumber = "85">
+               </Location>
+               <Location
+                  uuid = "CAE92B0C-E4D7-4E13-B4C8-5053F2C5D3F0 - 3f47c7f1e76724c6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for fitnessApp.RoomAPIService.searchByClassTypeName(classTypeName: Swift.String) async throws -&gt; Swift.Array&lt;fitnessApp.Room&gt;"
+                  moduleName = "fitnessApp.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kdroscova/Dev/School/TJV/semestralka/tjv/frontend/fitnessApp/fitnessApp/Services/Network/APIService/RoomAPIService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "85"
+                  endingLineNumber = "85">
+               </Location>
+               <Location
+                  uuid = "CAE92B0C-E4D7-4E13-B4C8-5053F2C5D3F0 - f3d14c06ec193ac5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for fitnessApp.RoomAPIService.searchByClassTypeName(classTypeName: Swift.String) async throws -&gt; Swift.Array&lt;fitnessApp.Room&gt;"
+                  moduleName = "fitnessApp.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kdroscova/Dev/School/TJV/semestralka/tjv/frontend/fitnessApp/fitnessApp/Services/Network/APIService/RoomAPIService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "85"
+                  endingLineNumber = "85">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

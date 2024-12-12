@@ -123,8 +123,9 @@ class FitnessClassControllerIT {
     @Test
     void update_ShouldModifyFitnessClassAndVerifyAssociations() throws Exception {
         // Arrange
+        LocalDate date = LocalDate.now().plusDays(7);
         FitnessClassDto updateDto = new FitnessClassDto();
-        updateDto.setDate(LocalDate.of(2024, 12, 10));
+        updateDto.setDate(date);
         updateDto.setTime(LocalTime.of(12, 30));
         updateDto.setCapacity(5);
         updateDto.setInstructorId(2L); // Preloaded instructor
@@ -140,7 +141,7 @@ class FitnessClassControllerIT {
         // Verify update
         FitnessClass updatedClass = fitnessClassRepository.findById(1L)
                 .orElseThrow(() -> new AssertionError("FitnessClass not found in the database"));
-        assertEquals(LocalDate.of(2024, 12, 10), updatedClass.getDate());
+        assertEquals(date, updatedClass.getDate());
         assertEquals(LocalTime.of(12, 30), updatedClass.getTime());
         assertEquals(5, updatedClass.getCapacity());
         assertEquals(2L, updatedClass.getInstructor().getId());
