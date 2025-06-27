@@ -7,8 +7,7 @@ on:
       - '.github/workflows/**'
   pull_request:
     paths:
-      - 'backend/**'
-      - '.github/workflows/**'
+      - main
 
 jobs:
   build-and-test:
