@@ -1,5 +1,7 @@
 # FitnessApp (TJV Semestral Project)
 
+![Backend CI](https://github.com/<your-username>/fitnessApp/actions/workflows/backend.yml/badge.svg)
+
 > ⚠️ This project was created as part of coursework at **FIT CTU**  
 > Please **do not copy or submit** it as your own if you're a student at any university.  
 > Feel free to read and learn from it, but **plagiarism is a violation of academic integrity**.
